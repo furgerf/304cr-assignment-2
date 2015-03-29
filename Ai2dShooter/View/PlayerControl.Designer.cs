@@ -50,7 +50,7 @@
             this.grpName.Controls.Add(this.label2);
             this.grpName.Location = new System.Drawing.Point(6, 3);
             this.grpName.Name = "grpName";
-            this.grpName.Size = new System.Drawing.Size(228, 126);
+            this.grpName.Size = new System.Drawing.Size(163, 126);
             this.grpName.TabIndex = 0;
             this.grpName.TabStop = false;
             // 
@@ -59,7 +59,7 @@
             this.txtHealthyThreshold.Enabled = false;
             this.txtHealthyThreshold.Location = new System.Drawing.Point(119, 48);
             this.txtHealthyThreshold.Name = "txtHealthyThreshold";
-            this.txtHealthyThreshold.Size = new System.Drawing.Size(103, 20);
+            this.txtHealthyThreshold.Size = new System.Drawing.Size(37, 20);
             this.txtHealthyThreshold.TabIndex = 8;
             // 
             // label3
@@ -76,7 +76,7 @@
             this.txtHeadshot.Enabled = false;
             this.txtHeadshot.Location = new System.Drawing.Point(119, 100);
             this.txtHeadshot.Name = "txtHeadshot";
-            this.txtHeadshot.Size = new System.Drawing.Size(103, 20);
+            this.txtHeadshot.Size = new System.Drawing.Size(37, 20);
             this.txtHeadshot.TabIndex = 6;
             // 
             // txtDamage
@@ -84,7 +84,7 @@
             this.txtDamage.Enabled = false;
             this.txtDamage.Location = new System.Drawing.Point(119, 74);
             this.txtDamage.Name = "txtDamage";
-            this.txtDamage.Size = new System.Drawing.Size(103, 20);
+            this.txtDamage.Size = new System.Drawing.Size(37, 20);
             this.txtDamage.TabIndex = 5;
             // 
             // label1
@@ -100,7 +100,7 @@
             // 
             this.progressHealth.Location = new System.Drawing.Point(6, 19);
             this.progressHealth.Name = "progressHealth";
-            this.progressHealth.Size = new System.Drawing.Size(216, 23);
+            this.progressHealth.Size = new System.Drawing.Size(150, 23);
             this.progressHealth.TabIndex = 3;
             // 
             // label2
@@ -118,7 +118,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.grpName);
             this.Name = "PlayerControl";
-            this.Size = new System.Drawing.Size(240, 136);
+            this.Size = new System.Drawing.Size(174, 135);
             this.grpName.ResumeLayout(false);
             this.grpName.PerformLayout();
             this.ResumeLayout(false);

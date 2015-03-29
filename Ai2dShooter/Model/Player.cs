@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using System.Runtime.CompilerServices;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 using Ai2dShooter.Properties;

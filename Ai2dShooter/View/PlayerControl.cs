@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Windows.Forms;
+using Ai2dShooter.Common;
 using Ai2dShooter.Model;
 
 namespace Ai2dShooter.View
@@ -44,7 +45,7 @@ namespace Ai2dShooter.View
         {
             InitializeComponent();
 
-            _updateLocation = (oldPosition, newPosition) => grpName.Text = Player.Name + " - " + Player.Location;
+            _updateLocation = (oldPosition, newPosition) => grpName.Text = Player.Name + " - " + Player.Location + " - " + Utils.PlayerControllerNames[Player.Controller];
             _updateHealth = (oldHealth, newHealth) => progressHealth.Value = Player.Health;
         }
 
