@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 using Ai2dShooter.Model;
 
@@ -42,7 +43,9 @@ namespace Ai2dShooter.View
 
         private void DrawCanvas(object sender, PaintEventArgs e)
         {
-            Maze.DrawMaze(e.Graphics, 32);
+            Maze.DrawMaze(e.Graphics, Utils.ScaleFactor);
+            foreach (var p in _players)
+                p.DrawPlayer(e.Graphics, Utils.ScaleFactor);
         }
 
         #endregion

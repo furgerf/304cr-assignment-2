@@ -54,6 +54,7 @@ namespace Ai2dShooter.View
 
         private void UpdateControls()
         {
+            grpName.ForeColor = Player.Color;
             _updateLocation(null, null);
             _updateHealth(0, 0);
             txtHealthyThreshold.Text = Player.HealthyThreshold.ToString(CultureInfo.InvariantCulture);

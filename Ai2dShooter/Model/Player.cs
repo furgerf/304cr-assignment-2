@@ -1,3 +1,5 @@
+using System.Drawing;
+using System.Linq;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 using Ai2dShooter.Properties;
@@ -44,6 +46,9 @@ namespace Ai2dShooter.Model
         public string Name { get; private set; }
 
         private static readonly string[] PlayerNames = Resources.names.Split('\n');
+
+        private static Color[] PlayerColors = {Color.Red, Color.Green, Color.Indigo, Color.Magenta, Color.Olive, Color.Sienna, Color.Teal, Color.Black, Color.DarkRed };
+
         private int _health;
         private Cell _location;
 
@@ -62,6 +67,8 @@ namespace Ai2dShooter.Model
             }
         }
 
+        public Color Color { get; private set; }
+
         #endregion
 
         #region Constructor
@@ -75,6 +82,10 @@ namespace Ai2dShooter.Model
             HeadshotChance = ((double) Utils.Rnd.Next(2, 6))/20; // 10-25%
             Name = PlayerNames[Utils.Rnd.Next(PlayerNames.Length)];
             Location = initialLocation;
+            Color = PlayerColors[Utils.Rnd.Next(PlayerColors.Length)];
+            var remainingColors = PlayerColors.ToList();
+            remainingColors.Remove(Color);
+            PlayerColors = remainingColors.ToArray();
         }
 
         #endregion
@@ -83,7 +94,12 @@ namespace Ai2dShooter.Model
 
         public override string ToString()
         {
-            return Name + " (" + Health + "/100)";
+            return Name + " (" + Location + ")";
+        }
+
+        public void DrawPlayer(Graphics graphics, int scaleFactor)
+        {
+            graphics.FillEllipse(new SolidBrush(Color), Location.X * scaleFactor - 1, Location.Y * scaleFactor - 1, scaleFactor + 1, scaleFactor + 1);
         }
 
         #endregion
