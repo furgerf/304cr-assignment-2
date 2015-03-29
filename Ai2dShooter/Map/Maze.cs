@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using Ai2dShooter.Common;
 
@@ -54,6 +53,22 @@ namespace Ai2dShooter.Map
             }
         }
 
+        public Cell NorthCenterCorner
+        {
+            get
+            {
+                var offset = 0;
+                while (true)
+                {
+                    if (Cells[Width/2 + offset, 0].IsClear)
+                        return Cells[Width/2 + offset, 0];
+                    if (Cells[Width/2 - offset, 0].IsClear)
+                        return Cells[Width/2 - offset, 0];
+                    offset++;
+                }
+            }
+        }
+
         public Cell NorthEastCorner
         {
             get
@@ -85,6 +100,22 @@ namespace Ai2dShooter.Map
                         if (Cells[Width - 1 - i, Height - 1 - j].IsClear)
                             return Cells[Width - 1 - i, Height - 1 - j];
                     }
+                    offset++;
+                }
+            }
+        }
+
+        public Cell SouthCenterCorner
+        {
+            get
+            {
+                var offset = 0;
+                while (true)
+                {
+                    if (Cells[Width/2 + offset, Height - 1].IsClear)
+                        return Cells[Width/2 + offset, Height - 1];
+                    if (Cells[Width/2 - offset, Height - 1].IsClear)
+                        return Cells[Width/2 - offset, Height - 1];
                     offset++;
                 }
             }
