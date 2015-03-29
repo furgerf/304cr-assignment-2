@@ -143,6 +143,21 @@ namespace Ai2dShooter.Model
             graphics.DrawLine(new Pen(Color.Black, 4), orientationStart, orientationEnd);
         }
 
+        public bool CanMove(Direction direction)
+        {
+            var c = Location.GetNeighbor(direction);
+
+            return c != null && c.IsClear;
+        }
+
+        public void Move(Direction direction)
+        {
+            if (!CanMove(direction))
+                throw new ArgumentException("Illegal move in direction " + direction);
+
+            Location = Location.GetNeighbor(direction);
+        }
+
         #endregion
 
         #region Event Handling

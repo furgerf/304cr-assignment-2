@@ -29,12 +29,12 @@
         private void InitializeComponent()
         {
             this._canvas = new System.Windows.Forms.Panel();
+            this.playerControl6 = new Ai2dShooter.View.PlayerControl();
+            this.playerControl5 = new Ai2dShooter.View.PlayerControl();
             this.playerControl4 = new Ai2dShooter.View.PlayerControl();
             this.playerControl3 = new Ai2dShooter.View.PlayerControl();
             this.playerControl2 = new Ai2dShooter.View.PlayerControl();
             this.playerControl1 = new Ai2dShooter.View.PlayerControl();
-            this.playerControl5 = new Ai2dShooter.View.PlayerControl();
-            this.playerControl6 = new Ai2dShooter.View.PlayerControl();
             this.SuspendLayout();
             // 
             // _canvas
@@ -45,6 +45,22 @@
             this._canvas.Name = "_canvas";
             this._canvas.Size = new System.Drawing.Size(962, 482);
             this._canvas.TabIndex = 4;
+            // 
+            // playerControl6
+            // 
+            this.playerControl6.Location = new System.Drawing.Point(886, 12);
+            this.playerControl6.Name = "playerControl6";
+            this.playerControl6.Player = null;
+            this.playerControl6.Size = new System.Drawing.Size(240, 136);
+            this.playerControl6.TabIndex = 6;
+            // 
+            // playerControl5
+            // 
+            this.playerControl5.Location = new System.Drawing.Point(710, 12);
+            this.playerControl5.Name = "playerControl5";
+            this.playerControl5.Player = null;
+            this.playerControl5.Size = new System.Drawing.Size(240, 136);
+            this.playerControl5.TabIndex = 5;
             // 
             // playerControl4
             // 
@@ -78,22 +94,6 @@
             this.playerControl1.Size = new System.Drawing.Size(240, 136);
             this.playerControl1.TabIndex = 0;
             // 
-            // playerControl5
-            // 
-            this.playerControl5.Location = new System.Drawing.Point(710, 12);
-            this.playerControl5.Name = "playerControl5";
-            this.playerControl5.Player = null;
-            this.playerControl5.Size = new System.Drawing.Size(240, 136);
-            this.playerControl5.TabIndex = 5;
-            // 
-            // playerControl6
-            // 
-            this.playerControl6.Location = new System.Drawing.Point(886, 12);
-            this.playerControl6.Name = "playerControl6";
-            this.playerControl6.Player = null;
-            this.playerControl6.Size = new System.Drawing.Size(240, 136);
-            this.playerControl6.TabIndex = 6;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -106,6 +106,8 @@
             this.Controls.Add(this.playerControl3);
             this.Controls.Add(this.playerControl2);
             this.Controls.Add(this.playerControl1);
+            this.DoubleBuffered = true;
+            this.KeyPreview = true;
             this.Name = "MainForm";
             this.Text = "2D AI Shooter Thing";
             this.ResumeLayout(false);
