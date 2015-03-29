@@ -19,7 +19,7 @@ namespace Ai2dShooter.View
         {
             InitializeComponent();
 
-            Maze.CreateNew(10, 10);
+            Maze.CreateNew(30, 15);
             Maze.Instance.SaveMap("maze with path.png");
 
             _playerControls = new[] {playerControl1, playerControl2, playerControl3, playerControl4};
@@ -27,12 +27,17 @@ namespace Ai2dShooter.View
             for (var i = 0; i < _players.Length; i++)
                 _playerControls[i].Player = _players[i];
 
-
+            _canvas.Paint += DrawCanvas;
         }
 
         #endregion
 
         #region Methods
+
+        private void DrawCanvas(object sender, PaintEventArgs e)
+        {
+            Maze.DrawMaze(e.Graphics, 32);
+        }
 
         #endregion
 

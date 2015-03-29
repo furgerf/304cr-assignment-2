@@ -28,36 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.playerControl1 = new Ai2dShooter.View.PlayerControl();
-            this.playerControl2 = new Ai2dShooter.View.PlayerControl();
-            this.playerControl3 = new Ai2dShooter.View.PlayerControl();
-            this.playerControl4 = new Ai2dShooter.View.PlayerControl();
             this._canvas = new System.Windows.Forms.Panel();
+            this.playerControl4 = new Ai2dShooter.View.PlayerControl();
+            this.playerControl3 = new Ai2dShooter.View.PlayerControl();
+            this.playerControl2 = new Ai2dShooter.View.PlayerControl();
+            this.playerControl1 = new Ai2dShooter.View.PlayerControl();
             this.SuspendLayout();
             // 
-            // playerControl1
+            // _canvas
             // 
-            this.playerControl1.Location = new System.Drawing.Point(12, 12);
-            this.playerControl1.Name = "playerControl1";
-            this.playerControl1.Player = null;
-            this.playerControl1.Size = new System.Drawing.Size(240, 136);
-            this.playerControl1.TabIndex = 0;
-            // 
-            // playerControl2
-            // 
-            this.playerControl2.Location = new System.Drawing.Point(258, 12);
-            this.playerControl2.Name = "playerControl2";
-            this.playerControl2.Player = null;
-            this.playerControl2.Size = new System.Drawing.Size(240, 136);
-            this.playerControl2.TabIndex = 1;
-            // 
-            // playerControl3
-            // 
-            this.playerControl3.Location = new System.Drawing.Point(504, 12);
-            this.playerControl3.Name = "playerControl3";
-            this.playerControl3.Player = null;
-            this.playerControl3.Size = new System.Drawing.Size(240, 136);
-            this.playerControl3.TabIndex = 2;
+            this._canvas.BackColor = System.Drawing.Color.White;
+            this._canvas.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this._canvas.Location = new System.Drawing.Point(12, 154);
+            this._canvas.Name = "_canvas";
+            this._canvas.Size = new System.Drawing.Size(962, 482);
+            this._canvas.TabIndex = 4;
             // 
             // playerControl4
             // 
@@ -67,20 +52,35 @@
             this.playerControl4.Size = new System.Drawing.Size(240, 136);
             this.playerControl4.TabIndex = 3;
             // 
-            // _canvas
+            // playerControl3
             // 
-            this._canvas.BackColor = System.Drawing.Color.White;
-            this._canvas.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this._canvas.Location = new System.Drawing.Point(12, 154);
-            this._canvas.Name = "_canvas";
-            this._canvas.Size = new System.Drawing.Size(978, 461);
-            this._canvas.TabIndex = 4;
+            this.playerControl3.Location = new System.Drawing.Point(504, 12);
+            this.playerControl3.Name = "playerControl3";
+            this.playerControl3.Player = null;
+            this.playerControl3.Size = new System.Drawing.Size(240, 136);
+            this.playerControl3.TabIndex = 2;
+            // 
+            // playerControl2
+            // 
+            this.playerControl2.Location = new System.Drawing.Point(258, 12);
+            this.playerControl2.Name = "playerControl2";
+            this.playerControl2.Player = null;
+            this.playerControl2.Size = new System.Drawing.Size(240, 136);
+            this.playerControl2.TabIndex = 1;
+            // 
+            // playerControl1
+            // 
+            this.playerControl1.Location = new System.Drawing.Point(12, 12);
+            this.playerControl1.Name = "playerControl1";
+            this.playerControl1.Player = null;
+            this.playerControl1.Size = new System.Drawing.Size(240, 136);
+            this.playerControl1.TabIndex = 0;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1029, 627);
+            this.ClientSize = new System.Drawing.Size(1029, 643);
             this.Controls.Add(this._canvas);
             this.Controls.Add(this.playerControl4);
             this.Controls.Add(this.playerControl3);

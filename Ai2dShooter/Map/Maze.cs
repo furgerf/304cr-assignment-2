@@ -13,6 +13,17 @@ namespace Ai2dShooter.Map
     {
         #region Fields
 
+        public static Action<Graphics, int> DrawMaze = (g, scale) =>
+        {
+            for (var x = 0; x < Instance.Width; x++)
+            {
+                for (var y = 0; y < Instance.Height; y++)
+                {
+                    g.FillRectangle(Instance.Cells[x, y].IsWall ? Brushes.Black : Brushes.Orange, scale * x, scale * y, scale, scale);
+                }
+            }
+        };
+
         public int Width { get; private set; }
 
         public int Height { get; private set; }
@@ -134,18 +145,7 @@ namespace Ai2dShooter.Map
         public void SaveMap(String filename)
         {
             var bitmap = new Bitmap(2*Width + 2, 2*Height + 2);
-            using (var graphics = Graphics.FromImage(bitmap))
-            {
-                graphics.DrawRectangle(Pens.Brown, 0, 0, 2*Width + 1, 2*Height + 1);
-                for (var x = 0; x < Width; x++)
-                {
-                    for (var y = 0; y < Height; y++)
-                    {
-                        if (Cells[x, y].IsWall)
-                            graphics.DrawRectangle(Pens.Black, 2*x + 1, 2*y + 1, 1, 1);
-                    }
-                }
-            }
+            DrawMaze(Graphics.FromImage(bitmap), 2);
             bitmap.Save(filename);
         }
 
