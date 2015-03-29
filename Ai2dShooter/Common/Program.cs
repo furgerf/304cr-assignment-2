@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Ai2dShooter.View;
 
-namespace Ai2dShooter
+namespace Ai2dShooter.Common
 {
     static class Program
     {
@@ -16,7 +14,7 @@ namespace Ai2dShooter
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new MainForm());
         }
     }
 }
