@@ -155,6 +155,8 @@ namespace Ai2dShooter.Model
             if (!CanMove(direction))
                 throw new ArgumentException("Illegal move in direction " + direction);
 
+            // assign to backing field because locationchanged will be triggered when updating location
+            _orientation = direction;
             Location = Location.GetNeighbor(direction);
         }
 

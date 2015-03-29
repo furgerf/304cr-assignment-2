@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Ai2dShooter.Common;
@@ -88,6 +89,21 @@ namespace Ai2dShooter.View
             Maze.DrawMaze(e.Graphics, Utils.ScaleFactor);
             foreach (var p in _players)
                 p.DrawPlayer(e.Graphics, Utils.ScaleFactor);
+            DrawFog(e.Graphics);
+        }
+
+        private void DrawFog(Graphics graphics)
+        {
+            if (!HasHumanPlayer)
+                return;
+
+            for (var x = 0; x < Maze.Instance.Width; x++)
+                for (var y = 0; y < Maze.Instance.Height; y++)
+                    if (HumanPlayer.Location.GetManhattenDistance(x, y) > Utils.Visibility)
+                        graphics.FillRectangle(new SolidBrush(Color.FromArgb(127, 0, 0, 0)),
+                            new Rectangle(x*Utils.ScaleFactor - 1, y*Utils.ScaleFactor - 1,
+                                Utils.ScaleFactor + 1,
+                                Utils.ScaleFactor + 1));
         }
 
         #endregion

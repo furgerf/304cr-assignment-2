@@ -58,6 +58,16 @@ namespace Ai2dShooter.Map
             }
         }
 
+        public int GetManhattenDistance(Cell other)
+        {
+            return GetManhattenDistance(other.X, other.Y);
+        }
+
+        public int GetManhattenDistance(int x, int y)
+        {
+            return Math.Abs(x - X) + Math.Abs(y - Y);
+        }
+
         public bool Equals(Cell other)
         {
             return X == other.X && Y == other.Y;

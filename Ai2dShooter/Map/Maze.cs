@@ -19,7 +19,7 @@ namespace Ai2dShooter.Map
             {
                 for (var y = 0; y < Instance.Height; y++)
                 {
-                    g.FillRectangle(Instance.Cells[x, y].IsWall ? Brushes.Black : Brushes.Orange, scale * x, scale * y, scale, scale);
+                    g.FillRectangle(Instance.Cells[x, y].IsWall ? Brushes.Black : Brushes.BurlyWood, scale * x, scale * y, scale, scale);
                 }
             }
         };
