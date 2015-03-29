@@ -101,9 +101,9 @@ namespace Ai2dShooter.View
                 for (var y = 0; y < Maze.Instance.Height; y++)
                     if (HumanPlayer.Location.GetManhattenDistance(x, y) > Utils.Visibility)
                         graphics.FillRectangle(new SolidBrush(Color.FromArgb(127, 0, 0, 0)),
-                            new Rectangle(x*Utils.ScaleFactor - 1, y*Utils.ScaleFactor - 1,
-                                Utils.ScaleFactor + 1,
-                                Utils.ScaleFactor + 1));
+                            new Rectangle(x*Utils.ScaleFactor, y*Utils.ScaleFactor,
+                                Utils.ScaleFactor,
+                                Utils.ScaleFactor));
         }
 
         #endregion
@@ -115,13 +115,13 @@ namespace Ai2dShooter.View
             if (!HasHumanPlayer)
                 return;
 
-            if (e.KeyCode == Keys.Up && HumanPlayer.CanMove(Direction.North))
+            if (e.KeyCode == Keys.W && HumanPlayer.CanMove(Direction.North))
                 HumanPlayer.Move(Direction.North);
-            if (e.KeyCode == Keys.Right && HumanPlayer.CanMove(Direction.East))
+            if (e.KeyCode == Keys.D && HumanPlayer.CanMove(Direction.East))
                 HumanPlayer.Move(Direction.East);
-            if (e.KeyCode == Keys.Down && HumanPlayer.CanMove(Direction.South))
+            if (e.KeyCode == Keys.S && HumanPlayer.CanMove(Direction.South))
                 HumanPlayer.Move(Direction.South);
-            if (e.KeyCode == Keys.Left && HumanPlayer.CanMove(Direction.West))
+            if (e.KeyCode == Keys.A && HumanPlayer.CanMove(Direction.West))
                 HumanPlayer.Move(Direction.West);
         }
 
