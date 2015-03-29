@@ -75,7 +75,6 @@ namespace Ai2dShooter.Map
         {
             // initialize variables
             var cellVisited = new bool[Width, Height];
-            var random = new Random();
             var openCells = new Stack<Cell>();
             var cellDirections = new List<Direction>();
 
@@ -103,7 +102,7 @@ namespace Ai2dShooter.Map
                 if (cellDirections.Any())
                 {
                     // pick random neighbor to move to
-                    var direction = cellDirections[random.Next(cellDirections.Count)];
+                    var direction = cellDirections[Utils.Rnd.Next(cellDirections.Count)];
                     var directionCell = cell.GetNeighbor(direction);
 
                     // move to neighbor
@@ -119,7 +118,7 @@ namespace Ai2dShooter.Map
                     {
                         // if we have more than one other neighbor, randomly mark one as visited
                         // to ensure it stays a wall
-                        var neihbor = cell.GetNeighbor(otherDirections[random.Next(otherDirections.Length)]);
+                        var neihbor = cell.GetNeighbor(otherDirections[Utils.Rnd.Next(otherDirections.Length)]);
                         cellVisited[neihbor.X, neihbor.Y] = true;
                     }
                 }
