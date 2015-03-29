@@ -6,6 +6,15 @@ namespace Ai2dShooter.View
 {
     public partial class MainForm : Form
     {
+        #region Fields
+
+        private readonly Player[] _players = {new Player(), new Player(), new Player(), new Player()};
+
+        private readonly PlayerControl[] _playerControls;
+
+        #endregion
+
+        #region Constructor
         public MainForm()
         {
             InitializeComponent();
@@ -13,7 +22,22 @@ namespace Ai2dShooter.View
             Maze.CreateNew(10, 10);
             Maze.Instance.SaveMap("maze with path.png");
 
-            var p = new Player();
+            _playerControls = new[] {playerControl1, playerControl2, playerControl3, playerControl4};
+
+            for (var i = 0; i < _players.Length; i++)
+                _playerControls[i].Player = _players[i];
+
+
         }
+
+        #endregion
+
+        #region Methods
+
+        #endregion
+
+        #region Event Handling
+
+        #endregion
     }
 }

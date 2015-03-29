@@ -1,5 +1,3 @@
-using System.IO;
-using System.Reflection;
 using Ai2dShooter.Common;
 using Ai2dShooter.Properties;
 
@@ -30,9 +28,9 @@ namespace Ai2dShooter.Model
         {
             Health = 100;
             HealthyThreshold = Utils.Rnd.Next(10, 50);
-            BackDamage = Utils.Rnd.Next(25, 75);
-            FrontDamage = Utils.Rnd.Next(25, BackDamage);
-            HeadshotChance = ((double) Utils.Rnd.Next(1, 4))/10;
+            BackDamage = Utils.Rnd.Next(35, 75);
+            FrontDamage = Utils.Rnd.Next(35, BackDamage);
+            HeadshotChance = ((double) Utils.Rnd.Next(2, 6))/20; // 10-25%
             Name = PlayerNames[Utils.Rnd.Next(PlayerNames.Length)];
         }
 
