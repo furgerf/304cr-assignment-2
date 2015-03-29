@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using Ai2dShooter.Common;
 
@@ -34,6 +35,78 @@ namespace Ai2dShooter.Map
         /// Singleton instance
         /// </summary>
         public static Maze Instance { get; private set; }
+
+        public Cell NorthWestCorner
+        {
+            get
+            {
+                var offset = 0;
+                while (true)
+                {
+                    for (var i = 0; i <= offset; i++)
+                    {
+                        var j = offset - i;
+                        if (Cells[i, j].IsClear)
+                            return Cells[i, j];
+                    }
+                    offset++;
+                }
+            }
+        }
+
+        public Cell NorthEastCorner
+        {
+            get
+            {
+                var offset = 0;
+                while (true)
+                {
+                    for (var i = 0; i <= offset; i++)
+                    {
+                        var j = offset - i;
+                        if (Cells[Width - 1 - i, j].IsClear)
+                            return Cells[Width - 1 - i, j];
+                    }
+                    offset++;
+                }
+            }
+        }
+
+        public Cell SouthEastCorner
+        {
+            get
+            {
+                var offset = 0;
+                while (true)
+                {
+                    for (var i = 0; i <= offset; i++)
+                    {
+                        var j = offset - i;
+                        if (Cells[Width - 1 - i, Height - 1 - j].IsClear)
+                            return Cells[Width - 1 - i, Height - 1 - j];
+                    }
+                    offset++;
+                }
+            }
+        }
+
+        public Cell SouthWestCorner
+        {
+            get
+            {
+                var offset = 0;
+                while (true)
+                {
+                    for (var i = 0; i <= offset; i++)
+                    {
+                        var j = offset - i;
+                        if (Cells[i, Height - 1 - j].IsClear)
+                            return Cells[i, Height - 1 - j];
+                    }
+                    offset++;
+                }
+            }
+        }
 
         #endregion
 

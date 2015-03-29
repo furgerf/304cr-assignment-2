@@ -8,7 +8,7 @@ namespace Ai2dShooter.View
     {
         #region Fields
 
-        private readonly Player[] _players = {new Player(), new Player(), new Player(), new Player()};
+        private readonly Player[] _players;
 
         private readonly PlayerControl[] _playerControls;
 
@@ -19,14 +19,20 @@ namespace Ai2dShooter.View
         {
             InitializeComponent();
 
+            // setup map
             Maze.CreateNew(30, 15);
             Maze.Instance.SaveMap("maze with path.png");
 
-            _playerControls = new[] {playerControl1, playerControl2, playerControl3, playerControl4};
+            // setup players
+            _players = new[] {new Player(Maze.Instance.NorthWestCorner), new Player(Maze.Instance.NorthEastCorner), 
+            new Player(Maze.Instance.SouthEastCorner), new Player(Maze.Instance.SouthWestCorner)};
 
+            // setup player controls
+            _playerControls = new[] {playerControl1, playerControl2, playerControl3, playerControl4};
             for (var i = 0; i < _players.Length; i++)
                 _playerControls[i].Player = _players[i];
 
+            // setup drawing
             _canvas.Paint += DrawCanvas;
         }
 

@@ -13,6 +13,8 @@ namespace Ai2dShooter.Map
 
         public bool IsWall;
 
+        public bool IsClear { get { return !IsWall; } }
+
         // neighbors
         public Cell West { get { return X > 0 ? Maze.Instance.Cells[X - 1, Y] : null; } }
         public Cell East { get { return X < Maze.Instance.Width - 1 ? Maze.Instance.Cells[X + 1, Y] : null; } }
