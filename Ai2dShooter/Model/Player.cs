@@ -1,5 +1,6 @@
+using System;
 using System.Drawing;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 using Ai2dShooter.Properties;
@@ -47,10 +48,9 @@ namespace Ai2dShooter.Model
 
         private static readonly string[] PlayerNames = Resources.names.Split('\n');
 
-        private static Color[] PlayerColors = {Color.Red, Color.Green, Color.Indigo, Color.Magenta, Color.Olive, Color.Sienna, Color.Teal, Color.Black, Color.DarkRed };
-
         private int _health;
         private Cell _location;
+        private Direction _orientation;
 
         public Cell Location
         {
@@ -69,12 +69,31 @@ namespace Ai2dShooter.Model
 
         public Color Color { get; private set; }
 
+        public Teams Team { get; private set; }
+
+        public PlayerController Controller { get; private set; }
+
+        public Direction Orientation
+        {
+            get { return _orientation; }
+            set
+            {
+                if (_orientation == value) return;
+
+                _orientation = value;
+
+                if (LocationChanged != null)
+                    LocationChanged(Location, Location);
+            }
+        }
+
         #endregion
 
         #region Constructor
 
-        public Player(Cell initialLocation)
+        public Player(Cell initialLocation, PlayerController controller, Teams team)
         {
+            Team = team;
             Health = 100;
             HealthyThreshold = Utils.Rnd.Next(10, 50);
             BackDamage = Utils.Rnd.Next(35, 75);
@@ -82,10 +101,9 @@ namespace Ai2dShooter.Model
             HeadshotChance = ((double) Utils.Rnd.Next(2, 6))/20; // 10-25%
             Name = PlayerNames[Utils.Rnd.Next(PlayerNames.Length)];
             Location = initialLocation;
-            Color = PlayerColors[Utils.Rnd.Next(PlayerColors.Length)];
-            var remainingColors = PlayerColors.ToList();
-            remainingColors.Remove(Color);
-            PlayerColors = remainingColors.ToArray();
+            Color = Utils.GetTeamColor(team);
+            Controller = controller;
+            Orientation = (Direction)Utils.Rnd.Next((int)Direction.Count);
         }
 
         #endregion
@@ -99,7 +117,31 @@ namespace Ai2dShooter.Model
 
         public void DrawPlayer(Graphics graphics, int scaleFactor)
         {
-            graphics.FillEllipse(new SolidBrush(Color), Location.X * scaleFactor - 1, Location.Y * scaleFactor - 1, scaleFactor + 1, scaleFactor + 1);
+            var box = new Rectangle(Location.X*scaleFactor - 1, Location.Y*scaleFactor - 1, scaleFactor + 1,
+                scaleFactor + 1);
+
+            var orientationStart = new Point(box.Left + box.Width/2, box.Top + box.Height/2);
+            Point orientationEnd;
+            switch (Orientation)
+            {
+                case Direction.North:
+                    orientationEnd = new Point((box.Left + box.Right) / 2, box.Top);
+                    break;
+                case Direction.East:
+                    orientationEnd = new Point(box.Right, (box.Bottom + box.Top) / 2);
+                    break;
+                case Direction.South:
+                    orientationEnd = new Point((box.Left + box.Right) / 2, box.Bottom);
+                    break;
+                case Direction.West:
+                    orientationEnd = new Point(box.Left, (box.Bottom + box.Top) / 2);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            graphics.FillEllipse(new SolidBrush(Color), box);
+            graphics.DrawLine(new Pen(Color.Black, 4), orientationStart, orientationEnd);
         }
 
         #endregion

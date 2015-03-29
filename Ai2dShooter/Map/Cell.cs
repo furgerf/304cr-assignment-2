@@ -95,7 +95,7 @@ namespace Ai2dShooter.Map
 
         public override string ToString()
         {
-            return "(" + X + "/" + Y + ") - " + (IsWall ? "Wall" : "Clear");
+            return "(" + X + "/" + Y + ")";
         }
 
         #endregion
