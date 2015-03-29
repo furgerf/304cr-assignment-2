@@ -59,7 +59,7 @@ namespace Ai2dShooter.View
             for (var i = 0; i < _players.Length; i++)
             {
                 playerControls[i].Player = _players[i];
-                _players[i].LocationChanged += (c, d) => _canvas.Invalidate();
+                _players[i].LocationChanged += () => _canvas.Invalidate();
             }
 
             // setup drawing
@@ -86,9 +86,9 @@ namespace Ai2dShooter.View
 
         private void DrawCanvas(object sender, PaintEventArgs e)
         {
-            Maze.DrawMaze(e.Graphics, Utils.ScaleFactor);
+            Maze.DrawMaze(e.Graphics, Constants.ScaleFactor);
             foreach (var p in _players)
-                p.DrawPlayer(e.Graphics, Utils.ScaleFactor);
+                p.DrawPlayer(e.Graphics, Constants.ScaleFactor);
             DrawFog(e.Graphics);
         }
 
@@ -99,11 +99,11 @@ namespace Ai2dShooter.View
 
             for (var x = 0; x < Maze.Instance.Width; x++)
                 for (var y = 0; y < Maze.Instance.Height; y++)
-                    if (HumanPlayer.Location.GetManhattenDistance(x, y) > Utils.Visibility)
+                    if (HumanPlayer.Location.GetManhattenDistance(x, y) > Constants.Visibility)
                         graphics.FillRectangle(new SolidBrush(Color.FromArgb(127, 0, 0, 0)),
-                            new Rectangle(x*Utils.ScaleFactor, y*Utils.ScaleFactor,
-                                Utils.ScaleFactor,
-                                Utils.ScaleFactor));
+                            new Rectangle(x*Constants.ScaleFactor, y*Constants.ScaleFactor,
+                                Constants.ScaleFactor,
+                                Constants.ScaleFactor));
         }
 
         #endregion
@@ -115,13 +115,14 @@ namespace Ai2dShooter.View
             if (!HasHumanPlayer)
                 return;
 
-            if (e.KeyCode == Keys.W && HumanPlayer.CanMove(Direction.North))
+            // arrow keys/wasd for player movement
+            if ((e.KeyCode == Keys.W || e.KeyCode == Keys.Up) && HumanPlayer.CanMove(Direction.North))
                 HumanPlayer.Move(Direction.North);
-            if (e.KeyCode == Keys.D && HumanPlayer.CanMove(Direction.East))
+            if ((e.KeyCode == Keys.D || e.KeyCode == Keys.Right) && HumanPlayer.CanMove(Direction.East))
                 HumanPlayer.Move(Direction.East);
-            if (e.KeyCode == Keys.S && HumanPlayer.CanMove(Direction.South))
+            if ((e.KeyCode == Keys.S || e.KeyCode == Keys.Down) && HumanPlayer.CanMove(Direction.South))
                 HumanPlayer.Move(Direction.South);
-            if (e.KeyCode == Keys.A && HumanPlayer.CanMove(Direction.West))
+            if ((e.KeyCode == Keys.A || e.KeyCode == Keys.Left) && HumanPlayer.CanMove(Direction.West))
                 HumanPlayer.Move(Direction.West);
         }
 

@@ -35,6 +35,7 @@ namespace Ai2dShooter.Map
         /// </summary>
         public static Maze Instance { get; private set; }
 
+        // corners
         public Cell NorthWestCorner
         {
             get
@@ -52,7 +53,6 @@ namespace Ai2dShooter.Map
                 }
             }
         }
-
         public Cell NorthCenterCorner
         {
             get
@@ -68,7 +68,6 @@ namespace Ai2dShooter.Map
                 }
             }
         }
-
         public Cell NorthEastCorner
         {
             get
@@ -86,7 +85,6 @@ namespace Ai2dShooter.Map
                 }
             }
         }
-
         public Cell SouthEastCorner
         {
             get
@@ -104,7 +102,6 @@ namespace Ai2dShooter.Map
                 }
             }
         }
-
         public Cell SouthCenterCorner
         {
             get
@@ -120,7 +117,6 @@ namespace Ai2dShooter.Map
                 }
             }
         }
-
         public Cell SouthWestCorner
         {
             get
@@ -217,7 +213,7 @@ namespace Ai2dShooter.Map
                 if (cellDirections.Any())
                 {
                     // pick random neighbor to move to
-                    var direction = cellDirections[Utils.Rnd.Next(cellDirections.Count)];
+                    var direction = cellDirections[Constants.Rnd.Next(cellDirections.Count)];
                     var directionCell = cell.GetNeighbor(direction);
 
                     // move to neighbor
@@ -233,7 +229,7 @@ namespace Ai2dShooter.Map
                     {
                         // if we have more than one other neighbor, randomly mark one as visited
                         // to ensure it stays a wall
-                        var neihbor = cell.GetNeighbor(otherDirections[Utils.Rnd.Next(otherDirections.Length)]);
+                        var neihbor = cell.GetNeighbor(otherDirections[Constants.Rnd.Next(otherDirections.Length)]);
                         cellVisited[neihbor.X, neihbor.Y] = true;
                     }
                 }

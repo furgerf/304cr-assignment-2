@@ -10,12 +10,10 @@ namespace Ai2dShooter.Model
     {
         #region Events
 
-        public delegate void OnHealthChanged(int oldHealth, int newHealth);
-
+        public delegate void OnHealthChanged();
         public event OnHealthChanged HealthChanged;
 
-        public delegate void OnLocationChanged(Cell oldPosition, Cell newPosition);
-
+        public delegate void OnLocationChanged();
         public event OnLocationChanged LocationChanged;
 
         #endregion
@@ -28,11 +26,13 @@ namespace Ai2dShooter.Model
             set
             {
                 if (_health == value) return;
-                var oldHealth = Health;
+             
+                // update value
                 _health = value;
                 
+                // trigger event
                 if (HealthChanged != null)
-                    HealthChanged(oldHealth, Health);
+                    HealthChanged();
             }
         }
 
@@ -57,12 +57,13 @@ namespace Ai2dShooter.Model
             set
             {
                 if (_location == value) return;
-                // TODO: Maybe some value validation?
-                var oldLocation = Location;
+
+                // update value
                 _location = value;
 
+                // trigger event
                 if (LocationChanged != null)
-                    LocationChanged(oldLocation, Location);
+                    LocationChanged();
             }
         }
 
@@ -79,10 +80,12 @@ namespace Ai2dShooter.Model
             {
                 if (_orientation == value) return;
 
+                // update value
                 _orientation = value;
 
+                // trigger event
                 if (LocationChanged != null)
-                    LocationChanged(Location, Location);
+                    LocationChanged();
             }
         }
 
@@ -94,15 +97,15 @@ namespace Ai2dShooter.Model
         {
             Team = team;
             Health = 100;
-            HealthyThreshold = Utils.Rnd.Next(10, 50);
-            BackDamage = Utils.Rnd.Next(35, 75);
-            FrontDamage = Utils.Rnd.Next(35, BackDamage);
-            HeadshotChance = ((double) Utils.Rnd.Next(2, 6))/20; // 10-25%
-            Name = PlayerNames[Utils.Rnd.Next(PlayerNames.Length)];
+            HealthyThreshold = Constants.Rnd.Next(10, 50);
+            BackDamage = Constants.Rnd.Next(35, 75);
+            FrontDamage = Constants.Rnd.Next(35, BackDamage);
+            HeadshotChance = ((double) Constants.Rnd.Next(2, 6))/20; // 10-25%
+            Name = PlayerNames[Constants.Rnd.Next(PlayerNames.Length)];
             Location = initialLocation;
             Color = Utils.GetTeamColor(team);
             Controller = controller;
-            Orientation = (Direction)Utils.Rnd.Next((int)Direction.Count);
+            Orientation = (Direction)Constants.Rnd.Next((int)Direction.Count);
         }
 
         #endregion
@@ -116,10 +119,17 @@ namespace Ai2dShooter.Model
 
         public void DrawPlayer(Graphics graphics, int scaleFactor)
         {
+            // box in which to draw the player
             var box = new Rectangle(Location.X*scaleFactor - 1, Location.Y*scaleFactor - 1, scaleFactor + 1,
                 scaleFactor + 1);
 
+            // draw player circle
+            graphics.FillEllipse(new SolidBrush(Color), box);
+
+            // start of the orientation line
             var orientationStart = new Point(box.Left + box.Width/2, box.Top + box.Height/2);
+
+            // get end of the orientation line (depending on orientation)
             Point orientationEnd;
             switch (Orientation)
             {
@@ -139,7 +149,7 @@ namespace Ai2dShooter.Model
                     throw new ArgumentOutOfRangeException();
             }
 
-            graphics.FillEllipse(new SolidBrush(Color), box);
+            // draw orientation line
             graphics.DrawLine(new Pen(Color.Black, 4), orientationStart, orientationEnd);
         }
 

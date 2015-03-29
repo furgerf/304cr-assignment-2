@@ -16,13 +16,14 @@ namespace Ai2dShooter.View
             {
                 if (Player == value) return;
 
+                // unregister events of old player
                 if (Player != null)
-                {
                     UnregisterEvents(Player);
-                }
 
+                // update value
                 _player = value;
 
+                // register events of new player
                 if (Player != null)
                 {
                     UpdateControls();
@@ -33,8 +34,14 @@ namespace Ai2dShooter.View
 
         private Player _player;
 
+        /// <summary>
+        /// Called when the player's location changes.
+        /// </summary>
         private readonly Player.OnLocationChanged _updateLocation;
 
+        /// <summary>
+        /// Called when the player's health changes.
+        /// </summary>
         private readonly Player.OnHealthChanged _updateHealth;
 
         #endregion
@@ -45,19 +52,23 @@ namespace Ai2dShooter.View
         {
             InitializeComponent();
 
-            _updateLocation = (oldPosition, newPosition) => grpName.Text = Player.Name + " - " + Player.Location + " - " + Utils.PlayerControllerNames[Player.Controller];
-            _updateHealth = (oldHealth, newHealth) => progressHealth.Value = Player.Health;
+            // assign event handlers
+            _updateLocation = () => grpName.Text = Player.Name + " - " + Player.Location + " - " + Constants.PlayerControllerNames[Player.Controller];
+            _updateHealth = () => progressHealth.Value = Player.Health;
         }
 
         #endregion
 
         #region Methods
 
+        /// <summary>
+        /// Updates the controls to reflect the player's current status.
+        /// </summary>
         private void UpdateControls()
         {
             grpName.ForeColor = Player.Color;
-            _updateLocation(null, null);
-            _updateHealth(0, 0);
+            _updateLocation();
+            _updateHealth();
             txtHealthyThreshold.Text = Player.HealthyThreshold.ToString(CultureInfo.InvariantCulture);
             txtDamage.Text = Player.FrontDamage + "/" + Player.BackDamage;
             txtHeadshot.Text = Player.HeadshotChance*100 + "%";
