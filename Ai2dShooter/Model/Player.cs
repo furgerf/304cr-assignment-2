@@ -194,11 +194,11 @@ namespace Ai2dShooter.Model
 
         public void DrawPlayer(Graphics graphics, int scaleFactor)
         {
-            // box in which to draw the player
+            // box in which to draw the opponent
             var box = new Rectangle((int)((Location.X+_locationOffset.X)*scaleFactor) - 1, (int)((Location.Y + _locationOffset.Y)*scaleFactor) - 1, scaleFactor + 1,
                 scaleFactor + 1);
 
-            // draw player circle
+            // draw opponent circle
             graphics.FillEllipse(new SolidBrush(Color), box);
 
             // start of the orientation line
@@ -227,7 +227,7 @@ namespace Ai2dShooter.Model
             // draw orientation line
             graphics.DrawLine(new Pen(Color.Black, 4), orientationStart, orientationEnd);
 
-            // draw player visibility range
+            // draw opponent visibility range
             if (Controller != PlayerController.Human)
             {
                 for (var x = Location.X - Constants.Visibility < 0 ? 0 : Location.X - Constants.Visibility; x <= (Location.X + Constants.Visibility > Maze.Instance.Width - 1 ? Maze.Instance.Width - 1 : Location.X + Constants.Visibility); x++)
@@ -274,15 +274,27 @@ namespace Ai2dShooter.Model
 
         public abstract void EnemySpotted();
 
-        public void Damage(Player player, int damage)
+        public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot)
         {
             // reduce life
-            Health -= damage;
+            Health -= damage <= Health ? damage : Health;
 
             // turn opponent towards "me"
-            Orientation = Location.GetDirection(player.Location);
+            Orientation = Location.GetDirection(opponent.Location);
 
-            Console.WriteLine(this + " has taken " + damage + " damage from " + player);
+            Console.WriteLine(this + " has taken " + damage + " damage from " + opponent + " from " + (frontalAttack ? "the front" : "the back") + (headshot ? ", it was a HEADSHOT!" : ""));
+
+            // retaliate!
+            if (Health == 0)
+            {
+                Console.WriteLine(this + " has died!");
+                return;
+            }
+
+            Thread.Sleep(Constants.AiMoveTimeout);
+
+            var hs = Constants.Rnd.Next() < HeadshotChance;
+            opponent.Damage(this, FrontDamage * (hs ? 2 : 1), true, hs);
         }
         #endregion
 

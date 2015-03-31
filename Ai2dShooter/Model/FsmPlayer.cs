@@ -53,7 +53,8 @@ namespace Ai2dShooter.Model
             switch (_state)
             {
                 case State.SeekEnemy:
-                    // attack as well!
+                    // attack as well
+                    _state = State.Attack;
                     break;
                 case State.Attack:
                     // attack still?
@@ -102,7 +103,7 @@ namespace Ai2dShooter.Model
                     throw new ArgumentOutOfRangeException();
             }
 
-            Thread.Sleep(Constants.AiMoveTimeout * 100);
+            Thread.Sleep(Constants.AiMoveTimeout);
         }
 
         #endregion

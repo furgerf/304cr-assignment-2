@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.Remoting.Messaging;
 using Ai2dShooter.Common;
 using Ai2dShooter.Model;
 
@@ -70,11 +71,10 @@ namespace Ai2dShooter.Controller
                     // if so, start shooting...
                     player.EnemySpotted();
 
-                    // check whether the other player can see us too
-                    if (opponent.Location.GetDirection(player.Location) == opponent.Orientation)
-                        opponent.Damage(player, player.FrontDamage * (Constants.Rnd.Next() < player.HeadshotChance ? 2 : 1));
-                    else
-                        opponent.Damage(player, player.BackDamage * (Constants.Rnd.Next() < player.HeadshotChance ? 2 : 1));
+                    var headshot = Constants.Rnd.Next() < player.HeadshotChance;
+                    var frontalAttack = opponent.Location.GetDirection(player.Location) == opponent.Orientation;
+
+                    opponent.Damage(player, (frontalAttack ? player.FrontDamage : player.BackDamage) * (headshot ? 2 : 1), frontalAttack, headshot);
                 }
             }
         }

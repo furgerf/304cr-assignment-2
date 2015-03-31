@@ -17,6 +17,6 @@ namespace Ai2dShooter.Common
 
         public const int MsPerCell = 200;
 
-        public const int AiMoveTimeout = 10;
+        public const int AiMoveTimeout = 1000;
     }
 }
