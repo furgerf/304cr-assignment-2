@@ -110,6 +110,7 @@
             this.KeyPreview = true;
             this.Name = "MainForm";
             this.Text = "2D AI Shooter Thing";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.ResumeLayout(false);
 
         }

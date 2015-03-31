@@ -112,6 +112,53 @@ namespace Ai2dShooter.Model
             Color = Utils.GetTeamColor(team);
             Controller = controller;
             Orientation = (Direction)Constants.Rnd.Next((int)Direction.Count);
+
+            // start movement thread
+            new Thread(() =>
+            {
+                // loop while application is running
+                while (MainForm.IsRunning)
+                {
+                    // zzzzzzzzZZZZZZZZZZzzzzzz
+                    if (!_isMoving)
+                    {
+                        Thread.Sleep(Constants.Framerate);
+                        continue;
+                    }
+
+                    // get offset in right direction
+                    PointF stepOffset = Utils.GetDirectionPoint(_orientation);
+                    // divide offset to get offset for single step
+                    stepOffset = new PointF(stepOffset.X/Constants.Framerate, stepOffset.Y/Constants.Framerate);
+
+                    // do half the steps
+                    for (var i = 0; i < Constants.Framerate/2; i++)
+                    {
+                        _locationOffset.X += stepOffset.X;
+                        _locationOffset.Y += stepOffset.Y;
+                        Thread.Sleep(Constants.MsPerCell/Constants.Framerate);
+                    }
+
+                    // move to next cell
+                    _locationOffset.X = -_locationOffset.X;
+                    _locationOffset.Y = -_locationOffset.Y;
+                    Location = Location.GetNeighbor(_orientation);
+
+                    // do other half of the steps
+                    for (var i = 0; i < Constants.Framerate/2; i++)
+                    {
+                        _locationOffset.X += stepOffset.X;
+                        _locationOffset.Y += stepOffset.Y;
+                        Thread.Sleep(Constants.MsPerCell/Constants.Framerate);
+                    }
+
+                    // clear offset
+                    _locationOffset = Point.Empty;
+
+                    // stop moving
+                    _isMoving = false;
+                }
+            }).Start();
         }
 
         #endregion
@@ -125,11 +172,6 @@ namespace Ai2dShooter.Model
 
         public void DrawPlayer(Graphics graphics, int scaleFactor)
         {
-            //if (Math.Abs(_locationOffset.X) > 1)
-            //    _locationOffset.X = Math.Sign(_locationOffset.X);
-            //if (Math.Abs(_locationOffset.Y) > 1)
-            //    _locationOffset.Y = Math.Sign(_locationOffset.Y);
-
             // box in which to draw the player
             var box = new Rectangle((int)((Location.X+_locationOffset.X)*scaleFactor) - 1, (int)((Location.Y + _locationOffset.Y)*scaleFactor) - 1, scaleFactor + 1,
                 scaleFactor + 1);
@@ -176,40 +218,15 @@ namespace Ai2dShooter.Model
             if (!CanMove(direction))
                 throw new ArgumentException("Illegal move in direction " + direction);
 
+            // abort if we're already moving
             if (_isMoving)
                 return;
-            _isMoving = true;
 
             // assign to backing field because locationchanged will be triggered when updating location
             _orientation = direction;
 
-            new Thread(() =>
-            {
-                PointF stepOffset = Utils.GetDirectionPoint(direction);
-                stepOffset = new PointF(stepOffset.X / Constants.MovementFps, stepOffset.Y / Constants.MovementFps);
-
-                for (var i = 0; i < Constants.MovementFps/2; i++)
-                {
-                    _locationOffset.X += stepOffset.X;
-                    _locationOffset.Y += stepOffset.Y;
-                    MainForm.Instance.Redraw();
-                    Thread.Sleep(Constants.MsPerCell / Constants.MovementFps);
-                }
-                _locationOffset.X = -_locationOffset.X;
-                _locationOffset.Y = -_locationOffset.Y;
-                Location = Location.GetNeighbor(direction);
-                for (var i = 0; i < Constants.MovementFps / 2; i++)
-                {
-                    _locationOffset.X += stepOffset.X;
-                    _locationOffset.Y += stepOffset.Y;
-                    MainForm.Instance.Redraw();
-                    Thread.Sleep(Constants.MsPerCell / Constants.MovementFps);
-                }
-
-                _locationOffset = Point.Empty;
-
-                _isMoving = false;
-            }).Start();
+            // tell movement thread to start moving
+            _isMoving = true;
         }
 
         #endregion

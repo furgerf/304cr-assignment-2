@@ -13,8 +13,8 @@ namespace Ai2dShooter.Common
 
         public static readonly Dictionary<PlayerController, string> PlayerControllerNames = new Dictionary<PlayerController, string> {{PlayerController.Human, "Human"}, {PlayerController.AiFsm, "AI: FSM"}};
 
-        public const int MovementFps = 50;
+        public const int Framerate = 50;
 
-        public const int MsPerCell = 250;
+        public const int MsPerCell = 200;
     }
 }

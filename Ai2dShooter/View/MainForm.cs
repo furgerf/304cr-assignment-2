@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
@@ -32,7 +33,7 @@ namespace Ai2dShooter.View
             }
         }
 
-        public static MainForm Instance { get; private set; }
+        public static bool IsRunning { get; private set; }
 
         #endregion
 
@@ -41,7 +42,7 @@ namespace Ai2dShooter.View
         {
             InitializeComponent();
 
-            Instance = this;
+            IsRunning = true;
 
             // setup map
             Maze.CreateNew(30, 15);
@@ -71,16 +72,22 @@ namespace Ai2dShooter.View
 
             // setup key listening
             KeyUp += OnKeyUp;
+
+            // setup canvas invalidator thread
+            new Thread(() =>
+            {
+                while (IsRunning)
+                {
+                    _canvas.Invalidate();
+                    Thread.Sleep(Constants.Framerate);
+                }
+                
+            }).Start();
         }
 
         #endregion
 
         #region Methods
-
-        public void Redraw()
-        {
-            _canvas.Invalidate();
-        }
 
         /// <summary>
         /// Sets double buffering for flicker-less drawing.
@@ -133,6 +140,11 @@ namespace Ai2dShooter.View
                 HumanPlayer.Move(Direction.South);
             if ((e.KeyCode == Keys.A || e.KeyCode == Keys.Left) && HumanPlayer.CanMove(Direction.West))
                 HumanPlayer.Move(Direction.West);
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            IsRunning = false;
         }
 
         #endregion
