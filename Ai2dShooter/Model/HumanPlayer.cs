@@ -25,6 +25,11 @@ namespace Ai2dShooter.Model
             // do nothing
         }
 
+        public override void KilledEnemy()
+        {
+            // do nothing
+        }
+
         #endregion
     }
 }

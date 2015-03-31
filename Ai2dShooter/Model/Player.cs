@@ -19,6 +19,9 @@ namespace Ai2dShooter.Model
         public delegate void OnLocationChanged();
         public event OnLocationChanged LocationChanged;
 
+        public delegate void OnDeath();
+        public event OnDeath Death;
+
         #endregion
 
         #region Public Fields
@@ -276,6 +279,8 @@ namespace Ai2dShooter.Model
 
         public abstract void EnemySpotted();
 
+        public abstract void KilledEnemy();
+
         public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot)
         {
             // reduce life
@@ -290,12 +295,19 @@ namespace Ai2dShooter.Model
             if (Health == 0)
             {
                 Console.WriteLine(this + " has died!");
+
+                // notify self of death
+                if (Death != null)
+                    Death();
+                
+                // notify opponent of death
+                opponent.KilledEnemy();
                 return;
             }
 
             Thread.Sleep(Constants.AiMoveTimeout);
 
-            var hs = Constants.Rnd.Next() < HeadshotChance;
+            var hs = Constants.Rnd.NextDouble() < HeadshotChance;
             opponent.Damage(this, FrontDamage * (hs ? 2 : 1), true, hs);
         }
         #endregion

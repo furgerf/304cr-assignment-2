@@ -23,6 +23,7 @@ namespace Ai2dShooter.Model
         {
             LocationChanged += MovementDecision;
             HealthChanged += HealthDecision;
+            Death += () => _state = State.Dead;
         }
 
         #endregion
@@ -44,6 +45,15 @@ namespace Ai2dShooter.Model
             // make decision?????
         }
 
+        public override void KilledEnemy()
+        {
+            // depending on health, look for friends or enemies
+            _state = Health >= HealthyThreshold ? State.SeekEnemy : State.SeekFriend;
+
+            // start movement
+            MovementDecision();
+        }
+
         #endregion
 
         #region Event Handling
@@ -62,7 +72,7 @@ namespace Ai2dShooter.Model
                 case State.SeekFriend:
                     throw new NotImplementedException();
                 case State.Dead:
-                    throw new NotImplementedException();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -96,9 +106,10 @@ namespace Ai2dShooter.Model
                     // no movement when attacking
                     break;
                 case State.SeekFriend:
-                    throw new NotImplementedException();
+                    // TODO
+                    break;
                 case State.Dead:
-                    throw new NotImplementedException();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

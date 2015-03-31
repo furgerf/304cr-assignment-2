@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.Remoting.Messaging;
 using Ai2dShooter.Common;
 using Ai2dShooter.Model;
 
@@ -31,6 +29,16 @@ namespace Ai2dShooter.Controller
                 // register to events
                 var p1 = p;
                 p.LocationChanged += () => PlayerLocationChanged(p1);
+
+                p.Death += () =>
+                {
+                    // remove from opponent's opponent list
+                    foreach (var opponent in _opponents[p1])
+                        _opponents[opponent] = _opponents[opponent].Except(new[] {p1}).ToArray();
+
+                    // remove own opponent list
+                    _opponents.Remove(p1);
+                };
 
                 // add opponents
                 _opponents.Add(p, players.Where(pp => pp.Team != p.Team).ToArray());
@@ -71,7 +79,7 @@ namespace Ai2dShooter.Controller
                     // if so, start shooting...
                     player.EnemySpotted();
 
-                    var headshot = Constants.Rnd.Next() < player.HeadshotChance;
+                    var headshot = Constants.Rnd.NextDouble() < player.HeadshotChance;
                     var frontalAttack = opponent.Location.GetDirection(player.Location) == opponent.Orientation;
 
                     opponent.Damage(player, (frontalAttack ? player.FrontDamage : player.BackDamage) * (headshot ? 2 : 1), frontalAttack, headshot);
