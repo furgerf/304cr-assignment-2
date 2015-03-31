@@ -39,6 +39,11 @@ namespace Ai2dShooter.Controller
             }
         }
 
+        public void StopGame()
+        {
+            GameRunning = false;
+        }
+
         #endregion
 
         #region Event Handling

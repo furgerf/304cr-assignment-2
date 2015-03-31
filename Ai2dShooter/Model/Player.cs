@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Threading;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
@@ -84,14 +85,14 @@ namespace Ai2dShooter.Model
             get { return _orientation; }
             private set
             {
-                if (_orientation == value) return;
+                //if (_orientation == value) return;
 
                 // update value
                 _orientation = value;
 
-                // trigger event
-                if (LocationChanged != null)
-                    LocationChanged();
+                //// trigger event
+                //if (LocationChanged != null)
+                //    LocationChanged();
             }
         }
 
@@ -208,6 +209,23 @@ namespace Ai2dShooter.Model
 
             // draw orientation line
             graphics.DrawLine(new Pen(Color.Black, 4), orientationStart, orientationEnd);
+
+            // draw player visibility range
+            if (Controller != PlayerController.Human)
+            {
+                for (var x = Location.X - Constants.Visibility < 0 ? 0 : Location.X - Constants.Visibility; x <= (Location.X + Constants.Visibility > Maze.Instance.Width - 1 ? Maze.Instance.Width - 1 : Location.X + Constants.Visibility); x++)
+                    for (var y = Location.Y - Constants.Visibility < 0 ? 0 : Location.Y - Constants.Visibility; y <= (Location.Y + Constants.Visibility > Maze.Instance.Height - 1 ? Maze.Instance.Height - 1 : Location.Y + Constants.Visibility); y++)
+                    {
+                        if (Maze.Instance.Cells[x, y] == null)
+                            continue;
+
+                        if (Location.GetManhattenDistance(x, y) <= Constants.Visibility)
+                            graphics.FillRectangle(new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(127, Color), Color.FromArgb(0)), 
+                                new Rectangle(x*Constants.ScaleFactor, y*Constants.ScaleFactor,
+                                    Constants.ScaleFactor,
+                                    Constants.ScaleFactor));
+                    }
+            }
         }
 
         public bool CanMove(Direction direction)

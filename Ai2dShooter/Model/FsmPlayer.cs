@@ -73,7 +73,7 @@ namespace Ai2dShooter.Model
                     throw new ArgumentOutOfRangeException();
             }
 
-            Thread.Sleep(Constants.AiMoveTimeout);
+            Thread.Sleep(Constants.AiMoveTimeout * 10);
         }
 
         #endregion

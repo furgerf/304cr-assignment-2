@@ -151,6 +151,7 @@ namespace Ai2dShooter.View
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             IsRunning = false;
+            _currentGame.StopGame();
         }
 
         #endregion
