@@ -47,6 +47,7 @@
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Common\Enums.cs" />
     <Compile Include="Common\Utils.cs" />
+    <Compile Include="Controller\GameController.cs" />
     <Compile Include="Map\Cell.cs" />
     <Compile Include="Map\Maze.cs" />
     <Compile Include="Model\Player.cs" />

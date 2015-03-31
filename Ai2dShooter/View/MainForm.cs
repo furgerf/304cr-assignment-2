@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Ai2dShooter.Common;
+using Ai2dShooter.Controller;
 using Ai2dShooter.Map;
 using Ai2dShooter.Model;
 
@@ -34,6 +35,8 @@ namespace Ai2dShooter.View
         }
 
         public static bool IsRunning { get; private set; }
+
+        private GameController _currentGame;
 
         #endregion
 
@@ -83,6 +86,9 @@ namespace Ai2dShooter.View
                 }
                 
             }).Start();
+
+            _currentGame = new GameController(_players);
+            _currentGame.StartGame();
         }
 
         #endregion
