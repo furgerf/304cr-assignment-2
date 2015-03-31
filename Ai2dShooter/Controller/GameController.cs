@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using Ai2dShooter.Common;
 using Ai2dShooter.Model;
 
 namespace Ai2dShooter.Controller
@@ -70,9 +72,9 @@ namespace Ai2dShooter.Controller
 
                     // check whether the other player can see us too
                     if (opponent.Location.GetDirection(player.Location) == opponent.Orientation)
-                        opponent.Damage(player, player.FrontDamage);
+                        opponent.Damage(player, player.FrontDamage * (Constants.Rnd.Next() < player.HeadshotChance ? 2 : 1));
                     else
-                        opponent.Damage(player, player.BackDamage);
+                        opponent.Damage(player, player.BackDamage * (Constants.Rnd.Next() < player.HeadshotChance ? 2 : 1));
                 }
             }
         }
