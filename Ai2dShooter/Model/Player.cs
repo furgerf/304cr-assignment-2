@@ -132,6 +132,8 @@ namespace Ai2dShooter.Model
                         continue;
                     }
 
+                    var firstLocation = Location;
+
                     // get offset in right direction
                     PointF stepOffset = Utils.GetDirectionPoint(_orientation);
                     // divide offset to get offset for single step
@@ -167,6 +169,7 @@ namespace Ai2dShooter.Model
                     if (!IsMoving)
                     {
                         _locationOffset = PointF.Empty;
+                        _location = firstLocation;
                         continue;
                     }
 
@@ -283,13 +286,6 @@ namespace Ai2dShooter.Model
 
         public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot)
         {
-            if (damage > 65)
-                Constants.HardHitSound.Play();
-            else if (damage > 50)
-                Constants.MediumHitSound.Play();
-            else
-                Constants.LowHitSound.Play();
-
             // reduce life
             Health -= damage <= Health ? damage : Health;
 
@@ -298,7 +294,18 @@ namespace Ai2dShooter.Model
 
             Console.WriteLine(this + " has taken " + damage + " damage from " + opponent + " from " + (frontalAttack ? "the front" : "the back") + (headshot ? ", it was a HEADSHOT!" : ""));
             if (headshot)
+            {
                 Constants.HeadshotSound.Play();
+            }
+            else
+            {
+                if (damage > 60)
+                    Constants.HardHitSound.Play();
+                else if (damage > 45)
+                    Constants.MediumHitSound.Play();
+                else
+                    Constants.LowHitSound.Play();
+            }
 
             // retaliate!
             if (Health == 0)

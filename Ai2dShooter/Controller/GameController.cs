@@ -16,6 +16,7 @@ namespace Ai2dShooter.Controller
         
         public static bool GameRunning;
  
+        private readonly List<Player[]> _shootingPlayers = new List<Player[]>();
 
         #endregion
 
@@ -33,6 +34,9 @@ namespace Ai2dShooter.Controller
 
                 p.Death += () =>
                 {
+                    // remove from shooting player list
+                    _shootingPlayers.Remove(_shootingPlayers.First(s => s.Contains(p)));
+
                     // remove from opponent's opponent list
                     foreach (var opponent in _opponents[p1])
                         _opponents[opponent] = _opponents[opponent].Except(new[] {p1}).ToArray();
@@ -66,14 +70,22 @@ namespace Ai2dShooter.Controller
             GameRunning = false;
         }
 
+        private bool IsShootingPlayer(Player player)
+        {
+            return _shootingPlayers.Any(s => s.Contains(player));
+        }
+
         #endregion
 
         #region Event Handling
 
         private void PlayerLocationChanged(Player player)
         {
+            if (IsShootingPlayer(player))
+                return;
+
             // check whether player can shoot at any other player
-            foreach (var opponent in _opponents[player])
+            foreach (var opponent in _opponents[player].Where(o => !IsShootingPlayer(o)))
             {
                 if (player.Location.Neighbors.Contains(opponent.Location))
                 {
@@ -81,6 +93,7 @@ namespace Ai2dShooter.Controller
 
                     // if so, start shooting...
                     player.EnemySpotted();
+                    _shootingPlayers.Add(new[] {player, opponent});
 
                     var headshot = Constants.Rnd.NextDouble() < player.HeadshotChance;
                     var frontalAttack = opponent.Location.GetDirection(player.Location) == opponent.Orientation;

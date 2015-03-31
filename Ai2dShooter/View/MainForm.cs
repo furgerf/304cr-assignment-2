@@ -48,7 +48,7 @@ namespace Ai2dShooter.View
             IsRunning = true;
 
             // setup map
-            Maze.CreateNew(30, 15);
+            Maze.CreateNew(4, 4); // 30, 15
             Maze.Instance.SaveMap("maze with path.png");
 
             // setup players
