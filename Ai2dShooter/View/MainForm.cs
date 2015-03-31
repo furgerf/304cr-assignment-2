@@ -55,10 +55,10 @@ namespace Ai2dShooter.View
             _players = new Player[]
             {
                 new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
-                new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
-                new FsmPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
-                new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
-                new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
+                //new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
+                //new FsmPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
+                //new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
+                //new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
                 new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold)
             };
 

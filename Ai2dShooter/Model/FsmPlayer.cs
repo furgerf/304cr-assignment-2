@@ -21,7 +21,8 @@ namespace Ai2dShooter.Model
         public FsmPlayer(Cell initialLocation, Teams team)
             : base(initialLocation, PlayerController.AiFsm, team)
         {
-            LocationChanged += MakeDecision;
+            LocationChanged += MovementDecision;
+            HealthChanged += HealthDecision;
         }
 
         #endregion
@@ -32,14 +33,41 @@ namespace Ai2dShooter.Model
         {
             _state = State.SeekEnemy;
             
-            new Thread(MakeDecision).Start();
+            new Thread(MovementDecision).Start();
+        }
+
+        public override void EnemySpotted()
+        {
+            _state = State.Attack;
+            AbortMovement();
+
+            // make decision?????
         }
 
         #endregion
 
         #region Event Handling
 
-        private void MakeDecision()
+        private void HealthDecision()
+        {
+            switch (_state)
+            {
+                case State.SeekEnemy:
+                    // attack as well!
+                    break;
+                case State.Attack:
+                    // attack still?
+                    break;
+                case State.SeekFriend:
+                    throw new NotImplementedException();
+                case State.Dead:
+                    throw new NotImplementedException();
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void MovementDecision()
         {
             while (IsMoving)
             {
@@ -64,16 +92,17 @@ namespace Ai2dShooter.Model
                     }
                     break;
                 case State.Attack:
+                    // no movement when attacking
                     break;
                 case State.SeekFriend:
-                    break;
+                    throw new NotImplementedException();
                 case State.Dead:
-                    break;
+                    throw new NotImplementedException();
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            Thread.Sleep(Constants.AiMoveTimeout * 10);
+            Thread.Sleep(Constants.AiMoveTimeout * 100);
         }
 
         #endregion

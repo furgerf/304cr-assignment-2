@@ -18,7 +18,12 @@ namespace Ai2dShooter.Model
         public override void StartGame()
         {
             // do nothing
-        } 
+        }
+
+        public override void EnemySpotted()
+        {
+            // do nothing
+        }
 
         #endregion
     }

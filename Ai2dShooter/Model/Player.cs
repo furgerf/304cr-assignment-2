@@ -26,7 +26,7 @@ namespace Ai2dShooter.Model
         public int Health
         {
             get { return _health; }
-            set
+            private set
             {
                 if (_health == value) return;
              
@@ -133,11 +133,17 @@ namespace Ai2dShooter.Model
                     stepOffset = new PointF(stepOffset.X/Constants.Framerate, stepOffset.Y/Constants.Framerate);
 
                     // do half the steps
-                    for (var i = 0; i < Constants.Framerate/2; i++)
+                    for (var i = 0; i < Constants.Framerate/2 && IsMoving; i++)
                     {
                         _locationOffset.X += stepOffset.X;
                         _locationOffset.Y += stepOffset.Y;
                         Thread.Sleep(Constants.MsPerCell/Constants.Framerate);
+                    }
+
+                    if (!IsMoving)
+                    {
+                        _locationOffset = PointF.Empty;
+                        continue;
                     }
 
                     // move to next cell
@@ -146,11 +152,17 @@ namespace Ai2dShooter.Model
                     _location = Location.GetNeighbor(_orientation);
 
                     // do other half of the steps
-                    for (var i = 0; i < Constants.Framerate/2; i++)
+                    for (var i = 0; i < Constants.Framerate / 2 && IsMoving; i++)
                     {
                         _locationOffset.X += stepOffset.X;
                         _locationOffset.Y += stepOffset.Y;
                         Thread.Sleep(Constants.MsPerCell/Constants.Framerate);
+                    }
+
+                    if (!IsMoving)
+                    {
+                        _locationOffset = PointF.Empty;
+                        continue;
                     }
 
                     // clear offset
@@ -170,9 +182,14 @@ namespace Ai2dShooter.Model
 
         #region Main Methods
 
+        protected void AbortMovement()
+        {
+            IsMoving = false;
+        }
+
         public override string ToString()
         {
-            return Name + " (" + Location + ")";
+            return Name + " " + Location;
         }
 
         public void DrawPlayer(Graphics graphics, int scaleFactor)
@@ -249,10 +266,24 @@ namespace Ai2dShooter.Model
 
             // tell movement thread to start moving
             IsMoving = true;
+
+            Console.WriteLine(this + " is moving towards " + Location.GetNeighbor(direction));
         }
 
         public abstract void StartGame();
 
+        public abstract void EnemySpotted();
+
+        public void Damage(Player player, int damage)
+        {
+            // reduce life
+            Health -= damage;
+
+            // turn opponent towards "me"
+            Orientation = Location.GetDirection(player.Location);
+
+            Console.WriteLine(this + " has taken " + damage + " damage from " + player);
+        }
         #endregion
 
         #region Event Handling
