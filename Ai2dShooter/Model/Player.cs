@@ -1,8 +1,10 @@
 using System;
 using System.Drawing;
+using System.Threading;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 using Ai2dShooter.Properties;
+using Ai2dShooter.View;
 
 namespace Ai2dShooter.Model
 {
@@ -67,6 +69,10 @@ namespace Ai2dShooter.Model
             }
         }
 
+        private PointF _locationOffset;
+
+        private bool _isMoving;
+
         public Color Color { get; private set; }
 
         public Teams Team { get; private set; }
@@ -76,7 +82,7 @@ namespace Ai2dShooter.Model
         public Direction Orientation
         {
             get { return _orientation; }
-            set
+            private set
             {
                 if (_orientation == value) return;
 
@@ -119,8 +125,13 @@ namespace Ai2dShooter.Model
 
         public void DrawPlayer(Graphics graphics, int scaleFactor)
         {
+            //if (Math.Abs(_locationOffset.X) > 1)
+            //    _locationOffset.X = Math.Sign(_locationOffset.X);
+            //if (Math.Abs(_locationOffset.Y) > 1)
+            //    _locationOffset.Y = Math.Sign(_locationOffset.Y);
+
             // box in which to draw the player
-            var box = new Rectangle(Location.X*scaleFactor - 1, Location.Y*scaleFactor - 1, scaleFactor + 1,
+            var box = new Rectangle((int)((Location.X+_locationOffset.X)*scaleFactor) - 1, (int)((Location.Y + _locationOffset.Y)*scaleFactor) - 1, scaleFactor + 1,
                 scaleFactor + 1);
 
             // draw player circle
@@ -165,9 +176,40 @@ namespace Ai2dShooter.Model
             if (!CanMove(direction))
                 throw new ArgumentException("Illegal move in direction " + direction);
 
+            if (_isMoving)
+                return;
+            _isMoving = true;
+
             // assign to backing field because locationchanged will be triggered when updating location
             _orientation = direction;
-            Location = Location.GetNeighbor(direction);
+
+            new Thread(() =>
+            {
+                PointF stepOffset = Utils.GetDirectionPoint(direction);
+                stepOffset = new PointF(stepOffset.X / Constants.MovementFps, stepOffset.Y / Constants.MovementFps);
+
+                for (var i = 0; i < Constants.MovementFps/2; i++)
+                {
+                    _locationOffset.X += stepOffset.X;
+                    _locationOffset.Y += stepOffset.Y;
+                    MainForm.Instance.Redraw();
+                    Thread.Sleep(Constants.MsPerCell / Constants.MovementFps);
+                }
+                _locationOffset.X = -_locationOffset.X;
+                _locationOffset.Y = -_locationOffset.Y;
+                Location = Location.GetNeighbor(direction);
+                for (var i = 0; i < Constants.MovementFps / 2; i++)
+                {
+                    _locationOffset.X += stepOffset.X;
+                    _locationOffset.Y += stepOffset.Y;
+                    MainForm.Instance.Redraw();
+                    Thread.Sleep(Constants.MsPerCell / Constants.MovementFps);
+                }
+
+                _locationOffset = Point.Empty;
+
+                _isMoving = false;
+            }).Start();
         }
 
         #endregion

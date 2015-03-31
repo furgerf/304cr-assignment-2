@@ -32,12 +32,16 @@ namespace Ai2dShooter.View
             }
         }
 
+        public static MainForm Instance { get; private set; }
+
         #endregion
 
         #region Constructor
         public MainForm()
         {
             InitializeComponent();
+
+            Instance = this;
 
             // setup map
             Maze.CreateNew(30, 15);
@@ -72,6 +76,11 @@ namespace Ai2dShooter.View
         #endregion
 
         #region Methods
+
+        public void Redraw()
+        {
+            _canvas.Invalidate();
+        }
 
         /// <summary>
         /// Sets double buffering for flicker-less drawing.

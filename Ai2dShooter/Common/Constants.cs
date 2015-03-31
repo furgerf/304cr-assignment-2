@@ -12,5 +12,9 @@ namespace Ai2dShooter.Common
         public const int Visibility = 5;
 
         public static readonly Dictionary<PlayerController, string> PlayerControllerNames = new Dictionary<PlayerController, string> {{PlayerController.Human, "Human"}, {PlayerController.AiFsm, "AI: FSM"}};
+
+        public const int MovementFps = 50;
+
+        public const int MsPerCell = 250;
     }
 }

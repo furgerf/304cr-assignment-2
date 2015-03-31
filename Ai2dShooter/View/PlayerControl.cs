@@ -53,8 +53,22 @@ namespace Ai2dShooter.View
             InitializeComponent();
 
             // assign event handlers
-            _updateLocation = () => grpName.Text = Player.Name + " - " + Player.Location + " - " + Constants.PlayerControllerNames[Player.Controller];
-            _updateHealth = () => progressHealth.Value = Player.Health;
+            _updateLocation = () =>
+            {
+                if (InvokeRequired)
+                    Invoke((MethodInvoker) (() => _updateLocation()));
+                else
+                    grpName.Text = Player.Name + " - " + Player.Location + " - " +
+                                   Constants.PlayerControllerNames[Player.Controller];
+            };
+            _updateHealth = () =>
+            {
+
+                if (InvokeRequired)
+                    Invoke((MethodInvoker)(() => _updateHealth()));
+                else
+                    progressHealth.Value = Player.Health;
+            };
         }
 
         #endregion
