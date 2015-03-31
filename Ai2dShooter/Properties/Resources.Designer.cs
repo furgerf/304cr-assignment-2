@@ -61,6 +61,15 @@ namespace Ai2dShooter.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream headshot {
+            get {
+                return ResourceManager.GetStream("headshot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Theodore
         ///Robt
         ///Herschel
@@ -128,7 +137,17 @@ namespace Ai2dShooter.Properties {
         ///Sirena
         ///Lovie
         ///Lilly
-        ///Julie [rest of string was truncated]&quot;;.
+        ///Julieta
+        ///Becki
+        ///Charla
+        ///Sharee
+        ///Emerald
+        ///Summer
+        ///Carole
+        ///Consuelo
+        ///Linda
+        ///Daisy
+        ///V [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string names {
             get {

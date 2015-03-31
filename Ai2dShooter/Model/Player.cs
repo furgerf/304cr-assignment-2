@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Threading;
+using System.Windows.Forms;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 using Ai2dShooter.Properties;
@@ -290,6 +291,8 @@ namespace Ai2dShooter.Model
             Orientation = Location.GetDirection(opponent.Location);
 
             Console.WriteLine(this + " has taken " + damage + " damage from " + opponent + " from " + (frontalAttack ? "the front" : "the back") + (headshot ? ", it was a HEADSHOT!" : ""));
+            if (headshot)
+                    Constants.HeadshotSound.Play();
 
             // retaliate!
             if (Health == 0)

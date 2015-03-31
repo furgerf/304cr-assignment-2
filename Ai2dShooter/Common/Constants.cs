@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Media;
 
 namespace Ai2dShooter.Common
 {
@@ -18,5 +20,13 @@ namespace Ai2dShooter.Common
         public const int MsPerCell = 200;
 
         public const int AiMoveTimeout = 1000;
+
+        public static readonly SoundPlayer HeadshotSound;
+
+        static Constants()
+        {
+            Stream str = Properties.Resources.headshot;
+            HeadshotSound = new SoundPlayer(str);
+        }
     }
 }
