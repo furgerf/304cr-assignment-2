@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Threading;
 using Ai2dShooter.Common;
+using Ai2dShooter.Controller;
 using Ai2dShooter.Map;
 using Ai2dShooter.Properties;
 using Ai2dShooter.View;
@@ -25,6 +26,8 @@ namespace Ai2dShooter.Model
         #endregion
 
         #region Public Fields
+
+        public int Speed { get; private set; }
 
         public bool IsAlive { get { return Health > 0; } }
 
@@ -107,6 +110,7 @@ namespace Ai2dShooter.Model
 
         protected Player(Cell initialLocation, PlayerController controller, Teams team)
         {
+            Speed = Constants.Rnd.Next(50, 150);
             Team = team;
             Health = 100;
             HealthyThreshold = Constants.Rnd.Next(10, 50);
@@ -144,7 +148,7 @@ namespace Ai2dShooter.Model
                     {
                         _locationOffset.X += stepOffset.X;
                         _locationOffset.Y += stepOffset.Y;
-                        Thread.Sleep(Constants.MsPerCell/Constants.Framerate);
+                        Thread.Sleep(Speed/Constants.Framerate);
                     }
 
                     if (!IsMoving)
@@ -163,7 +167,7 @@ namespace Ai2dShooter.Model
                     {
                         _locationOffset.X += stepOffset.X;
                         _locationOffset.Y += stepOffset.Y;
-                        Thread.Sleep(Constants.MsPerCell/Constants.Framerate);
+                        Thread.Sleep(Speed/Constants.Framerate);
                     }
 
                     if (!IsMoving)
@@ -236,7 +240,7 @@ namespace Ai2dShooter.Model
             graphics.DrawLine(new Pen(Color.FromArgb(IsAlive ? 255 : 64, Color.Black), 4), orientationStart, orientationEnd);
 
             // draw opponent visibility range
-            if (Controller != PlayerController.Human)
+            if (Controller != PlayerController.Human && IsAlive)
             {
                 for (var x = Location.X - Constants.Visibility < 0 ? 0 : Location.X - Constants.Visibility; x <= (Location.X + Constants.Visibility > Maze.Instance.Width - 1 ? Maze.Instance.Width - 1 : Location.X + Constants.Visibility); x++)
                     for (var y = Location.Y - Constants.Visibility < 0 ? 0 : Location.Y - Constants.Visibility; y <= (Location.Y + Constants.Visibility > Maze.Instance.Height - 1 ? Maze.Instance.Height - 1 : Location.Y + Constants.Visibility); y++)
@@ -262,20 +266,28 @@ namespace Ai2dShooter.Model
 
         public void Move(Direction direction)
         {
-            if (!CanMove(direction))
-                throw new ArgumentException("Illegal move in direction " + direction);
+            //lock (Constants.SpottedLock)
+            {
+                if (!CanMove(direction))
+                    throw new ArgumentException("Illegal move in direction " + direction);
 
-            // abort if we're already moving
-            if (IsMoving)
-                return;
+                //if (GameController.Instance.IsOpponentOnCell(Location.GetNeighbor(direction), Team))
+                //{
+                //    Console.WriteLine("ABORTING MOVE BECAUSE GUNFIGHT IS ABOUT TO START");
+                //    return;
+                //}
 
-            // assign to backing field because locationchanged will be triggered when updating location
-            _orientation = direction;
+                // abort if we're already moving
+                if (IsMoving)
+                    return;
 
-            // tell movement thread to start moving
-            IsMoving = true;
+                    // assign to backing field because locationchanged will be triggered when updating location
+                    _orientation = direction;
 
-            Console.WriteLine(this + " is moving towards " + Location.GetNeighbor(direction));
+                    // tell movement thread to start moving
+                    IsMoving = true;
+                //Console.WriteLine(this + " is moving towards " + Location.GetNeighbor(direction));
+            }
         }
 
         public abstract void StartGame();
@@ -284,15 +296,14 @@ namespace Ai2dShooter.Model
 
         public abstract void SpottedByEnemy();
 
+        protected abstract void ResumeMovement();
+
         public abstract void KilledEnemy();
 
         public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot)
         {
             // reduce life
             Health -= damage <= Health ? damage : Health;
-
-            // turn opponent towards "me"
-            Orientation = Location.GetDirection(opponent.Location);
 
             Console.WriteLine(this + " has taken " + damage + " damage from " + opponent + " from " + (frontalAttack ? "the front" : "the back") + (headshot ? ", it was a HEADSHOT!" : ""));
             if (headshot)
@@ -308,6 +319,31 @@ namespace Ai2dShooter.Model
                 else
                     Constants.LowHitSound.Play();
             }
+
+            if (!Location.IsNeighbor(opponent.Location))
+            {
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("Im " + this + " and he is " + opponent);
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+                Console.WriteLine("The opponent got away...");
+
+                ResumeMovement();
+                opponent.ResumeMovement();
+
+                return;
+            }
+
+            // turn opponent towards "me"
+            Orientation = Location.GetDirection(opponent.Location);
 
             // retaliate!
             if (Health == 0)

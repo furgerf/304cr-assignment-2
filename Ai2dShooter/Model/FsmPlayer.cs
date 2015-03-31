@@ -41,18 +41,18 @@ namespace Ai2dShooter.Model
         {
             _state = State.Attack;
             AbortMovement();
-            Console.WriteLine("I SPOTTED SOMEONE!");
-
-            // make decision?????
         }
 
         public override void SpottedByEnemy()
         {
             _state = State.Attack;
             AbortMovement();
-            Console.WriteLine("IVE BEEN SPOTTED!");
+        }
 
-            // make decision?????
+        protected override void ResumeMovement()
+        {
+            _state = State.SeekEnemy;
+            MovementDecision();
         }
 
         public override void KilledEnemy()
@@ -70,7 +70,7 @@ namespace Ai2dShooter.Model
 
         private void HealthDecision()
         {
-            Console.WriteLine("HEALTH STATE: " + _state);
+            //Console.WriteLine("HEALTH STATE: " + _state);
             switch (_state)
             {
                 case State.SeekEnemy:
@@ -93,13 +93,14 @@ namespace Ai2dShooter.Model
         {
             while (IsMoving)
             {
-                Thread.Sleep(Constants.MsPerCell / Constants.Framerate);
+                Thread.Sleep(Speed / Constants.Framerate);
             }
 
-            Console.WriteLine("MOVEMENT STATE: " + _state);
+            //Console.WriteLine("MOVEMENT STATE: " + _state);
             switch (_state)
             {
                 case State.SeekEnemy:
+                case State.SeekFriend:
                     // move in random direction, if possible don't go backwards
                     var neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
                     if (neighbors.Length == 1)
@@ -117,7 +118,6 @@ namespace Ai2dShooter.Model
                 case State.Attack:
                     // no movement when attacking
                     break;
-                case State.SeekFriend:
                     // TODO
                     Console.WriteLine("I DONT KNOW HOW TO SEEK FRIENDS YET!");
                     break;

@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Ai2dShooter.Common;
+using Ai2dShooter.Map;
 using Ai2dShooter.Model;
+using Ai2dShooter.View;
 
 namespace Ai2dShooter.Controller
 {
@@ -20,12 +23,16 @@ namespace Ai2dShooter.Controller
 
         private int _deathCount;
 
+        public static GameController Instance { get; private set; }
+
         #endregion
 
         #region Constructor
 
         public GameController(Player[] players)
         {
+            Instance = this;
+
             _players = players;
 
             foreach (var p in players)
@@ -48,6 +55,14 @@ namespace Ai2dShooter.Controller
 
                     if (_deathCount++ == 0)
                         Constants.FirstBloodSound.Play();
+
+                    foreach (var o in _opponents.Values)
+                        if (o.Length == 0)
+                        {
+                            // game over!
+                            MainForm.IsRunning = false;
+                            StopGame();
+                        }
                 };
 
                 // add opponents
@@ -59,15 +74,28 @@ namespace Ai2dShooter.Controller
 
         #region Main Methods
 
+        //private Object _lock = new object();
+
+        public bool IsOpponentOnCell(Cell cell, Teams team)
+        {
+            //lock (_lock)
+                return _players.Any(p => p.Location == cell && p.Team != team && p.IsAlive);
+        }
+
         public void StartGame()
         {
             Constants.PlaySound.Play();
 
             GameRunning = true;
-            foreach (var player in _players)
+            new Thread(() =>
             {
-                player.StartGame();
-            }
+                foreach (var player in _players)
+                {
+                    // use random timeout between players starting
+                    Thread.Sleep(Constants.Rnd.Next(Constants.AiMoveTimeout));
+                    player.StartGame();
+                }
+            }).Start();
         }
 
         public void StopGame()
@@ -96,16 +124,28 @@ namespace Ai2dShooter.Controller
             {
                 if (player.Location.Neighbors.Contains(opponent.Location))
                 {
-                    Console.WriteLine(player + " has spotted " + opponent);
-                    player.EnemySpotted();
-                    opponent.SpottedByEnemy();
+                        var op = opponent;
+                        // *someone* has spotted *someone*
+                        // did the player move into a camper's crosshair?
+                        if (opponent.Location.GetNeighbor(opponent.Orientation) == player.Location)
+                        {
+                            Console.WriteLine(player + " got camped by " + opponent + "!");
+                            // swap player and opponent
+                            op = player;
+                            player = opponent;
+                        }
 
-                    _shootingPlayers.Add(new[] {player, opponent});
+                        Console.WriteLine(player + " has spotted " + op);
+                        player.EnemySpotted();
+                        op.SpottedByEnemy();
 
-                    var headshot = Constants.Rnd.NextDouble() < player.HeadshotChance;
-                    var frontalAttack = opponent.Location.GetDirection(player.Location) == opponent.Orientation;
+                        _shootingPlayers.Add(new[] {player, op});
 
-                    opponent.Damage(player, (frontalAttack ? player.FrontDamage : player.BackDamage) * (headshot ? 2 : 1), frontalAttack, headshot);
+                        var headshot = Constants.Rnd.NextDouble() < player.HeadshotChance;
+                        var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
+
+                        op.Damage(player, (frontalAttack ? player.FrontDamage : player.BackDamage)*(headshot ? 2 : 1),
+                            frontalAttack, headshot);
                 }
             }
         }

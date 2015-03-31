@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Xml.Linq;
 using Ai2dShooter.Common;
 
@@ -38,6 +39,11 @@ namespace Ai2dShooter.Map
         #endregion
 
         #region Methods
+
+        public bool IsNeighbor(Cell cell)
+        {
+            return Neighbors.Contains(cell);
+        }
 
         /// <summary>
         /// Retrieves the neighbor in the given direction.
