@@ -102,6 +102,24 @@
   <ItemGroup>
     <None Include="Resources\headshot.wav" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\play.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\firstblood.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\perfect.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\usp1.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\deagle-1.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\elite-1.wav" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

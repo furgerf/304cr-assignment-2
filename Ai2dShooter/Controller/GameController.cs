@@ -15,6 +15,7 @@ namespace Ai2dShooter.Controller
         private readonly Dictionary<Player, Player[]> _opponents = new Dictionary<Player, Player[]>();
         
         public static bool GameRunning;
+ 
 
         #endregion
 
@@ -51,6 +52,8 @@ namespace Ai2dShooter.Controller
 
         public void StartGame()
         {
+            Constants.PlaySound.Play();
+
             GameRunning = true;
             foreach (var player in _players)
             {
