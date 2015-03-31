@@ -1,4 +1,5 @@
 using System;
+using System.Xml.Linq;
 using Ai2dShooter.Common;
 
 namespace Ai2dShooter.Map
@@ -11,7 +12,7 @@ namespace Ai2dShooter.Map
         public int X { get; private set; }
         public int Y { get; private set; }
 
-        public bool IsWall;
+        public bool IsWall { get; set; }
 
         public bool IsClear { get { return !IsWall; } }
 
@@ -20,6 +21,8 @@ namespace Ai2dShooter.Map
         public Cell East { get { return X < Maze.Instance.Width - 1 ? Maze.Instance.Cells[X + 1, Y] : null; } }
         public Cell North { get { return Y > 0 ? Maze.Instance.Cells[X, Y - 1] : null; } }
         public Cell South { get { return Y < Maze.Instance.Height - 1 ? Maze.Instance.Cells[X, Y + 1] : null; } }
+
+        public Cell[] Neighbors { get { return new []{East, South, West, North};} }
 
         #endregion
 
@@ -56,6 +59,25 @@ namespace Ai2dShooter.Map
                 default:
                     throw new ArgumentOutOfRangeException("direction");
             }
+        }
+
+        /// <summary>
+        /// Returns the direction in which the neighbor lies.
+        /// </summary>
+        /// <param name="neighbor">Neighboring cell</param>
+        /// <returns>Direction of the neighbor</returns>
+        public Direction GetDirection(Cell neighbor)
+        {
+            if (neighbor == East)
+                return Direction.East;
+            if (neighbor == South)
+                return Direction.South;
+            if (neighbor == West)
+                return Direction.West;
+            if (neighbor == North)
+                return Direction.North;
+
+            throw new ArgumentException(neighbor + " is no neighbor!");
         }
 
         public int GetManhattenDistance(Cell other)

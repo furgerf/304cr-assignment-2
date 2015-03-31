@@ -8,7 +8,7 @@ using Ai2dShooter.View;
 
 namespace Ai2dShooter.Model
 {
-    public class Player
+    public abstract class Player
     {
         #region Events
 
@@ -71,7 +71,7 @@ namespace Ai2dShooter.Model
 
         private PointF _locationOffset;
 
-        private bool _isMoving;
+        protected bool IsMoving;
 
         public Color Color { get; private set; }
 
@@ -99,7 +99,7 @@ namespace Ai2dShooter.Model
 
         #region Constructor
 
-        public Player(Cell initialLocation, PlayerController controller, Teams team)
+        protected Player(Cell initialLocation, PlayerController controller, Teams team)
         {
             Team = team;
             Health = 100;
@@ -120,7 +120,7 @@ namespace Ai2dShooter.Model
                 while (MainForm.IsRunning)
                 {
                     // zzzzzzzzZZZZZZZZZZzzzzzz
-                    if (!_isMoving)
+                    if (!IsMoving)
                     {
                         Thread.Sleep(Constants.Framerate);
                         continue;
@@ -142,7 +142,7 @@ namespace Ai2dShooter.Model
                     // move to next cell
                     _locationOffset.X = -_locationOffset.X;
                     _locationOffset.Y = -_locationOffset.Y;
-                    Location = Location.GetNeighbor(_orientation);
+                    _location = Location.GetNeighbor(_orientation);
 
                     // do other half of the steps
                     for (var i = 0; i < Constants.Framerate/2; i++)
@@ -156,7 +156,11 @@ namespace Ai2dShooter.Model
                     _locationOffset = Point.Empty;
 
                     // stop moving
-                    _isMoving = false;
+                    IsMoving = false;
+
+                    // move is complete, trigger event
+                    if (LocationChanged != null)
+                        LocationChanged();
                 }
             }).Start();
         }
@@ -219,15 +223,17 @@ namespace Ai2dShooter.Model
                 throw new ArgumentException("Illegal move in direction " + direction);
 
             // abort if we're already moving
-            if (_isMoving)
+            if (IsMoving)
                 return;
 
             // assign to backing field because locationchanged will be triggered when updating location
             _orientation = direction;
 
             // tell movement thread to start moving
-            _isMoving = true;
+            IsMoving = true;
         }
+
+        public abstract void StartGame();
 
         #endregion
 

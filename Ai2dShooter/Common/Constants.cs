@@ -16,5 +16,7 @@ namespace Ai2dShooter.Common
         public const int Framerate = 50;
 
         public const int MsPerCell = 200;
+
+        public const int AiMoveTimeout = 0;
     }
 }

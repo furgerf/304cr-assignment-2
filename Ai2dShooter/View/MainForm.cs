@@ -52,14 +52,14 @@ namespace Ai2dShooter.View
             Maze.Instance.SaveMap("maze with path.png");
 
             // setup players
-            _players = new[]
+            _players = new Player[]
             {
-                new Player(Maze.Instance.NorthWestCorner, PlayerController.Human, Teams.TeamHot),
-                new Player(Maze.Instance.NorthCenterCorner, PlayerController.AiFsm, Teams.TeamHot),
-                new Player(Maze.Instance.NorthEastCorner, PlayerController.AiFsm, Teams.TeamHot),
-                new Player(Maze.Instance.SouthEastCorner, PlayerController.AiFsm, Teams.TeamCold),
-                new Player(Maze.Instance.SouthCenterCorner, PlayerController.AiFsm, Teams.TeamCold),
-                new Player(Maze.Instance.SouthWestCorner, PlayerController.AiFsm, Teams.TeamCold)
+                new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
+                new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
+                new FsmPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
+                new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
+                new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
+                new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold)
             };
 
             // setup player controls

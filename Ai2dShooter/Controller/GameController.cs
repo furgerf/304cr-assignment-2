@@ -1,12 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Ai2dShooter.Common;
 using Ai2dShooter.Model;
-using Ai2dShooter.View;
 
 namespace Ai2dShooter.Controller
 {
@@ -16,7 +8,7 @@ namespace Ai2dShooter.Controller
 
         private readonly Player[] _players;
 
-        private bool _gameRunning;
+        public static bool GameRunning;
 
         #endregion
 
@@ -40,7 +32,11 @@ namespace Ai2dShooter.Controller
 
         public void StartGame()
         {
-            _gameRunning = true;
+            GameRunning = true;
+            foreach (var player in _players)
+            {
+                player.StartGame();
+            }
         }
 
         #endregion
