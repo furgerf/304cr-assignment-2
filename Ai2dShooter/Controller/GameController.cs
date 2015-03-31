@@ -18,6 +18,8 @@ namespace Ai2dShooter.Controller
  
         private readonly List<Player[]> _shootingPlayers = new List<Player[]>();
 
+        private int _deathCount;
+
         #endregion
 
         #region Constructor
@@ -43,6 +45,9 @@ namespace Ai2dShooter.Controller
 
                     // remove own opponent list
                     _opponents.Remove(p1);
+
+                    if (_deathCount++ == 0)
+                        Constants.FirstBloodSound.Play();
                 };
 
                 // add opponents
@@ -81,7 +86,9 @@ namespace Ai2dShooter.Controller
 
         private void PlayerLocationChanged(Player player)
         {
-            if (IsShootingPlayer(player))
+            //Console.WriteLine(player + "s location has changed");
+
+            if (IsShootingPlayer(player) || !player.IsAlive)
                 return;
 
             // check whether player can shoot at any other player
@@ -90,9 +97,9 @@ namespace Ai2dShooter.Controller
                 if (player.Location.Neighbors.Contains(opponent.Location))
                 {
                     Console.WriteLine(player + " has spotted " + opponent);
-
-                    // if so, start shooting...
                     player.EnemySpotted();
+                    opponent.SpottedByEnemy();
+
                     _shootingPlayers.Add(new[] {player, opponent});
 
                     var headshot = Constants.Rnd.NextDouble() < player.HeadshotChance;

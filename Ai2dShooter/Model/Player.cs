@@ -282,6 +282,8 @@ namespace Ai2dShooter.Model
 
         public abstract void EnemySpotted();
 
+        public abstract void SpottedByEnemy();
+
         public abstract void KilledEnemy();
 
         public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot)
@@ -299,7 +301,7 @@ namespace Ai2dShooter.Model
             }
             else
             {
-                if (damage > 60)
+                if (damage > 55)
                     Constants.HardHitSound.Play();
                 else if (damage > 45)
                     Constants.MediumHitSound.Play();

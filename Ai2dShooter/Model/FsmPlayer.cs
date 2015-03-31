@@ -41,6 +41,16 @@ namespace Ai2dShooter.Model
         {
             _state = State.Attack;
             AbortMovement();
+            Console.WriteLine("I SPOTTED SOMEONE!");
+
+            // make decision?????
+        }
+
+        public override void SpottedByEnemy()
+        {
+            _state = State.Attack;
+            AbortMovement();
+            Console.WriteLine("IVE BEEN SPOTTED!");
 
             // make decision?????
         }
@@ -60,6 +70,7 @@ namespace Ai2dShooter.Model
 
         private void HealthDecision()
         {
+            Console.WriteLine("HEALTH STATE: " + _state);
             switch (_state)
             {
                 case State.SeekEnemy:
@@ -85,6 +96,7 @@ namespace Ai2dShooter.Model
                 Thread.Sleep(Constants.MsPerCell / Constants.Framerate);
             }
 
+            Console.WriteLine("MOVEMENT STATE: " + _state);
             switch (_state)
             {
                 case State.SeekEnemy:
@@ -107,6 +119,7 @@ namespace Ai2dShooter.Model
                     break;
                 case State.SeekFriend:
                     // TODO
+                    Console.WriteLine("I DONT KNOW HOW TO SEEK FRIENDS YET!");
                     break;
                 case State.Dead:
                     break;
