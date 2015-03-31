@@ -134,7 +134,7 @@ namespace Ai2dShooter.View
 
         private void OnKeyUp(object sender, KeyEventArgs e)
         {
-            if (!HasHumanPlayer)
+            if (!HasHumanPlayer || !HumanPlayer.IsAlive)
                 return;
 
             // arrow keys/wasd for player movement

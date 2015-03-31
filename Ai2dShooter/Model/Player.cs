@@ -23,6 +23,8 @@ namespace Ai2dShooter.Model
 
         #region Public Fields
 
+        public bool IsAlive { get { return Health > 0; } }
+
         public int Health
         {
             get { return _health; }
@@ -199,7 +201,7 @@ namespace Ai2dShooter.Model
                 scaleFactor + 1);
 
             // draw opponent circle
-            graphics.FillEllipse(new SolidBrush(Color), box);
+            graphics.FillEllipse(new SolidBrush(Color.FromArgb(IsAlive ? 255 : 64, Color)), box);
 
             // start of the orientation line
             var orientationStart = new Point(box.Left + box.Width/2, box.Top + box.Height/2);
@@ -225,7 +227,7 @@ namespace Ai2dShooter.Model
             }
 
             // draw orientation line
-            graphics.DrawLine(new Pen(Color.Black, 4), orientationStart, orientationEnd);
+            graphics.DrawLine(new Pen(Color.FromArgb(IsAlive ? 255 : 64, Color.Black), 4), orientationStart, orientationEnd);
 
             // draw opponent visibility range
             if (Controller != PlayerController.Human)
