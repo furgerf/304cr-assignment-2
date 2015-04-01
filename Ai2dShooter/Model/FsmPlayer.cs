@@ -35,7 +35,6 @@ namespace Ai2dShooter.Model
             _state = State.SeekEnemy;
 
             new Thread(MovementDecision).Start();
-            //MovementDecision();
         }
 
         public override void EnemySpotted()
@@ -50,7 +49,7 @@ namespace Ai2dShooter.Model
             AbortMovement();
         }
 
-        protected override void ResumeMovement()
+        protected override void ResumeMovementAfterShooting()
         {
             _state = State.SeekEnemy;
             MovementDecision();
@@ -79,7 +78,7 @@ namespace Ai2dShooter.Model
                     _state = State.Attack;
                     break;
                 case State.Attack:
-                    // attack still?
+                    // keep attacking
                     break;
                 case State.SeekFriend:
                     throw new NotImplementedException();

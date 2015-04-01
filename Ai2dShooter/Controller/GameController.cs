@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Ai2dShooter.Common;
-using Ai2dShooter.Map;
 using Ai2dShooter.Model;
 using Ai2dShooter.View;
 
@@ -11,19 +10,23 @@ namespace Ai2dShooter.Controller
 {
     public class GameController
     {
+        #region Public Fields
+
+        public static GameController Instance { get; private set; }
+
+        public bool GameRunning;
+
+        #endregion
+
         #region Private Fields
 
         private readonly Player[] _players;
 
         private readonly Dictionary<Player, Player[]> _opponents = new Dictionary<Player, Player[]>();
         
-        public static bool GameRunning;
- 
         private readonly List<Player[]> _shootingPlayers = new List<Player[]>();
 
         private int _deathCount;
-
-        public static GameController Instance { get; private set; }
 
         #endregion
 
@@ -60,7 +63,7 @@ namespace Ai2dShooter.Controller
                         if (o.Length == 0)
                         {
                             // game over!
-                            MainForm.IsRunning = false;
+                            MainForm.ApplicationRunning = false;
                             StopGame();
                         }
                 };
@@ -73,13 +76,6 @@ namespace Ai2dShooter.Controller
         #endregion
 
         #region Main Methods
-
-        //private Object _lock = new object();
-
-        public bool IsOpponentOnCell(Cell cell, Teams team)
-        {
-            return _players.Any(p => p.Location == cell && p.Team != team && p.IsAlive);
-        }
 
         public void StartGame()
         {

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Media;
 
 namespace Ai2dShooter.Common
 {
@@ -27,7 +26,7 @@ namespace Ai2dShooter.Common
         private static readonly Dictionary<Teams, List<Color>> TeamColors = new Dictionary<Teams, List<Color>>
         {
             {Teams.TeamHot, new List<Color>{Color.LightCoral, Color.Magenta, Color.Maroon, Color.Orange, Color.SaddleBrown, Color.Red}},
-            {Teams.TeamCold, new List<Color>{Color.RoyalBlue, Color.Navy, Color.Green, Color.MediumSeaGreen, Color.Aqua}}
+            {Teams.TeamCold, new List<Color>{Color.RoyalBlue, Color.Navy, Color.Green, Color.MediumSeaGreen, Color.DarkGreen, Color.Aqua}}
         };
 
         public static Color GetTeamColor(Teams team)

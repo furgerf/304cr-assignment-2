@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Xml.Linq;
 using Ai2dShooter.Common;
 
 namespace Ai2dShooter.Map

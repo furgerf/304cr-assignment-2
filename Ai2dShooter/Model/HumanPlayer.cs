@@ -25,7 +25,7 @@ namespace Ai2dShooter.Model
             // do nothing
         }
 
-        protected override void ResumeMovement()
+        protected override void ResumeMovementAfterShooting()
         {
             // do nothing
         }

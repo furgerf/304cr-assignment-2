@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Media;
 
 namespace Ai2dShooter.Common
@@ -19,9 +18,9 @@ namespace Ai2dShooter.Common
 
         public static readonly object MovementLock = new object();
 
-        public const int AiMoveTimeout = 300;
+        public const int AiMoveTimeout = 200;
 
-        public const int ShootingTimeout = 2*AiMoveTimeout;
+        public const int ShootingTimeout = (int)(1.5*AiMoveTimeout);
 
         public static readonly SoundPlayer HeadshotSound;
         public static readonly SoundPlayer PlaySound;

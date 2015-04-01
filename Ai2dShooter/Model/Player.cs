@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Threading;
 using Ai2dShooter.Common;
 using Ai2dShooter.Controller;
@@ -51,16 +50,12 @@ namespace Ai2dShooter.Model
         public int HealthyThreshold { get; private set; }
 
         public int FrontDamage { get; private set; }
+
         public int BackDamage { get; private set; }
 
         public double HeadshotChance { get; private set; }
 
         public string Name { get; private set; }
-
-        private static readonly string[] PlayerNames = Resources.names.Split('\n');
-
-        private int _health;
-        private Cell _location;
 
         public Cell Location
         {
@@ -84,17 +79,37 @@ namespace Ai2dShooter.Model
             }
         }
 
-        private PointF _locationOffset;
-
-        protected bool IsMoving { get; private set; }
-
         public Color Color { get; private set; }
 
         public Teams Team { get; private set; }
 
         public PlayerController Controller { get; private set; }
 
-        public Direction Orientation { get; private set; }
+        public Direction Orientation
+        {
+            get { return _orientation; }
+            private set
+            {
+                if (!IsAlive) return;
+                _orientation = value;
+            }
+        }
+
+        #endregion
+
+        #region Private Fields
+
+        private static readonly string[] PlayerNames = Resources.names.Split('\n');
+
+        private int _health;
+
+        private Cell _location;
+
+        private PointF _locationOffset;
+
+        private Direction _orientation;
+
+        protected bool IsMoving { get; private set; }
 
         #endregion
 
@@ -114,14 +129,12 @@ namespace Ai2dShooter.Model
             Color = Utils.GetTeamColor(team);
             Controller = controller;
             Orientation = (Direction)Constants.Rnd.Next((int)Direction.Count);
-            
-            //Slowness = 1000;
 
             // start movement thread
             new Thread(() =>
             {
                 // loop while application is running
-                while (MainForm.IsRunning)
+                while (MainForm.ApplicationRunning)
                 {
                     // zzzzzzzzZZZZZZZZZZzzzzzz
                     if (!IsMoving)
@@ -138,7 +151,7 @@ namespace Ai2dShooter.Model
                     stepOffset = new PointF(stepOffset.X/Constants.Framerate, stepOffset.Y/Constants.Framerate);
 
                     // do half the steps
-                    for (var i = 0; i < Constants.Framerate && IsMoving && MainForm.IsRunning && IsAlive; i++)
+                    for (var i = 0; i < Constants.Framerate && IsMoving && MainForm.ApplicationRunning && IsAlive; i++)
                     {
                         _locationOffset.X += stepOffset.X;
                         _locationOffset.Y += stepOffset.Y;
@@ -150,11 +163,7 @@ namespace Ai2dShooter.Model
 
                     if (!IsMoving)
                     {
-                        Console.WriteLine("MOVEMENT ABORTED");
-                        Console.WriteLine("MOVEMENT ABORTED");
-                        Console.WriteLine("Previous location " + previousLocation + ", current location: " + Location);
-                        Console.WriteLine("MOVEMENT ABORTED");
-                        Console.WriteLine("MOVEMENT ABORTED");
+                        ResumeMovementAfterShooting();
                         return;
                     }
 
@@ -169,7 +178,7 @@ namespace Ai2dShooter.Model
 
         #endregion
 
-        #region Main Methods
+        #region Implemented Methods
 
         protected void AbortMovement()
         {
@@ -243,40 +252,22 @@ namespace Ai2dShooter.Model
 
         public void Move(Direction direction)
         {
-            //lock (Constants.SpottedLock)
-            {
-                if (!CanMove(direction))
-                    throw new ArgumentException("Illegal move in direction " + direction);
+            if (!CanMove(direction))
+                throw new ArgumentException("Illegal move in direction " + direction);
 
-                //if (GameController.Instance.IsOpponentOnCell(Location.GetNeighbor(direction), Team))
-                //{
-                //    Console.WriteLine("ABORTING MOVE OF " + this + " BECAUSE GUNFIGHT IS ABOUT TO START");
-                //    return;
-                //}
-                GameController.Instance.CheckForOpponents(this);
+            GameController.Instance.CheckForOpponents(this);
 
-                // abort if we're already moving
-                if (IsMoving)
-                    return;
+            // abort if we're already moving
+            if (IsMoving)
+                return;
 
-                // assign to backing field because locationchanged will be triggered when updating location
-                Orientation = direction;
+            // assign to backing field because locationchanged will be triggered when updating location
+            Orientation = direction;
 
-                // tell movement thread to start moving
-                IsMoving = true;
-                //Console.WriteLine(this + " is moving towards " + Location.GetNeighbor(direction));
-            }
+            // tell movement thread to start moving
+            IsMoving = true;
+            //Console.WriteLine(this + " is moving towards " + Location.GetNeighbor(direction));
         }
-
-        public abstract void StartGame();
-
-        public abstract void EnemySpotted();
-
-        public abstract void SpottedByEnemy();
-
-        protected abstract void ResumeMovement();
-
-        public abstract void KilledEnemy();
 
         public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot)
         {
@@ -301,21 +292,9 @@ namespace Ai2dShooter.Model
             if (!Location.IsNeighbor(opponent.Location))
             {
                 Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("Im " + this + " and he is " + opponent);
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
-                Console.WriteLine("The opponent got away...");
 
-                ResumeMovement();
-                opponent.ResumeMovement();
+                ResumeMovementAfterShooting();
+                opponent.ResumeMovementAfterShooting();
 
                 return;
             }
@@ -331,7 +310,7 @@ namespace Ai2dShooter.Model
                 // notify self of death
                 if (Death != null)
                     Death();
-                
+
                 // notify opponent of death
                 opponent.KilledEnemy();
                 return;
@@ -342,6 +321,21 @@ namespace Ai2dShooter.Model
             var hs = Constants.Rnd.NextDouble() < HeadshotChance;
             opponent.Damage(this, FrontDamage * (hs ? 2 : 1), true, hs);
         }
+
+        #endregion
+
+        #region Abstract Methods
+
+        public abstract void StartGame();
+
+        public abstract void EnemySpotted();
+
+        public abstract void SpottedByEnemy();
+
+        protected abstract void ResumeMovementAfterShooting();
+
+        public abstract void KilledEnemy();
+
         #endregion
 
         #region Event Handling

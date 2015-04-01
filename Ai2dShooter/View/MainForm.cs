@@ -34,7 +34,7 @@ namespace Ai2dShooter.View
             }
         }
 
-        public static bool IsRunning { get; set; }
+        public static bool ApplicationRunning { get; set; }
 
         private GameController _currentGame;
 
@@ -45,7 +45,7 @@ namespace Ai2dShooter.View
         {
             InitializeComponent();
 
-            IsRunning = true;
+            ApplicationRunning = true;
 
             // setup map
             Maze.CreateNew(6, 6); // 30, 15
@@ -81,7 +81,7 @@ namespace Ai2dShooter.View
             // setup canvas invalidator thread
             new Thread(() =>
             {
-                while (IsRunning)
+                while (ApplicationRunning)
                 {
                     _canvas.Invalidate();
                     Thread.Sleep(Constants.Framerate);
@@ -152,7 +152,7 @@ namespace Ai2dShooter.View
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            IsRunning = false;
+            ApplicationRunning = false;
             _currentGame.StopGame();
         }
 
