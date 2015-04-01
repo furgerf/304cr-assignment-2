@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Windows.Forms;
 using Ai2dShooter.Common;
 using Ai2dShooter.Model;
@@ -55,11 +56,18 @@ namespace Ai2dShooter.View
             // assign event handlers
             _updateLocation = () =>
             {
-                if (InvokeRequired)
-                    Invoke((MethodInvoker) (() => _updateLocation()));
-                else
-                    grpName.Text = Player.Name + " - " + Player.Location + " - " +
-                                   Constants.PlayerControllerNames[Player.Controller];
+                try
+                {
+                    if (InvokeRequired)
+                        Invoke((MethodInvoker) (() => _updateLocation()));
+                    else
+                        grpName.Text = Player.Name + " - " + Player.Location + " - " +
+                                       Constants.PlayerControllerNames[Player.Controller];
+                }
+                catch (ObjectDisposedException ode)
+                {
+                    Console.WriteLine(ode.Message);
+                }
             };
             _updateHealth = () =>
             {

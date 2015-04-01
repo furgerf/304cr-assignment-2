@@ -33,8 +33,9 @@ namespace Ai2dShooter.Model
         public override void StartGame()
         {
             _state = State.SeekEnemy;
-            
+
             new Thread(MovementDecision).Start();
+            //MovementDecision();
         }
 
         public override void EnemySpotted()
@@ -91,10 +92,8 @@ namespace Ai2dShooter.Model
 
         private void MovementDecision()
         {
-            while (IsMoving)
-            {
-                Thread.Sleep(Speed / Constants.Framerate);
-            }
+            if (IsMoving || !IsAlive)
+                return;
 
             //Console.WriteLine("MOVEMENT STATE: " + _state);
             switch (_state)

@@ -17,11 +17,11 @@ namespace Ai2dShooter.Common
 
         public const int Framerate = 50;
 
-        //public const int MsPerCell = 100;
+        public static readonly object MovementLock = new object();
 
-        //public static readonly object FreezeLock = new object();
+        public const int AiMoveTimeout = 300;
 
-        public const int AiMoveTimeout = 200;
+        public const int ShootingTimeout = 2*AiMoveTimeout;
 
         public static readonly SoundPlayer HeadshotSound;
         public static readonly SoundPlayer PlaySound;

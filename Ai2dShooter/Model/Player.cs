@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Threading;
 using Ai2dShooter.Common;
 using Ai2dShooter.Controller;
@@ -27,7 +28,7 @@ namespace Ai2dShooter.Model
 
         #region Public Fields
 
-        public int Speed { get; private set; }
+        public int Slowness { get; private set; }
 
         public bool IsAlive { get { return Health > 0; } }
 
@@ -60,17 +61,22 @@ namespace Ai2dShooter.Model
 
         private int _health;
         private Cell _location;
-        private Direction _orientation;
 
         public Cell Location
         {
             get { return _location; }
             set
             {
-                if (_location == value) return;
+                if (_location == value || !IsAlive) return;
 
-                // update value
-                _location = value;
+                var prev = _location;
+
+                lock (Constants.MovementLock)
+                {
+                    // update value
+                    _location = value;
+                }
+                Console.WriteLine(this + " moved from " + prev);
 
                 // trigger event
                 if (LocationChanged != null)
@@ -80,7 +86,7 @@ namespace Ai2dShooter.Model
 
         private PointF _locationOffset;
 
-        protected bool IsMoving;
+        protected bool IsMoving { get; private set; }
 
         public Color Color { get; private set; }
 
@@ -88,21 +94,7 @@ namespace Ai2dShooter.Model
 
         public PlayerController Controller { get; private set; }
 
-        public Direction Orientation
-        {
-            get { return _orientation; }
-            private set
-            {
-                //if (_orientation == value) return;
-
-                // update value
-                _orientation = value;
-
-                //// trigger event
-                //if (LocationChanged != null)
-                //    LocationChanged();
-            }
-        }
+        public Direction Orientation { get; private set; }
 
         #endregion
 
@@ -110,7 +102,7 @@ namespace Ai2dShooter.Model
 
         protected Player(Cell initialLocation, PlayerController controller, Teams team)
         {
-            Speed = Constants.Rnd.Next(50, 150);
+            Slowness = Constants.Rnd.Next(100, 250);
             Team = team;
             Health = 100;
             HealthyThreshold = Constants.Rnd.Next(10, 50);
@@ -122,6 +114,8 @@ namespace Ai2dShooter.Model
             Color = Utils.GetTeamColor(team);
             Controller = controller;
             Orientation = (Direction)Constants.Rnd.Next((int)Direction.Count);
+            
+            //Slowness = 1000;
 
             // start movement thread
             new Thread(() =>
@@ -136,56 +130,39 @@ namespace Ai2dShooter.Model
                         continue;
                     }
 
-                    var firstLocation = Location;
+                    var previousLocation = Location;
 
                     // get offset in right direction
-                    PointF stepOffset = Utils.GetDirectionPoint(_orientation);
+                    PointF stepOffset = Utils.GetDirectionPoint(Orientation);
                     // divide offset to get offset for single step
                     stepOffset = new PointF(stepOffset.X/Constants.Framerate, stepOffset.Y/Constants.Framerate);
 
                     // do half the steps
-                    for (var i = 0; i < Constants.Framerate/2 && IsMoving; i++)
+                    for (var i = 0; i < Constants.Framerate && IsMoving && MainForm.IsRunning && IsAlive; i++)
                     {
                         _locationOffset.X += stepOffset.X;
                         _locationOffset.Y += stepOffset.Y;
-                        Thread.Sleep(Speed/Constants.Framerate);
-                    }
-
-                    if (!IsMoving)
-                    {
-                        _locationOffset = PointF.Empty;
-                        continue;
-                    }
-
-                    // move to next cell
-                    _locationOffset.X = -_locationOffset.X;
-                    _locationOffset.Y = -_locationOffset.Y;
-                    _location = Location.GetNeighbor(_orientation);
-
-                    // do other half of the steps
-                    for (var i = 0; i < Constants.Framerate / 2 && IsMoving; i++)
-                    {
-                        _locationOffset.X += stepOffset.X;
-                        _locationOffset.Y += stepOffset.Y;
-                        Thread.Sleep(Speed/Constants.Framerate);
-                    }
-
-                    if (!IsMoving)
-                    {
-                        _locationOffset = PointF.Empty;
-                        _location = firstLocation;
-                        continue;
+                        Thread.Sleep(Slowness/Constants.Framerate);
                     }
 
                     // clear offset
                     _locationOffset = Point.Empty;
 
+                    if (!IsMoving)
+                    {
+                        Console.WriteLine("MOVEMENT ABORTED");
+                        Console.WriteLine("MOVEMENT ABORTED");
+                        Console.WriteLine("Previous location " + previousLocation + ", current location: " + Location);
+                        Console.WriteLine("MOVEMENT ABORTED");
+                        Console.WriteLine("MOVEMENT ABORTED");
+                        return;
+                    }
+
                     // stop moving
                     IsMoving = false;
 
-                    // move is complete, trigger event
-                    if (LocationChanged != null)
-                        LocationChanged();
+                    //Console.WriteLine("Changing location");
+                    Location = Location.GetNeighbor(Orientation);
                 }
             }).Start();
         }
@@ -273,19 +250,20 @@ namespace Ai2dShooter.Model
 
                 //if (GameController.Instance.IsOpponentOnCell(Location.GetNeighbor(direction), Team))
                 //{
-                //    Console.WriteLine("ABORTING MOVE BECAUSE GUNFIGHT IS ABOUT TO START");
+                //    Console.WriteLine("ABORTING MOVE OF " + this + " BECAUSE GUNFIGHT IS ABOUT TO START");
                 //    return;
                 //}
+                GameController.Instance.CheckForOpponents(this);
 
                 // abort if we're already moving
                 if (IsMoving)
                     return;
 
-                    // assign to backing field because locationchanged will be triggered when updating location
-                    _orientation = direction;
+                // assign to backing field because locationchanged will be triggered when updating location
+                Orientation = direction;
 
-                    // tell movement thread to start moving
-                    IsMoving = true;
+                // tell movement thread to start moving
+                IsMoving = true;
                 //Console.WriteLine(this + " is moving towards " + Location.GetNeighbor(direction));
             }
         }

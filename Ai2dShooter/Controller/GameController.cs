@@ -78,8 +78,7 @@ namespace Ai2dShooter.Controller
 
         public bool IsOpponentOnCell(Cell cell, Teams team)
         {
-            //lock (_lock)
-                return _players.Any(p => p.Location == cell && p.Team != team && p.IsAlive);
+            return _players.Any(p => p.Location == cell && p.Team != team && p.IsAlive);
         }
 
         public void StartGame()
@@ -108,22 +107,15 @@ namespace Ai2dShooter.Controller
             return _shootingPlayers.Any(s => s.Contains(player));
         }
 
-        #endregion
-
-        #region Event Handling
-
-        private void PlayerLocationChanged(Player player)
+        public void CheckForOpponents(Player player)
         {
-            //Console.WriteLine(player + "s location has changed");
-
-            if (IsShootingPlayer(player) || !player.IsAlive)
-                return;
-
-            // check whether player can shoot at any other player
-            foreach (var opponent in _opponents[player].Where(o => !IsShootingPlayer(o)))
+            lock (Constants.MovementLock)
             {
-                if (player.Location.Neighbors.Contains(opponent.Location))
+                // check whether player can shoot at any other player
+                foreach (var opponent in _opponents[player].Where(o => !IsShootingPlayer(o)))
                 {
+                    if (player.Location.Neighbors.Contains(opponent.Location))
+                    {
                         var op = opponent;
                         // *someone* has spotted *someone*
                         // did the player move into a camper's crosshair?
@@ -139,15 +131,28 @@ namespace Ai2dShooter.Controller
                         player.EnemySpotted();
                         op.SpottedByEnemy();
 
-                        _shootingPlayers.Add(new[] {player, op});
+                        _shootingPlayers.Add(new[] { player, op });
 
                         var headshot = Constants.Rnd.NextDouble() < player.HeadshotChance;
                         var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
 
-                        op.Damage(player, (frontalAttack ? player.FrontDamage : player.BackDamage)*(headshot ? 2 : 1),
+                        op.Damage(player, (frontalAttack ? player.FrontDamage : player.BackDamage) * (headshot ? 2 : 1),
                             frontalAttack, headshot);
+                    }
                 }
             }
+        }
+
+        #endregion
+
+        #region Event Handling
+
+        private void PlayerLocationChanged(Player player)
+        {
+            if (IsShootingPlayer(player) || !player.IsAlive)
+                return;
+
+            CheckForOpponents(player);
         }
 
         #endregion

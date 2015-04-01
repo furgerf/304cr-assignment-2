@@ -48,18 +48,19 @@ namespace Ai2dShooter.View
             IsRunning = true;
 
             // setup map
-            Maze.CreateNew(15, 15); // 30, 15
-            Maze.Instance.SaveMap("maze with path.png");
+            Maze.CreateNew(6, 6); // 30, 15
+
+            _canvas.Size = new Size(Constants.ScaleFactor * Maze.Instance.Width, Constants.ScaleFactor *Maze.Instance.Height);
 
             // setup players
             _players = new Player[]
             {
-                new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
-                //new FsmPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
-                new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
+                //new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
+                new FsmPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
+                //new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
                 new FsmPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
                 new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
-                new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
+                //new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
                 new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold)
             };
 
