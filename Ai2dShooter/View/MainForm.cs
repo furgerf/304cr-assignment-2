@@ -36,8 +36,6 @@ namespace Ai2dShooter.View
 
         public static bool ApplicationRunning { get; set; }
 
-        private GameController _currentGame;
-
         #endregion
 
         #region Constructor
@@ -97,8 +95,7 @@ namespace Ai2dShooter.View
                 
             }).Start();
 
-            _currentGame = new GameController(_players);
-            _currentGame.StartGame();
+            new GameController(_players).StartGame();
         }
 
         #endregion
@@ -167,7 +164,7 @@ namespace Ai2dShooter.View
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             ApplicationRunning = false;
-            _currentGame.StopGame();
+            GameController.Instance.StopGame();
         }
 
         #endregion

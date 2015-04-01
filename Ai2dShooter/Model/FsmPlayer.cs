@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using Ai2dShooter.Common;
@@ -11,6 +13,14 @@ namespace Ai2dShooter.Model
         #region Private Fields
 
         private enum State { SeekEnemy, Attack, SeekFriend, Dead, Count }
+
+        private static readonly Dictionary<State, Color> StateColors = new Dictionary<State, Color>
+        {
+            {State.SeekEnemy, Color.Green},
+            {State.Attack, Color.Red},
+            {State.SeekFriend, Color.Pink},
+            {State.Dead, Color.FromArgb(Constants.DeadAlpha, Color.DeepSkyBlue)}
+        };
 
         private State _state;
 
@@ -29,6 +39,11 @@ namespace Ai2dShooter.Model
         #endregion
 
         #region Main Methods
+
+        protected override void DrawPlayerImplementation(Graphics graphics, int scaleFactor, Rectangle box)
+        {
+            graphics.DrawEllipse(new Pen(StateColors[_state], 3), box);
+        }
 
         public override void StartGame()
         {

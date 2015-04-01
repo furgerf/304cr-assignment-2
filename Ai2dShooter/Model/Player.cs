@@ -134,9 +134,10 @@ namespace Ai2dShooter.Model
 
         private Cell _location;
 
-        private PointF _locationOffset;
+        protected PointF LocationOffset;
 
         private Direction _orientation;
+
         private int _kills;
 
         protected bool IsMoving { get; set; }
@@ -190,8 +191,8 @@ namespace Ai2dShooter.Model
                 int i;
                 for (i = 0; i < Constants.Framerate && IsMoving && MainForm.ApplicationRunning && IsAlive; i++)
                 {
-                    _locationOffset.X += stepOffset.X;
-                    _locationOffset.Y += stepOffset.Y;
+                    LocationOffset.X += stepOffset.X;
+                    LocationOffset.Y += stepOffset.Y;
                     Thread.Sleep(Slowness / Constants.Framerate);
                 }
 
@@ -199,20 +200,20 @@ namespace Ai2dShooter.Model
                 {
                     for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i -= 2)
                     {
-                        _locationOffset.X -= 2 * stepOffset.X;
-                        _locationOffset.Y -= 2 * stepOffset.Y;
+                        LocationOffset.X -= 2 * stepOffset.X;
+                        LocationOffset.Y -= 2 * stepOffset.Y;
                         Thread.Sleep(Slowness / Constants.Framerate);
                     }
 
                     // clear offset
-                    _locationOffset = Point.Empty;
+                    LocationOffset = Point.Empty;
 
                     //Console.WriteLine(this + " had his movement aborted");
                     continue;
                 }
 
                 // clear offset
-                _locationOffset = Point.Empty;
+                LocationOffset = Point.Empty;
 
                 // stop moving
                 IsMoving = false;
@@ -234,13 +235,13 @@ namespace Ai2dShooter.Model
 
         public void DrawPlayer(Graphics graphics, int scaleFactor)
         {
-            // box in which to draw the opponent
-            var box = new Rectangle((int) ((Location.X + _locationOffset.X)*scaleFactor) - 1,
-                (int) ((Location.Y + _locationOffset.Y)*scaleFactor) - 1, scaleFactor + 1,
+            // box in which to draw the player
+            var box = new Rectangle((int) ((Location.X + LocationOffset.X)*scaleFactor) - 1,
+                (int) ((Location.Y + LocationOffset.Y)*scaleFactor) - 1, scaleFactor + 1,
                 scaleFactor + 1);
 
             // draw opponent circle
-            graphics.FillEllipse(new SolidBrush(Color.FromArgb(IsAlive ? 255 : 64, Color)), box);
+            graphics.FillEllipse(new SolidBrush(Color.FromArgb(IsAlive ? 255 : Constants.DeadAlpha, Color)), box);
 
             // start of the orientation line
             var orientationStart = new Point(box.Left + box.Width/2, box.Top + box.Height/2);
@@ -266,7 +267,7 @@ namespace Ai2dShooter.Model
             }
 
             // draw orientation line
-            graphics.DrawLine(new Pen(Color.FromArgb(IsAlive ? 255 : 64, Color.Black), 4), orientationStart,
+            graphics.DrawLine(new Pen(Color.FromArgb(IsAlive ? 255 : Constants.DeadAlpha, Color.Black), 4), orientationStart,
                 orientationEnd);
 
             // draw opponent visibility range
@@ -296,6 +297,8 @@ namespace Ai2dShooter.Model
                                     Constants.ScaleFactor));
                     }
             }
+
+            DrawPlayerImplementation(graphics, scaleFactor, box);
         }
 
         public bool CanMove(Direction direction)
@@ -377,6 +380,8 @@ namespace Ai2dShooter.Model
         public abstract void EnemySpotted();
 
         public abstract void SpottedByEnemy();
+
+        protected abstract void DrawPlayerImplementation(Graphics graphics, int scaleFactor, Rectangle box);
 
         public virtual void KilledEnemy()
         {

@@ -35,6 +35,8 @@ namespace Ai2dShooter.Common
         public static readonly SoundPlayer MediumHitSound;
         public static readonly SoundPlayer HardHitSound;
 
+        public const int DeadAlpha = 64;
+
         static Constants()
         {
             HeadshotSound = new SoundPlayer(Properties.Resources.headshot);
