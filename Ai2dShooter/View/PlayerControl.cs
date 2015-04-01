@@ -85,7 +85,7 @@ namespace Ai2dShooter.View
             _updateKills = () =>
             {
                 if (InvokeRequired)
-                    Invoke((MethodInvoker) (() => _updateHealth()));
+                    Invoke((MethodInvoker)(() => _updateKills()));
                 else
                     txtKills.Text = Player.Kills.ToString(CultureInfo.InvariantCulture);
             };

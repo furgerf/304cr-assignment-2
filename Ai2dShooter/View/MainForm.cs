@@ -65,12 +65,20 @@ namespace Ai2dShooter.View
             };
 
             // setup player controls
-            var playerControls = new[] {playerControl1, playerControl2, playerControl3, playerControl4, playerControl5, playerControl6};
+            var playerControlRight = 0;
+            var playerControlBottom = 0;
             for (var i = 0; i < _players.Length; i++)
             {
-                playerControls[i].Player = _players[i];
+                var pc = new PlayerControl {Player = _players[i]};
+                pc.Location = new Point(_canvas.Location.X + (pc.Width + 8) * i, _canvas.Location.Y + _canvas.Height + 8);
+                playerControlRight = pc.Right;
+                playerControlBottom = pc.Bottom;
+
+                Controls.Add(pc);
                 _players[i].LocationChanged += () => _canvas.Invalidate();
             }
+            Width = playerControlRight + 16;
+            Height = playerControlBottom + 32;
 
             // setup drawing
             _canvas.Paint += DrawCanvas;
