@@ -141,11 +141,12 @@ namespace Ai2dShooter.Controller
                             throw new Exception("Can only have one gunfight at a time!");
                         _shootingPlayers = new[] {player, op};
 
-                        var headshot = Constants.Rnd.NextDouble() < player.HeadshotChance;
+                        var hit = Constants.Rnd.NextDouble() < player.ShootingAccuracy;
+                        var headshot = hit && (Constants.Rnd.NextDouble() < player.HeadshotChance);
                         var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
 
                         Thread.Sleep(Constants.ShootingTimeout);
-                        op.Damage(player, (frontalAttack ? player.FrontDamage : player.BackDamage)*(headshot ? 2 : 1),
+                        op.Damage(player, (hit ? 1 : 0)*(frontalAttack ? player.FrontDamage : player.BackDamage)*(headshot ? 2 : 1),
                             frontalAttack, headshot);
                         return;
                     }

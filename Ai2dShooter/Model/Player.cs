@@ -148,7 +148,7 @@ namespace Ai2dShooter.Model
         protected Player(Cell initialLocation, PlayerController controller, Teams team)
         {
             ShootingAccuracy = ((double)Constants.Rnd.Next(3) + 17) / 20; // 85-95%
-            Slowness = Constants.Rnd.Next(300, 400);
+            Slowness = Constants.Rnd.Next(200, 500);
             Team = team;
             Health = 100;
             HealthyThreshold = Constants.Rnd.Next(10, 50);
@@ -337,7 +337,9 @@ namespace Ai2dShooter.Model
             }
             else
             {
-                if (damage > 55)
+                if (damage == 0)
+                    Constants.MissSound.Play();
+                else if (damage > 55)
                     Constants.HardHitSound.Play();
                 else if (damage > 45)
                     Constants.MediumHitSound.Play();
@@ -361,8 +363,9 @@ namespace Ai2dShooter.Model
 
             Thread.Sleep(Constants.ShootingTimeout);
 
-            var hs = Constants.Rnd.NextDouble() < HeadshotChance;
-            opponent.Damage(this, FrontDamage*(hs ? 2 : 1), true, hs);
+            var hit = Constants.Rnd.NextDouble() < ShootingAccuracy;
+            var hs = hit && (Constants.Rnd.NextDouble() < HeadshotChance);
+            opponent.Damage(this, (hit ? 1 : 0) * FrontDamage * (hs ? 2 : 1), true, hs);
         }
 
         #endregion

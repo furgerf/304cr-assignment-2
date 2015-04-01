@@ -106,7 +106,8 @@ namespace Ai2dShooter.View
             _updateHealth();
             txtHealthyThreshold.Text = Player.HealthyThreshold.ToString(CultureInfo.InvariantCulture);
             txtDamage.Text = Player.FrontDamage + "/" + Player.BackDamage;
-            txtAccuracy.Text = Player.ShootingAccuracy + "/" + Player.HeadshotChance;
+            txtAccuracy.Text = 100*Player.ShootingAccuracy + "%";
+            txtHeadshot.Text = 100*Player.HeadshotChance + "%";
             txtSlowness.Text = Player.Slowness + "ms/cell";
             _updateKills();
         }
