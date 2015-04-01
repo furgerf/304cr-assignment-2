@@ -9,6 +9,9 @@ using Ai2dShooter.Map;
 
 namespace Ai2dShooter.Model
 {
+    /// <summary>
+    /// An AI player controlled by a finite state machine (FSM).
+    /// </summary>
     public class FsmPlayer : Player
     {
         #region Private Fields
