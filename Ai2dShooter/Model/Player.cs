@@ -44,6 +44,11 @@ namespace Ai2dShooter.Model
                 // trigger event
                 if (HealthChanged != null)
                     HealthChanged();
+
+                if (Health <= 0 && Death != null)
+                {
+                    Death();
+                }
             }
         }
 
@@ -64,14 +69,17 @@ namespace Ai2dShooter.Model
             {
                 if (_location == value || !IsAlive) return;
 
-                var prev = _location;
+                //var prev = _location;
+
 
                 lock (Constants.MovementLock)
                 {
+                    //Constants.MovementSemaphore.WaitOne();
                     // update value
                     _location = value;
+                    //Constants.MovementSemaphore.Release();
                 }
-                Console.WriteLine(this + " moved from " + prev);
+                //Console.WriteLine(this + " moved from " + prev);
 
                 // trigger event
                 if (LocationChanged != null)
@@ -109,7 +117,7 @@ namespace Ai2dShooter.Model
 
         private Direction _orientation;
 
-        protected bool IsMoving { get; private set; }
+        protected bool IsMoving { get; set; }
 
         #endregion
 
@@ -117,7 +125,7 @@ namespace Ai2dShooter.Model
 
         protected Player(Cell initialLocation, PlayerController controller, Teams team)
         {
-            Slowness = Constants.Rnd.Next(100, 250);
+            Slowness = Constants.Rnd.Next(300, 400);
             Team = team;
             Health = 100;
             HealthyThreshold = Constants.Rnd.Next(10, 50);
@@ -143,29 +151,39 @@ namespace Ai2dShooter.Model
                         continue;
                     }
 
-                    var previousLocation = Location;
-
                     // get offset in right direction
                     PointF stepOffset = Utils.GetDirectionPoint(Orientation);
                     // divide offset to get offset for single step
                     stepOffset = new PointF(stepOffset.X/Constants.Framerate, stepOffset.Y/Constants.Framerate);
 
                     // do half the steps
-                    for (var i = 0; i < Constants.Framerate && IsMoving && MainForm.ApplicationRunning && IsAlive; i++)
+                    int i;
+                    for (i = 0; i < Constants.Framerate && IsMoving && MainForm.ApplicationRunning && IsAlive; i++)
                     {
                         _locationOffset.X += stepOffset.X;
                         _locationOffset.Y += stepOffset.Y;
                         Thread.Sleep(Slowness/Constants.Framerate);
                     }
 
-                    // clear offset
-                    _locationOffset = Point.Empty;
-
                     if (!IsMoving)
                     {
-                        ResumeMovementAfterShooting();
-                        return;
+                        for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i-=2)
+                        {
+                            _locationOffset.X -= 2*stepOffset.X;
+                            _locationOffset.Y -= 2*stepOffset.Y;
+                            Thread.Sleep(Slowness / Constants.Framerate);
+                        }
+
+                        // clear offset
+                        _locationOffset = Point.Empty;
+
+                        Console.WriteLine(this + " had his movement aborted");
+                        //ResumeMovementAfterShooting();
+                        continue;
                     }
+
+                    // clear offset
+                    _locationOffset = Point.Empty;
 
                     // stop moving
                     IsMoving = false;
@@ -293,30 +311,31 @@ namespace Ai2dShooter.Model
             {
                 Console.WriteLine("The opponent got away...");
 
-                ResumeMovementAfterShooting();
-                opponent.ResumeMovementAfterShooting();
+                //ResumeMovementAfterShooting();
+                //opponent.ResumeMovementAfterShooting();
 
                 return;
             }
 
-            // turn opponent towards "me"
-            Orientation = Location.GetDirection(opponent.Location);
-
             // retaliate!
-            if (Health == 0)
+            if (!IsAlive)
             {
+                //Constants.MovementSemaphore.Release();
                 Console.WriteLine(this + " has died!");
 
                 // notify self of death
-                if (Death != null)
-                    Death();
+                //if (Death != null)
+                //    Death();
 
                 // notify opponent of death
                 opponent.KilledEnemy();
                 return;
             }
 
-            Thread.Sleep(Constants.AiMoveTimeout);
+            // turn towards opponent
+            Orientation = Location.GetDirection(opponent.Location);
+
+            Thread.Sleep(Constants.ShootingTimeout);
 
             var hs = Constants.Rnd.NextDouble() < HeadshotChance;
             opponent.Damage(this, FrontDamage * (hs ? 2 : 1), true, hs);
@@ -332,7 +351,7 @@ namespace Ai2dShooter.Model
 
         public abstract void SpottedByEnemy();
 
-        protected abstract void ResumeMovementAfterShooting();
+        //protected abstract void ResumeMovementAfterShooting();
 
         public abstract void KilledEnemy();
 
@@ -343,5 +362,11 @@ namespace Ai2dShooter.Model
 
 
         #endregion
+
+        public void TriggerLocationChange()
+        {
+            if (LocationChanged != null)
+                LocationChanged();
+        }
     }
 }
