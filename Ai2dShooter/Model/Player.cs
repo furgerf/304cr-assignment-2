@@ -72,6 +72,7 @@ namespace Ai2dShooter.Model
                 if (Health <= 0 && Death != null)
                 {
                     Death();
+                    Constants.DeathSound.Play();
                 }
             }
         }
@@ -377,6 +378,8 @@ namespace Ai2dShooter.Model
         public virtual void KilledEnemy()
         {
             Kills++;
+            if (Kills == 3)
+                Constants.TripleKillSound.Play();
         }
 
         #endregion

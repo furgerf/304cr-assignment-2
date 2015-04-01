@@ -212,6 +212,15 @@ namespace Ai2dShooter.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
+        internal static System.IO.UnmanagedMemoryStream triplekill {
+            get {
+                return ResourceManager.GetStream("triplekill", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
         internal static System.IO.UnmanagedMemoryStream usp1 {
             get {
                 return ResourceManager.GetStream("usp1", resourceCulture);

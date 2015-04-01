@@ -27,6 +27,8 @@ namespace Ai2dShooter.Common
         public static readonly SoundPlayer PlaySound;
         public static readonly SoundPlayer FirstBloodSound;
         public static readonly SoundPlayer PerfectSound;
+        public static readonly SoundPlayer DeathSound;
+        public static readonly SoundPlayer TripleKillSound;
 
         public static readonly SoundPlayer LowHitSound;
         public static readonly SoundPlayer MediumHitSound;
@@ -38,6 +40,8 @@ namespace Ai2dShooter.Common
             PlaySound = new SoundPlayer(Properties.Resources.play);
             FirstBloodSound = new SoundPlayer(Properties.Resources.firstblood);
             PerfectSound = new SoundPlayer(Properties.Resources.perfect);
+            DeathSound = new SoundPlayer(Properties.Resources.death6);
+            TripleKillSound = new SoundPlayer(Properties.Resources.triplekill);
 
             LowHitSound = new SoundPlayer(Properties.Resources.usp1);
             MediumHitSound = new SoundPlayer(Properties.Resources.elite_1);

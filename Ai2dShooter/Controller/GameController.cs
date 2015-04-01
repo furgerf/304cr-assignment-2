@@ -66,6 +66,10 @@ namespace Ai2dShooter.Controller
                         if (o.Length == 0)
                         {
                             // game over!
+                            // did all players of one team survive?
+                            if (_opponents[_opponents.Keys.ToArray()[0]].Length == _opponents.Keys.Count)
+                                Constants.PerfectSound.Play();
+
                             MainForm.ApplicationRunning = false;
                             StopGame();
                         }
