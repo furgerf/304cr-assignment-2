@@ -18,7 +18,6 @@ namespace Ai2dShooter.Common
         public const int Framerate = 50;
 
         public static readonly object MovementLock = new object();
-        //public static readonly Semaphore MovementSemaphore = new Semaphore(1, 1);
 
         public const int AiMoveTimeout = 100;
 

@@ -46,7 +46,6 @@ namespace Ai2dShooter.Controller
 
                 p.Death += () =>
                 {
-                    //Monitor.PulseAll(Constants.MovementLock);
                     // remove from shooting player list
                     //var shooters = _shootingPlayers.First(s => s.Contains(p));
                     _shootingPlayers.Remove(_shootingPlayers.First(s => s.Contains(p)));
@@ -113,7 +112,6 @@ namespace Ai2dShooter.Controller
 
             lock (Constants.MovementLock)
             {
-            //Constants.MovementSemaphore.WaitOne();
                 // check whether player can shoot at any other player
                 foreach (var opponent in _opponents[player].Where(o => !IsShootingPlayer(o)))
                 {
@@ -136,19 +134,18 @@ namespace Ai2dShooter.Controller
 
                         if (_shootingPlayers.Count != 0)
                             throw new Exception();
-                        _shootingPlayers.Add(new[] { player, op });
+                        _shootingPlayers.Add(new[] {player, op});
 
                         var headshot = Constants.Rnd.NextDouble() < player.HeadshotChance;
                         var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
 
                         Thread.Sleep(Constants.ShootingTimeout);
-                        op.Damage(player, (frontalAttack ? player.FrontDamage : player.BackDamage) * (headshot ? 2 : 1),
+                        op.Damage(player, (frontalAttack ? player.FrontDamage : player.BackDamage)*(headshot ? 2 : 1),
                             frontalAttack, headshot);
                         return;
                     }
                 }
-                }
-                //Constants.MovementSemaphore.Release();
+            }
         }
 
         #endregion

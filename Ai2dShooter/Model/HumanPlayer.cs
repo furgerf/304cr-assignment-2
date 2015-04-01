@@ -25,11 +25,6 @@ namespace Ai2dShooter.Model
             // do nothing
         }
 
-        //protected override void ResumeMovementAfterShooting()
-        //{
-        //    // do nothing
-        //}
-
         public override void SpottedByEnemy()
         {
             // do nothing

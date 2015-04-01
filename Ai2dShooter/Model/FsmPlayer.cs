@@ -49,21 +49,10 @@ namespace Ai2dShooter.Model
             AbortMovement();
         }
 
-        //protected override void ResumeMovementAfterShooting()
-        //{
-        //    _state = State.SeekEnemy;
-
-        //    IsMoving = false;
-
-        //    MovementDecision();
-        //}
-
         public override void KilledEnemy()
         {
             // depending on health, look for friends or enemies
             _state = Health >= HealthyThreshold ? State.SeekEnemy : State.SeekFriend;
-
-            //IsMoving = true;
 
             // start movement
             MovementDecision();

@@ -48,7 +48,7 @@ namespace Ai2dShooter.View
             ApplicationRunning = true;
 
             // setup map
-            Maze.CreateNew(6, 6); // 30, 15
+            Maze.CreateNew(10, 10); // 30, 15
 
             _canvas.Size = new Size(Constants.ScaleFactor * Maze.Instance.Width, Constants.ScaleFactor *Maze.Instance.Height);
 
@@ -57,10 +57,10 @@ namespace Ai2dShooter.View
             {
                 //new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
                 new FsmPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
-                //new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
+                new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
                 new FsmPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
                 new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
-                //new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
+                new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
                 new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold)
             };
 
@@ -110,9 +110,15 @@ namespace Ai2dShooter.View
 
         private void DrawCanvas(object sender, PaintEventArgs e)
         {
+            // draw map
             Maze.DrawMaze(e.Graphics, Constants.ScaleFactor);
-            foreach (var p in _players)
+            // draw dead players
+            foreach (var p in _players.Where(p => !p.IsAlive))
                 p.DrawPlayer(e.Graphics, Constants.ScaleFactor);
+            // draw alive players
+            foreach (var p in _players.Where(p => p.IsAlive))
+                p.DrawPlayer(e.Graphics, Constants.ScaleFactor);
+            // draw fog
             DrawFog(e.Graphics);
         }
 
