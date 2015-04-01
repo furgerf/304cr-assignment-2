@@ -23,8 +23,8 @@ namespace Ai2dShooter.Controller
         private readonly Player[] _players;
 
         private readonly Dictionary<Player, Player[]> _opponents = new Dictionary<Player, Player[]>();
-        
-        private readonly List<Player[]> _shootingPlayers = new List<Player[]>();
+
+        private Player[] _shootingPlayers;
 
         private int _deathCount;
 
@@ -48,8 +48,9 @@ namespace Ai2dShooter.Controller
                 {
                     // remove from shooting player list
                     //var shooters = _shootingPlayers.First(s => s.Contains(p));
-                    _shootingPlayers.Remove(_shootingPlayers.First(s => s.Contains(p)));
+                    //_shootingPlayers.Remove(_shootingPlayers.First(s => s.Contains(p)));
                     //shooters.First(s => s != p).TriggerLocationChange();
+                    _shootingPlayers = null;
 
                     // remove from opponent's opponent list
                     foreach (var opponent in _opponents[p1])
@@ -102,7 +103,7 @@ namespace Ai2dShooter.Controller
 
         private bool IsShootingPlayer(Player player)
         {
-            return _shootingPlayers.Any(s => s.Contains(player));
+            return _shootingPlayers != null && _shootingPlayers.Any(s => s == player);
         }
 
         public void CheckForOpponents(Player player)
@@ -132,9 +133,9 @@ namespace Ai2dShooter.Controller
                         player.EnemySpotted();
                         op.SpottedByEnemy();
 
-                        if (_shootingPlayers.Count != 0)
-                            throw new Exception();
-                        _shootingPlayers.Add(new[] {player, op});
+                        if (_shootingPlayers != null)
+                            throw new Exception("Can only have one gunfight at a time!");
+                        _shootingPlayers = new[] {player, op};
 
                         var headshot = Constants.Rnd.NextDouble() < player.HeadshotChance;
                         var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
