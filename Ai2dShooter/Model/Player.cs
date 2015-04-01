@@ -30,6 +30,10 @@ namespace Ai2dShooter.Model
 
         #region Public Fields
 
+        public int Kills { get; private set; }
+
+        public double ShootingAccuracy { get; private set; }
+
         public int Slowness { get; private set; }
 
         public bool IsAlive
@@ -127,6 +131,7 @@ namespace Ai2dShooter.Model
 
         protected Player(Cell initialLocation, PlayerController controller, Teams team)
         {
+            ShootingAccuracy = ((double)Constants.Rnd.Next(3) + 17) / 20; // 85-95%
             Slowness = Constants.Rnd.Next(300, 400);
             Team = team;
             Health = 100;
@@ -141,63 +146,65 @@ namespace Ai2dShooter.Model
             Orientation = (Direction) Constants.Rnd.Next((int) Direction.Count);
 
             // start movement thread
-            new Thread(() =>
-            {
-                // loop while application is running
-                while (MainForm.ApplicationRunning)
-                {
-                    // zzzzzzzzZZZZZZZZZZzzzzzz
-                    if (!IsMoving)
-                    {
-                        Thread.Sleep(Constants.Framerate);
-                        continue;
-                    }
-
-                    // get offset in right direction
-                    PointF stepOffset = Utils.GetDirectionPoint(Orientation);
-                    // divide offset to get offset for single step
-                    stepOffset = new PointF(stepOffset.X/Constants.Framerate, stepOffset.Y/Constants.Framerate);
-
-                    // do half the steps
-                    int i;
-                    for (i = 0; i < Constants.Framerate && IsMoving && MainForm.ApplicationRunning && IsAlive; i++)
-                    {
-                        _locationOffset.X += stepOffset.X;
-                        _locationOffset.Y += stepOffset.Y;
-                        Thread.Sleep(Slowness/Constants.Framerate);
-                    }
-
-                    if (!IsMoving)
-                    {
-                        for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i -= 2)
-                        {
-                            _locationOffset.X -= 2*stepOffset.X;
-                            _locationOffset.Y -= 2*stepOffset.Y;
-                            Thread.Sleep(Slowness/Constants.Framerate);
-                        }
-
-                        // clear offset
-                        _locationOffset = Point.Empty;
-
-                        //Console.WriteLine(this + " had his movement aborted");
-                        continue;
-                    }
-
-                    // clear offset
-                    _locationOffset = Point.Empty;
-
-                    // stop moving
-                    IsMoving = false;
-
-                    //Console.WriteLine("Changing location");
-                    Location = Location.GetNeighbor(Orientation);
-                }
-            }).Start();
+            new Thread(MovementWorker).Start();
         }
 
         #endregion
 
         #region Implemented Methods
+
+        private void MovementWorker()
+        {
+            // loop while application is running
+            while (MainForm.ApplicationRunning)
+            {
+                // zzzzzzzzZZZZZZZZZZzzzzzz
+                if (!IsMoving)
+                {
+                    Thread.Sleep(Constants.Framerate);
+                    continue;
+                }
+
+                // get offset in right direction
+                PointF stepOffset = Utils.GetDirectionPoint(Orientation);
+                // divide offset to get offset for single step
+                stepOffset = new PointF(stepOffset.X / Constants.Framerate, stepOffset.Y / Constants.Framerate);
+
+                // do half the steps
+                int i;
+                for (i = 0; i < Constants.Framerate && IsMoving && MainForm.ApplicationRunning && IsAlive; i++)
+                {
+                    _locationOffset.X += stepOffset.X;
+                    _locationOffset.Y += stepOffset.Y;
+                    Thread.Sleep(Slowness / Constants.Framerate);
+                }
+
+                if (!IsMoving)
+                {
+                    for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i -= 2)
+                    {
+                        _locationOffset.X -= 2 * stepOffset.X;
+                        _locationOffset.Y -= 2 * stepOffset.Y;
+                        Thread.Sleep(Slowness / Constants.Framerate);
+                    }
+
+                    // clear offset
+                    _locationOffset = Point.Empty;
+
+                    //Console.WriteLine(this + " had his movement aborted");
+                    continue;
+                }
+
+                // clear offset
+                _locationOffset = Point.Empty;
+
+                // stop moving
+                IsMoving = false;
+
+                //Console.WriteLine("Changing location");
+                Location = Location.GetNeighbor(Orientation);
+            }
+        }
 
         protected void AbortMovement()
         {
@@ -352,7 +359,10 @@ namespace Ai2dShooter.Model
 
         public abstract void SpottedByEnemy();
 
-        public abstract void KilledEnemy();
+        public virtual void KilledEnemy()
+        {
+            Kills++;
+        }
 
         #endregion
 

@@ -51,6 +51,8 @@ namespace Ai2dShooter.Model
 
         public override void KilledEnemy()
         {
+            base.KilledEnemy();
+
             // depending on health, look for friends or enemies
             _state = Health >= HealthyThreshold ? State.SeekEnemy : State.SeekFriend;
 
