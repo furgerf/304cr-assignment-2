@@ -156,9 +156,9 @@ namespace Ai2dShooter.Model
                                     continue;
                                 }
 
-                                // calculate score: distance * distance + 2 * rnd
+                                // calculate score: distance * distance + rnd
                                 directionScore[i] = neighbor.GetManhattenDistance(_targetCell) * neighbor.GetManhattenDistance(_targetCell) +
-                                                    2*Constants.Rnd.Next(Constants.Visibility);
+                                                    Constants.Rnd.Next(Constants.Visibility);
 
                                 // if we'd have to go backwards, double the score
                                 if (((int) Orientation + 2%(int) Direction.Count) == i)

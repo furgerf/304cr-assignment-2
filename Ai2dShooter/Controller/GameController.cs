@@ -111,10 +111,12 @@ namespace Ai2dShooter.Controller
         public Cell GetClosestOpponentCell(Player player)
         {
             Cell closest = null;
+            var visibleCells = player.VisibleReachableCells.ToArray();
+
             foreach (var o in _opponents[player])
             {
                 var distance = player.Location.GetManhattenDistance(o.Location);
-                if (distance > Constants.Visibility)
+                if (!visibleCells.Contains(o.Location))
                     continue;
 
                 closest = closest ?? o.Location;

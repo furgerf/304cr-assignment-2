@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Threading;
 using Ai2dShooter.Common;
 using Ai2dShooter.Controller;
@@ -124,6 +126,32 @@ namespace Ai2dShooter.Model
             }
         }
 
+        public IEnumerable<Cell> VisibleReachableCells
+        {
+            get
+            {
+                var testedCells = new List<Cell> {Location};
+                var cells = new List<Cell>{Location};
+                var stack = new Stack<Cell>();
+                stack.Push(Location);
+                var distances = new Dictionary<Cell, int> {{Location, 0}};
+
+                while (stack.Count > 0)
+                {
+                    var currentCell = stack.Pop();
+                    foreach (var s in currentCell.Neighbors.Where(s => s != null && s.IsClear && distances[currentCell] + 1 <= Constants.Visibility && !testedCells.Contains(s)))
+                    {
+                        stack.Push(s);
+                        cells.Add(s);
+                        testedCells.Add(s);
+                        distances[s] = distances[currentCell] + 1;
+                    }
+                }
+
+                return cells.ToArray();
+            }
+        }
+
         #endregion
 
         #region Private Fields
@@ -149,7 +177,7 @@ namespace Ai2dShooter.Model
         protected Player(Cell initialLocation, PlayerController controller, Teams team)
         {
             ShootingAccuracy = ((double)Constants.Rnd.Next(3) + 17) / 20; // 85-95%
-            Slowness = Constants.Rnd.Next(100, 300);
+            Slowness = Constants.Rnd.Next(100, 200);
             Team = team;
             Health = 100;
             HealthyThreshold = Constants.Rnd.Next(10, 50);
@@ -273,29 +301,36 @@ namespace Ai2dShooter.Model
             // draw opponent visibility range
             if (Controller != PlayerController.Human && IsAlive && !MainForm.HasLivingHumanPlayer)
             {
-                for (var x = Location.X - Constants.Visibility < 0 ? 0 : Location.X - Constants.Visibility;
-                    x <=
-                    (Location.X + Constants.Visibility > Maze.Instance.Width - 1
-                        ? Maze.Instance.Width - 1
-                        : Location.X + Constants.Visibility);
-                    x++)
-                    for (var y = Location.Y - Constants.Visibility < 0 ? 0 : Location.Y - Constants.Visibility;
-                        y <=
-                        (Location.Y + Constants.Visibility > Maze.Instance.Height - 1
-                            ? Maze.Instance.Height - 1
-                            : Location.Y + Constants.Visibility);
-                        y++)
-                    {
-                        if (Maze.Instance.Cells[x, y] == null)
-                            continue;
-
-                        if (Location.GetManhattenDistance(x, y) <= Constants.Visibility)
-                            graphics.FillRectangle(
+                foreach (var c in VisibleReachableCells)
+                    graphics.FillRectangle(
                                 new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(127, Color), Color.FromArgb(0)),
-                                new Rectangle(x*Constants.ScaleFactor, y*Constants.ScaleFactor,
+                                new Rectangle(c.X * Constants.ScaleFactor, c.Y * Constants.ScaleFactor,
                                     Constants.ScaleFactor,
                                     Constants.ScaleFactor));
-                    }
+
+                //for (var x = Location.X - Constants.Visibility < 0 ? 0 : Location.X - Constants.Visibility;
+                //    x <=
+                //    (Location.X + Constants.Visibility > Maze.Instance.Width - 1
+                //        ? Maze.Instance.Width - 1
+                //        : Location.X + Constants.Visibility);
+                //    x++)
+                //    for (var y = Location.Y - Constants.Visibility < 0 ? 0 : Location.Y - Constants.Visibility;
+                //        y <=
+                //        (Location.Y + Constants.Visibility > Maze.Instance.Height - 1
+                //            ? Maze.Instance.Height - 1
+                //            : Location.Y + Constants.Visibility);
+                //        y++)
+                //    {
+                //        if (Maze.Instance.Cells[x, y] == null)
+                //            continue;
+
+                //        if (Location.GetManhattenDistance(x, y) <= Constants.Visibility)
+                //            graphics.FillRectangle(
+                //                new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(127, Color), Color.FromArgb(0)),
+                //                new Rectangle(x*Constants.ScaleFactor, y*Constants.ScaleFactor,
+                //                    Constants.ScaleFactor,
+                //                    Constants.ScaleFactor));
+                //    }
             }
 
             DrawPlayerImplementation(graphics, scaleFactor, box);

@@ -135,14 +135,16 @@ namespace Ai2dShooter.View
 
         private void DrawFog(Graphics graphics)
         {
-            if (!HasLivingHumanPlayer)
+            if (!HasLivingHumanPlayer || !GameController.Instance.GameRunning)
                 return;
+
+            var visible = HumanPlayer.VisibleReachableCells.ToArray();
 
             for (var x = 0; x < Maze.Instance.Width; x++)
                 for (var y = 0; y < Maze.Instance.Height; y++)
-                    if (HumanPlayer.Location.GetManhattenDistance(x, y) > Constants.Visibility)
+                    if (!visible.Contains(Maze.Instance.Cells[x, y]) && (Maze.Instance.Cells[x, y]).IsClear || !Maze.Instance.Cells[x, y].Neighbors.Any(visible.Contains))
                         graphics.FillRectangle(new SolidBrush(Color.FromArgb(255, 32, 32, 32)),
-                            new Rectangle(x*Constants.ScaleFactor, y*Constants.ScaleFactor,
+                            new Rectangle(x * Constants.ScaleFactor, y * Constants.ScaleFactor,
                                 Constants.ScaleFactor,
                                 Constants.ScaleFactor));
         }
