@@ -47,7 +47,9 @@ namespace Ai2dShooter.Model
 
         protected override void DrawPlayerImplementation(Graphics graphics, int scaleFactor, Rectangle box)
         {
-            graphics.DrawEllipse(new Pen(StateColors[_state], 3), box);
+            var smallerBox = box;
+            smallerBox.Inflate((int)-_opponentPen.Width, (int)-_opponentPen.Width);
+            graphics.DrawEllipse(new Pen(StateColors[_state], 3), smallerBox);
 
             if (_targetCell != null && IsAlive)
             {
@@ -94,16 +96,12 @@ namespace Ai2dShooter.Model
             //Console.WriteLine("HEALTH STATE: " + _state);
             switch (_state)
             {
-                case State.SeekEnemy:
-                    // attack as well
-                    _state = State.Combat;
-                    break;
+                //case State.SeekEnemy:
+                //    // attack as well
+                //    _state = State.Combat;
+                //    break;
                 case State.Combat:
                     // keep attacking
-                    break;
-                case State.SeekFriend:
-                    throw new NotImplementedException();
-                case State.Dead:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -116,12 +114,12 @@ namespace Ai2dShooter.Model
                 return;
 
             //Console.WriteLine("MOVEMENT STATE: " + _state);
+            Cell[] neighbors;
             switch (_state)
             {
                 case State.SeekEnemy:
-                case State.SeekFriend:
                     // stuck?
-                    var neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
+                    neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
                     if (neighbors.Length == 1)
                     {
                         // backtrack
@@ -158,9 +156,9 @@ namespace Ai2dShooter.Model
                                     continue;
                                 }
 
-                                // calculate score: distance + rnd
-                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell) +
-                                                    Constants.Rnd.Next(2*Constants.Visibility);
+                                // calculate score: distance * distance + 2 * rnd
+                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell) * neighbor.GetManhattenDistance(_targetCell) +
+                                                    2*Constants.Rnd.Next(Constants.Visibility);
 
                                 // if we'd have to go backwards, double the score
                                 if (((int) Orientation + 2%(int) Direction.Count) == i)
@@ -178,13 +176,63 @@ namespace Ai2dShooter.Model
                         }
                     }
                     break;
-                case State.Combat:
-                    // no movement when attacking
-                    break;
-                    // TODO
-                    Console.WriteLine("I DONT KNOW HOW TO SEEK FRIENDS YET!");
-                    break;
-                case State.Dead:
+                case State.SeekFriend:
+                    // stuck?
+                    neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
+                    if (neighbors.Length == 1)
+                    {
+                        // backtrack
+                        Move(Location.GetDirection(neighbors[0]));
+                    }
+                    else
+                    {
+                        // find closest friend
+                        _targetCell = GameController.Instance.GetClosestOpponentCell(this);
+
+                        if (_targetCell == null)
+                        {
+                            // no target found, move in random direction that is not backwards
+                            Move(
+                                Location.GetDirection(
+                                    neighbors.Except(new[] { Location.GetNeighbor((Direction)(((int)Orientation + 2) % 4)) }).ToArray()[
+                                        Constants.Rnd.Next(neighbors.Length - 1)]));
+                        }
+                        else
+                        {
+                            // calculate scores for each direction
+                            var directionScore = new int[4];
+
+                            // iterate over directions
+                            for (var i = 0; i < (int)Direction.Count; i++)
+                            {
+                                // get neighbor in that direction
+                                var neighbor = Location.GetNeighbor((Direction)i);
+                                // ignore neighbors that can't be moved to
+                                if (neighbor == null || neighbor.IsWall)
+                                {
+                                    directionScore[i] = int.MaxValue;
+                                    continue;
+                                }
+
+                                // calculate score: distance + rnd
+                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell) +
+                                                    Constants.Rnd.Next(Constants.Visibility);
+
+                                // if we'd have to go backwards, double the score
+                                if (((int)Orientation + 2 % (int)Direction.Count) == i)
+                                    directionScore[i] *= 2;
+                            }
+
+                            // pick all directions with lowest costs
+                            var bestDirections =
+                                (from d in directionScore
+                                 where d == directionScore.Min()
+                                 select Array.IndexOf(directionScore, d)).ToArray();
+
+                            // randomly chose one of the best directions
+                            Move((Direction)bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
+                        }
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

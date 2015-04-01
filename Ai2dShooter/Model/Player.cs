@@ -149,13 +149,13 @@ namespace Ai2dShooter.Model
         protected Player(Cell initialLocation, PlayerController controller, Teams team)
         {
             ShootingAccuracy = ((double)Constants.Rnd.Next(3) + 17) / 20; // 85-95%
-            Slowness = Constants.Rnd.Next(200, 500);
+            Slowness = Constants.Rnd.Next(100, 300);
             Team = team;
             Health = 100;
             HealthyThreshold = Constants.Rnd.Next(10, 50);
             BackDamage = Constants.Rnd.Next(35, 75);
             FrontDamage = Constants.Rnd.Next(35, BackDamage);
-            HeadshotChance = ((double) Constants.Rnd.Next(2, 6))/20; // 10-25%
+            HeadshotChance = ((double) Constants.Rnd.Next(2, 5))/20; // 10-20%
             Name = PlayerNames[Constants.Rnd.Next(PlayerNames.Length)];
             Location = initialLocation;
             Color = Utils.GetTeamColor(team);
@@ -271,7 +271,7 @@ namespace Ai2dShooter.Model
                 orientationEnd);
 
             // draw opponent visibility range
-            if (Controller != PlayerController.Human && IsAlive)
+            if (Controller != PlayerController.Human && IsAlive && !MainForm.HasLivingHumanPlayer)
             {
                 for (var x = Location.X - Constants.Visibility < 0 ? 0 : Location.X - Constants.Visibility;
                     x <=

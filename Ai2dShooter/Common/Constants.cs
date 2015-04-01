@@ -10,13 +10,15 @@ namespace Ai2dShooter.Common
 
         public const int ScaleFactor = 32;
         
-        public const int Visibility = 4;
+        public const int Visibility = 5;
 
         public static readonly Dictionary<PlayerController, string> PlayerControllerNames = new Dictionary<PlayerController, string> {{PlayerController.Human, "Human"}, {PlayerController.AiFsm, "AI: FSM"}};
 
         public const int Framerate = 50;
 
         public static readonly object MovementLock = new object();
+
+        //public static readonly object HumanMovementLock = new object();
 
         public const int AiMoveTimeout = 100;
 

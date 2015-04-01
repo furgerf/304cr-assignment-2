@@ -14,11 +14,11 @@ namespace Ai2dShooter.View
     {
         #region Fields
 
-        private readonly Player[] _players;
+        private static Player[] _players;
 
-        private Player HumanPlayer { get { return _players.FirstOrDefault(p => p.Controller == PlayerController.Human);}}
+        private static Player HumanPlayer { get { return _players.FirstOrDefault(p => p.Controller == PlayerController.Human);}}
 
-        private bool HasHumanPlayer { get { return HumanPlayer != null; } }
+        public static bool HasLivingHumanPlayer { get { return HumanPlayer != null && HumanPlayer.IsAlive; } }
 
         /// <summary>
         /// Disables flickering when drawing on canvas.
@@ -46,19 +46,25 @@ namespace Ai2dShooter.View
             ApplicationRunning = true;
 
             // setup map
-            Maze.CreateNew(10, 10); // 30, 15
+            Maze.CreateNew(30, 15); // 30, 15
 
             _canvas.Size = new Size(Constants.ScaleFactor * Maze.Instance.Width, Constants.ScaleFactor *Maze.Instance.Height);
 
             // setup players
             _players = new Player[]
             {
-                //new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
+                new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
+                //new FsmPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
                 new FsmPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
                 new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
+                new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
+                new FsmPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
                 new FsmPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
                 new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
+                new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
                 new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
+                new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
+                new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold),
                 new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold)
             };
 
@@ -129,13 +135,13 @@ namespace Ai2dShooter.View
 
         private void DrawFog(Graphics graphics)
         {
-            if (!HasHumanPlayer)
+            if (!HasLivingHumanPlayer)
                 return;
 
             for (var x = 0; x < Maze.Instance.Width; x++)
                 for (var y = 0; y < Maze.Instance.Height; y++)
                     if (HumanPlayer.Location.GetManhattenDistance(x, y) > Constants.Visibility)
-                        graphics.FillRectangle(new SolidBrush(Color.FromArgb(127, 0, 0, 0)),
+                        graphics.FillRectangle(new SolidBrush(Color.FromArgb(255, 32, 32, 32)),
                             new Rectangle(x*Constants.ScaleFactor, y*Constants.ScaleFactor,
                                 Constants.ScaleFactor,
                                 Constants.ScaleFactor));
@@ -147,18 +153,24 @@ namespace Ai2dShooter.View
 
         private void OnKeyUp(object sender, KeyEventArgs e)
         {
-            if (!HasHumanPlayer || !HumanPlayer.IsAlive)
+            if (!HasLivingHumanPlayer || !HumanPlayer.IsAlive)
                 return;
 
-            // arrow keys/wasd for player movement
-            if ((e.KeyCode == Keys.W || e.KeyCode == Keys.Up) && HumanPlayer.CanMove(Direction.North))
-                HumanPlayer.Move(Direction.North);
-            if ((e.KeyCode == Keys.D || e.KeyCode == Keys.Right) && HumanPlayer.CanMove(Direction.East))
-                HumanPlayer.Move(Direction.East);
-            if ((e.KeyCode == Keys.S || e.KeyCode == Keys.Down) && HumanPlayer.CanMove(Direction.South))
-                HumanPlayer.Move(Direction.South);
-            if ((e.KeyCode == Keys.A || e.KeyCode == Keys.Left) && HumanPlayer.CanMove(Direction.West))
-                HumanPlayer.Move(Direction.West);
+            new Thread(() => 
+            {
+                if (GameController.Instance.ArePlayersShooting)
+                    return;
+
+                // arrow keys/wasd for player movement
+                if ((e.KeyCode == Keys.W || e.KeyCode == Keys.Up) && HumanPlayer.CanMove(Direction.North))
+                    HumanPlayer.Move(Direction.North);
+                if ((e.KeyCode == Keys.D || e.KeyCode == Keys.Right) && HumanPlayer.CanMove(Direction.East))
+                    HumanPlayer.Move(Direction.East);
+                if ((e.KeyCode == Keys.S || e.KeyCode == Keys.Down) && HumanPlayer.CanMove(Direction.South))
+                    HumanPlayer.Move(Direction.South);
+                if ((e.KeyCode == Keys.A || e.KeyCode == Keys.Left) && HumanPlayer.CanMove(Direction.West))
+                    HumanPlayer.Move(Direction.West);
+            }).Start();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

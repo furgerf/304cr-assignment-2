@@ -17,6 +17,8 @@ namespace Ai2dShooter.Controller
 
         public bool GameRunning;
 
+        public bool ArePlayersShooting { get { return _shootingPlayers != null; } }
+
         #endregion
 
         #region Private Fields
@@ -132,44 +134,46 @@ namespace Ai2dShooter.Controller
         {
             if (IsShootingPlayer(player))
                 return;
-
-            lock (Constants.MovementLock)
-            {
-                // check whether player can shoot at any other player
-                foreach (var opponent in _opponents[player].Where(o => !IsShootingPlayer(o)))
+            //lock (Constants.HumanMovementLock)
+                lock (Constants.MovementLock)
                 {
-                    if (player.Location.Neighbors.Contains(opponent.Location))
+                    // check whether player can shoot at any other player
+                    foreach (var opponent in _opponents[player].Where(o => !IsShootingPlayer(o)))
                     {
-                        var op = opponent;
-                        // *someone* has spotted *someone*
-                        // did the player move into a camper's crosshair?
-                        if (opponent.Location.GetNeighbor(opponent.Orientation) == player.Location)
+                        if (player.Location.Neighbors.Contains(opponent.Location))
                         {
-                            Console.WriteLine(player + " got camped by " + opponent + "!");
-                            // swap player and opponent
-                            op = player;
-                            player = opponent;
+                            var op = opponent;
+                            // *someone* has spotted *someone*
+                            // did the player move into a camper's crosshair?
+                            if (opponent.Location.GetNeighbor(opponent.Orientation) == player.Location)
+                            {
+                                Console.WriteLine(player + " got camped by " + opponent + "!");
+                                // swap player and opponent
+                                op = player;
+                                player = opponent;
+                            }
+
+                            Console.WriteLine(player + " has spotted " + op);
+                            player.EnemySpotted();
+                            op.SpottedByEnemy();
+
+                            if (_shootingPlayers != null)
+                                throw new Exception("Can only have one gunfight at a time!");
+                            _shootingPlayers = new[] {player, op};
+
+                            var hit = Constants.Rnd.NextDouble() < player.ShootingAccuracy;
+                            var headshot = hit && (Constants.Rnd.NextDouble() < player.HeadshotChance);
+                            var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
+
+                            Thread.Sleep(Constants.ShootingTimeout);
+                            op.Damage(player,
+                                (hit ? 1 : 0)*(frontalAttack ? player.FrontDamage : player.BackDamage)*
+                                (headshot ? 2 : 1),
+                                frontalAttack, headshot);
+                            return;
                         }
-
-                        Console.WriteLine(player + " has spotted " + op);
-                        player.EnemySpotted();
-                        op.SpottedByEnemy();
-
-                        if (_shootingPlayers != null)
-                            throw new Exception("Can only have one gunfight at a time!");
-                        _shootingPlayers = new[] {player, op};
-
-                        var hit = Constants.Rnd.NextDouble() < player.ShootingAccuracy;
-                        var headshot = hit && (Constants.Rnd.NextDouble() < player.HeadshotChance);
-                        var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
-
-                        Thread.Sleep(Constants.ShootingTimeout);
-                        op.Damage(player, (hit ? 1 : 0)*(frontalAttack ? player.FrontDamage : player.BackDamage)*(headshot ? 2 : 1),
-                            frontalAttack, headshot);
-                        return;
                     }
                 }
-            }
         }
 
         #endregion
