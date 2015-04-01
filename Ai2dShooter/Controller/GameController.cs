@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Ai2dShooter.Common;
+using Ai2dShooter.Map;
 using Ai2dShooter.Model;
 using Ai2dShooter.View;
 
@@ -103,6 +104,23 @@ namespace Ai2dShooter.Controller
         public void StopGame()
         {
             GameRunning = false;
+        }
+
+        public Cell GetClosestOpponentCell(Player player)
+        {
+            Cell closest = null;
+            foreach (var o in _opponents[player])
+            {
+                var distance = player.Location.GetManhattenDistance(o.Location);
+                if (distance > Constants.Visibility)
+                    continue;
+
+                closest = closest ?? o.Location;
+
+                if (distance < player.Location.GetManhattenDistance(closest))
+                    closest = o.Location;
+            }
+            return closest;
         }
 
         private bool IsShootingPlayer(Player player)
