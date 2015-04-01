@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Ai2dShooter.Common;
 
 namespace Ai2dShooter.Map
@@ -11,18 +10,16 @@ namespace Ai2dShooter.Map
         // actual data
         public int X { get; private set; }
         public int Y { get; private set; }
-
         public bool IsWall { get; set; }
 
-        public bool IsClear { get { return !IsWall; } }
-
         // neighbors
+        public Cell[] Neighbors { get { return new[] { East, South, West, North }; } }
         public Cell West { get { return X > 0 ? Maze.Instance.Cells[X - 1, Y] : null; } }
         public Cell East { get { return X < Maze.Instance.Width - 1 ? Maze.Instance.Cells[X + 1, Y] : null; } }
         public Cell North { get { return Y > 0 ? Maze.Instance.Cells[X, Y - 1] : null; } }
         public Cell South { get { return Y < Maze.Instance.Height - 1 ? Maze.Instance.Cells[X, Y + 1] : null; } }
 
-        public Cell[] Neighbors { get { return new []{East, South, West, North};} }
+        public bool IsClear { get { return !IsWall; } }
 
         #endregion
 
@@ -38,11 +35,6 @@ namespace Ai2dShooter.Map
         #endregion
 
         #region Methods
-
-        public bool IsNeighbor(Cell cell)
-        {
-            return Neighbors.Contains(cell);
-        }
 
         /// <summary>
         /// Retrieves the neighbor in the given direction.

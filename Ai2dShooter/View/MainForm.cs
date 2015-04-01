@@ -46,15 +46,15 @@ namespace Ai2dShooter.View
             ApplicationRunning = true;
 
             // setup map
-            Maze.CreateNew(30, 15); // 30, 15
+            Maze.CreateNew(25, 15); // 30, 15
 
             _canvas.Size = new Size(Constants.ScaleFactor * Maze.Instance.Width, Constants.ScaleFactor *Maze.Instance.Height);
 
             // setup players
             _players = new Player[]
             {
-                new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
-                //new FsmPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
+                //new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
+                new FsmPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
                 new FsmPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
                 new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
                 new FsmPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
@@ -160,6 +160,7 @@ namespace Ai2dShooter.View
 
             new Thread(() => 
             {
+                // don't allow the human player to move while there is shooting going on
                 if (GameController.Instance.ArePlayersShooting)
                     return;
 
@@ -177,6 +178,7 @@ namespace Ai2dShooter.View
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // tell the threads to terminate
             ApplicationRunning = false;
             GameController.Instance.StopGame();
         }

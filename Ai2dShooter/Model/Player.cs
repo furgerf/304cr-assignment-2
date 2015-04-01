@@ -131,7 +131,7 @@ namespace Ai2dShooter.Model
             get
             {
                 var testedCells = new List<Cell> {Location};
-                var cells = new List<Cell>{Location};
+                var cells = new List<Cell> {Location};
                 var stack = new Stack<Cell>();
                 stack.Push(Location);
                 var distances = new Dictionary<Cell, int> {{Location, 0}};
@@ -139,7 +139,12 @@ namespace Ai2dShooter.Model
                 while (stack.Count > 0)
                 {
                     var currentCell = stack.Pop();
-                    foreach (var s in currentCell.Neighbors.Where(s => s != null && s.IsClear && distances[currentCell] + 1 <= Constants.Visibility && !testedCells.Contains(s)))
+                    foreach (
+                        var s in
+                            currentCell.Neighbors.Where(
+                                s =>
+                                    s != null && s.IsClear && distances[currentCell] + 1 <= Constants.Visibility &&
+                                    !testedCells.Contains(s)))
                     {
                         stack.Push(s);
                         cells.Add(s);
@@ -154,7 +159,7 @@ namespace Ai2dShooter.Model
 
         #endregion
 
-        #region Private Fields
+        #region Private/Protected Fields
 
         private static readonly string[] PlayerNames = Resources.names.Split('\n');
 
@@ -176,18 +181,23 @@ namespace Ai2dShooter.Model
 
         protected Player(Cell initialLocation, PlayerController controller, Teams team)
         {
-            ShootingAccuracy = ((double)Constants.Rnd.Next(3) + 17) / 20; // 85-95%
-            Slowness = Constants.Rnd.Next(100, 200);
+            // initialize values from parameters
+            _location = initialLocation;
+            Controller = controller;
             Team = team;
+
+            // initialize fixed values
             Health = 100;
+            Color = Utils.GetTeamColor(team);
+
+            // initialize random values
+            ShootingAccuracy = ((double) Constants.Rnd.Next(3) + 17)/20; // 85-95%
+            Slowness = Constants.Rnd.Next(100, 200);
             HealthyThreshold = Constants.Rnd.Next(10, 50);
             BackDamage = Constants.Rnd.Next(35, 75);
             FrontDamage = Constants.Rnd.Next(35, BackDamage);
             HeadshotChance = ((double) Constants.Rnd.Next(2, 5))/20; // 10-20%
             Name = PlayerNames[Constants.Rnd.Next(PlayerNames.Length)];
-            Location = initialLocation;
-            Color = Utils.GetTeamColor(team);
-            Controller = controller;
             Orientation = (Direction) Constants.Rnd.Next((int) Direction.Count);
 
             // start movement thread
@@ -213,7 +223,7 @@ namespace Ai2dShooter.Model
                 // get offset in right direction
                 PointF stepOffset = Utils.GetDirectionPoint(Orientation);
                 // divide offset to get offset for single step
-                stepOffset = new PointF(stepOffset.X / Constants.Framerate, stepOffset.Y / Constants.Framerate);
+                stepOffset = new PointF(stepOffset.X/Constants.Framerate, stepOffset.Y/Constants.Framerate);
 
                 // do half the steps
                 int i;
@@ -221,16 +231,16 @@ namespace Ai2dShooter.Model
                 {
                     LocationOffset.X += stepOffset.X;
                     LocationOffset.Y += stepOffset.Y;
-                    Thread.Sleep(Slowness / Constants.Framerate);
+                    Thread.Sleep(Slowness/Constants.Framerate);
                 }
 
                 if (!IsMoving)
                 {
                     for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i -= 2)
                     {
-                        LocationOffset.X -= 2 * stepOffset.X;
-                        LocationOffset.Y -= 2 * stepOffset.Y;
-                        Thread.Sleep(Slowness / Constants.Framerate);
+                        LocationOffset.X -= 2*stepOffset.X;
+                        LocationOffset.Y -= 2*stepOffset.Y;
+                        Thread.Sleep(Slowness/Constants.Framerate);
                     }
 
                     // clear offset
@@ -295,7 +305,8 @@ namespace Ai2dShooter.Model
             }
 
             // draw orientation line
-            graphics.DrawLine(new Pen(Color.FromArgb(IsAlive ? 255 : Constants.DeadAlpha, Color.Black), 4), orientationStart,
+            graphics.DrawLine(new Pen(Color.FromArgb(IsAlive ? 255 : Constants.DeadAlpha, Color.Black), 4),
+                orientationStart,
                 orientationEnd);
 
             // draw opponent visibility range
@@ -303,37 +314,15 @@ namespace Ai2dShooter.Model
             {
                 foreach (var c in VisibleReachableCells)
                     graphics.FillRectangle(
-                                new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(127, Color), Color.FromArgb(0)),
-                                new Rectangle(c.X * Constants.ScaleFactor, c.Y * Constants.ScaleFactor,
-                                    Constants.ScaleFactor,
-                                    Constants.ScaleFactor));
+                        new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(127, Color), Color.FromArgb(0)),
+                        new Rectangle(c.X*Constants.ScaleFactor, c.Y*Constants.ScaleFactor,
+                            Constants.ScaleFactor,
+                            Constants.ScaleFactor));
 
-                //for (var x = Location.X - Constants.Visibility < 0 ? 0 : Location.X - Constants.Visibility;
-                //    x <=
-                //    (Location.X + Constants.Visibility > Maze.Instance.Width - 1
-                //        ? Maze.Instance.Width - 1
-                //        : Location.X + Constants.Visibility);
-                //    x++)
-                //    for (var y = Location.Y - Constants.Visibility < 0 ? 0 : Location.Y - Constants.Visibility;
-                //        y <=
-                //        (Location.Y + Constants.Visibility > Maze.Instance.Height - 1
-                //            ? Maze.Instance.Height - 1
-                //            : Location.Y + Constants.Visibility);
-                //        y++)
-                //    {
-                //        if (Maze.Instance.Cells[x, y] == null)
-                //            continue;
-
-                //        if (Location.GetManhattenDistance(x, y) <= Constants.Visibility)
-                //            graphics.FillRectangle(
-                //                new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(127, Color), Color.FromArgb(0)),
-                //                new Rectangle(x*Constants.ScaleFactor, y*Constants.ScaleFactor,
-                //                    Constants.ScaleFactor,
-                //                    Constants.ScaleFactor));
-                //    }
             }
 
-            DrawPlayerImplementation(graphics, scaleFactor, box);
+            if (!MainForm.HasLivingHumanPlayer || Controller == PlayerController.Human)
+                DrawPlayerImplementation(graphics, scaleFactor, box);
         }
 
         public bool CanMove(Direction direction)
@@ -369,21 +358,18 @@ namespace Ai2dShooter.Model
 
             Console.WriteLine(this + " has taken " + damage + " damage from " + opponent + " from " +
                               (frontalAttack ? "the front" : "the back") + (headshot ? ", it was a HEADSHOT!" : ""));
+
+            // play sounds
             if (headshot)
-            {
                 Constants.HeadshotSound.Play();
-            }
+            if (damage == 0)
+                Constants.MissSound.Play();
+            else if (damage > 55)
+                Constants.HardHitSound.Play();
+            else if (damage > 45)
+                Constants.MediumHitSound.Play();
             else
-            {
-                if (damage == 0)
-                    Constants.MissSound.Play();
-                else if (damage > 55)
-                    Constants.HardHitSound.Play();
-                else if (damage > 45)
-                    Constants.MediumHitSound.Play();
-                else
-                    Constants.LowHitSound.Play();
-            }
+                Constants.LowHitSound.Play();
 
             // retaliate!
             if (!IsAlive)
@@ -403,7 +389,7 @@ namespace Ai2dShooter.Model
 
             var hit = Constants.Rnd.NextDouble() < ShootingAccuracy;
             var hs = hit && (Constants.Rnd.NextDouble() < HeadshotChance);
-            opponent.Damage(this, (hit ? 1 : 0) * FrontDamage * (hs ? 2 : 1), true, hs);
+            opponent.Damage(this, (hit ? 1 : 0)*FrontDamage*(hs ? 2 : 1), true, hs);
         }
 
         #endregion
@@ -424,12 +410,6 @@ namespace Ai2dShooter.Model
             if (Kills == 3)
                 Constants.TripleKillSound.Play();
         }
-
-        #endregion
-
-        #region Event Handling
-
-
 
         #endregion
     }

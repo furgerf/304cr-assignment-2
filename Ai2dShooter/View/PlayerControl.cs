@@ -127,9 +127,5 @@ namespace Ai2dShooter.View
         }
 
         #endregion
-
-        #region Event Handling
-        
-        #endregion
     }
 }

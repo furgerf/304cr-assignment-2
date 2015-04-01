@@ -47,31 +47,37 @@ namespace Ai2dShooter.Model
 
         protected override void DrawPlayerImplementation(Graphics graphics, int scaleFactor, Rectangle box)
         {
+            // make the box a bit smaller (so the circle doesn't exceed the box)
             var smallerBox = box;
             smallerBox.Inflate((int)-_opponentPen.Width, (int)-_opponentPen.Width);
+
+            // draw circle in the color belonging to the current state
             graphics.DrawEllipse(new Pen(StateColors[_state], 3), smallerBox);
 
+            // if required, draw a line to the cell that is currently being targeted by the player
             if (_targetCell != null && IsAlive)
-            {
                 graphics.DrawLine(_opponentPen, box.X + box.Width/2, box.Y + box.Height/2, _targetCell.X * scaleFactor + box.Width / 2, _targetCell.Y*scaleFactor + box.Height / 2);
-            }
         }
 
         public override void StartGame()
         {
+            // initial state: seek enemy
             _state = State.SeekEnemy;
 
+            // start own worker thread
             new Thread(MovementDecision).Start();
         }
 
         public override void EnemySpotted()
         {
+            // stop moving and start fighting
             _state = State.Combat;
             AbortMovement();
         }
 
         public override void SpottedByEnemy()
         {
+            // stop moving and start fighting
             _state = State.Combat;
             AbortMovement();
         }
@@ -91,15 +97,14 @@ namespace Ai2dShooter.Model
 
         #region Event Handling
 
+        /// <summary>
+        /// Should only lose life while in combat, and then there's no need to do anything.
+        /// </summary>
         private void HealthDecision()
         {
             //Console.WriteLine("HEALTH STATE: " + _state);
             switch (_state)
             {
-                //case State.SeekEnemy:
-                //    // attack as well
-                //    _state = State.Combat;
-                //    break;
                 case State.Combat:
                     // keep attacking
                     break;
@@ -108,6 +113,9 @@ namespace Ai2dShooter.Model
             }
         }
 
+        /// <summary>
+        /// Make a decision in which direction to move.
+        /// </summary>
         private void MovementDecision()
         {
             if (IsMoving || !IsAlive)
@@ -186,15 +194,17 @@ namespace Ai2dShooter.Model
                     }
                     else
                     {
+                        // TODO: Maybe also take enemies into account (flee)
                         // find closest friend
-                        _targetCell = GameController.Instance.GetClosestOpponentCell(this);
+                        _targetCell = GameController.Instance.GetClosestFriendCell(this);
 
                         if (_targetCell == null)
                         {
-                            // no target found, move in random direction that is not backwards
+                            // all friends are dead 
                             Move(
                                 Location.GetDirection(
-                                    neighbors.Except(new[] { Location.GetNeighbor((Direction)(((int)Orientation + 2) % 4)) }).ToArray()[
+                                    neighbors.Except(new[]
+                                    {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))}).ToArray()[
                                         Constants.Rnd.Next(neighbors.Length - 1)]));
                         }
                         else
@@ -203,10 +213,10 @@ namespace Ai2dShooter.Model
                             var directionScore = new int[4];
 
                             // iterate over directions
-                            for (var i = 0; i < (int)Direction.Count; i++)
+                            for (var i = 0; i < (int) Direction.Count; i++)
                             {
                                 // get neighbor in that direction
-                                var neighbor = Location.GetNeighbor((Direction)i);
+                                var neighbor = Location.GetNeighbor((Direction) i);
                                 // ignore neighbors that can't be moved to
                                 if (neighbor == null || neighbor.IsWall)
                                 {
@@ -215,22 +225,23 @@ namespace Ai2dShooter.Model
                                 }
 
                                 // calculate score: distance + rnd
-                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell) +
+                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
+                                                    neighbor.GetManhattenDistance(_targetCell) +
                                                     Constants.Rnd.Next(Constants.Visibility);
 
                                 // if we'd have to go backwards, double the score
-                                if (((int)Orientation + 2 % (int)Direction.Count) == i)
+                                if (((int) Orientation + 2%(int) Direction.Count) == i)
                                     directionScore[i] *= 2;
                             }
 
                             // pick all directions with lowest costs
                             var bestDirections =
                                 (from d in directionScore
-                                 where d == directionScore.Min()
-                                 select Array.IndexOf(directionScore, d)).ToArray();
+                                    where d == directionScore.Min()
+                                    select Array.IndexOf(directionScore, d)).ToArray();
 
                             // randomly chose one of the best directions
-                            Move((Direction)bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
+                            Move((Direction) bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
                         }
                     }
                     break;

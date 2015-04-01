@@ -18,6 +18,7 @@ namespace Ai2dShooter.Model
 
         protected override void DrawPlayerImplementation(Graphics graphics, int scaleFactor, Rectangle box)
         {
+            // draw a white H in the middle of the circle
             graphics.DrawString("H", new Font(FontFamily.GenericSansSerif, 22), Brushes.White, box);
         }
 

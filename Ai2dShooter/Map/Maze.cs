@@ -13,15 +13,14 @@ namespace Ai2dShooter.Map
     {
         #region Fields
 
+        /// <summary>
+        /// Action that draws the maze using the graphics object provided and scaled by the scale value.
+        /// </summary>
         public static Action<Graphics, int> DrawMaze = (g, scale) =>
         {
             for (var x = 0; x < Instance.Width; x++)
-            {
                 for (var y = 0; y < Instance.Height; y++)
-                {
                     g.FillRectangle(Instance.Cells[x, y].IsWall ? Brushes.Black : Brushes.BurlyWood, scale * x, scale * y, scale, scale);
-                }
-            }
         };
 
         public int Width { get; private set; }
@@ -146,15 +145,15 @@ namespace Ai2dShooter.Map
         /// <param name="height">Height of the maze</param>
         private Maze(int width, int height)
         {
+            // assign dimensions
             Width = width;
             Height = height;
 
+            // initiate cells
             Cells = new Cell[width,height];
-
             for (var x = 0; x < width; x++)
                 for (var y = 0; y < height; y++)
                     Cells[x, y] = new Cell(x, y);
-
             Cells[0, 0].IsWall = false;
         }
 
@@ -240,13 +239,6 @@ namespace Ai2dShooter.Map
                 }
                 cellDirections.Clear();
             }
-        }
-
-        public void SaveMap(String filename)
-        {
-            var bitmap = new Bitmap(2*Width + 2, 2*Height + 2);
-            DrawMaze(Graphics.FromImage(bitmap), 2);
-            bitmap.Save(filename);
         }
 
         #endregion

@@ -13,19 +13,25 @@ namespace Ai2dShooter.Controller
     {
         #region Public Fields
 
+        /// <summary>
+        /// Currently running game. Updated whenever a new game is created.
+        /// </summary>
         public static GameController Instance { get; private set; }
 
         public bool GameRunning;
 
-        public bool ArePlayersShooting { get { return _shootingPlayers != null; } }
+        public bool ArePlayersShooting
+        {
+            get { return _shootingPlayers != null; }
+        }
 
         #endregion
 
         #region Private Fields
 
-        private readonly Player[] _players;
-
         private readonly Dictionary<Player, Player[]> _opponents = new Dictionary<Player, Player[]>();
+
+        private readonly Dictionary<Player, Player[]> _friends = new Dictionary<Player, Player[]>();
 
         private Player[] _shootingPlayers;
 
@@ -39,8 +45,6 @@ namespace Ai2dShooter.Controller
         {
             Instance = this;
 
-            _players = players;
-
             foreach (var p in players)
             {
                 // register to events
@@ -49,10 +53,7 @@ namespace Ai2dShooter.Controller
 
                 p.Death += () =>
                 {
-                    // remove from shooting player list
-                    //var shooters = _shootingPlayers.First(s => s.Contains(p));
-                    //_shootingPlayers.Remove(_shootingPlayers.First(s => s.Contains(p)));
-                    //shooters.First(s => s != p).TriggerLocationChange();
+                    // the players aren't shooting anymore
                     _shootingPlayers = null;
 
                     // remove from opponent's opponent list
@@ -61,6 +62,13 @@ namespace Ai2dShooter.Controller
 
                     // remove own opponent list
                     _opponents.Remove(p1);
+
+                    // remove from friends' friend list
+                    foreach (var friend in _friends[p1])
+                        _friends[friend] = _friends[friend].Except(new[] {p1}).ToArray();
+
+                    // remove own friend list
+                    _friends.Remove(p1);
 
                     if (_deathCount++ == 0)
                         Constants.FirstBloodSound.Play();
@@ -80,6 +88,9 @@ namespace Ai2dShooter.Controller
 
                 // add opponents
                 _opponents.Add(p, players.Where(pp => pp.Team != p.Team).ToArray());
+
+                // add friends
+                _friends.Add(p, players.Where(pp => pp.Team == p.Team && pp != p).ToArray());
             }
         }
 
@@ -87,14 +98,18 @@ namespace Ai2dShooter.Controller
 
         #region Main Methods
 
+        /// <summary>
+        /// Starts a new game by telling the players to start.
+        /// </summary>
         public void StartGame()
         {
             Constants.PlaySound.Play();
 
             GameRunning = true;
+
             new Thread(() =>
             {
-                foreach (var player in _players)
+                foreach (var player in _friends.Keys)
                 {
                     // use random timeout between players starting
                     Thread.Sleep(Constants.Rnd.Next(Constants.AiMoveTimeout));
@@ -103,79 +118,133 @@ namespace Ai2dShooter.Controller
             }).Start();
         }
 
+        /// <summary>
+        /// Stop (pause) game.
+        /// </summary>
         public void StopGame()
         {
             GameRunning = false;
         }
 
+        /// <summary>
+        /// Returns the cell of the opponent that is closest to the player and is visible.
+        /// </summary>
+        /// <param name="player">Player looking for a target</param>
+        /// <returns>Cell of the nearest target, or null if no target is visible</returns>
         public Cell GetClosestOpponentCell(Player player)
         {
             Cell closest = null;
+
+            // get all visible cells
             var visibleCells = player.VisibleReachableCells.ToArray();
 
+            // iterate over opponents to see whether they're close by
             foreach (var o in _opponents[player])
             {
-                var distance = player.Location.GetManhattenDistance(o.Location);
+                // if the opponent's cell isn't visible, return
                 if (!visibleCells.Contains(o.Location))
                     continue;
 
+                // ensure closest isn't null
                 closest = closest ?? o.Location;
 
-                if (distance < player.Location.GetManhattenDistance(closest))
+                // if the current target is closer than the previously closest target, update it
+                if (player.Location.GetManhattenDistance(o.Location) < player.Location.GetManhattenDistance(closest))
                     closest = o.Location;
             }
+
+            // return target
             return closest;
         }
 
+        /// <summary>
+        /// Finds the location of the closest friendly player.
+        /// </summary>
+        /// <param name="player">Player looking for friends</param>
+        /// <returns>Cell of the closest friend or null if everyone else is dead</returns>
+        public Cell GetClosestFriendCell(Player player)
+        {
+            Cell closest = null;
+
+            // iterate over fiends
+            foreach (var f in _friends[player])
+            {
+                // ensure closest isn't null for comparison below
+                closest = closest ?? f.Location;
+
+                // update closest if the current friend is closer
+                if (player.Location.GetManhattenDistance(f.Location) < player.Location.GetManhattenDistance(closest))
+                    closest = f.Location;
+            }
+
+            // return closest friend
+            return closest;
+        }
+
+        /// <summary>
+        /// Determines whether the player is currently shooting
+        /// </summary>
+        /// <param name="player">Player that may be shooting</param>
+        /// <returns>True if the player is shooting</returns>
         private bool IsShootingPlayer(Player player)
         {
             return _shootingPlayers != null && _shootingPlayers.Any(s => s == player);
         }
 
+        /// <summary>
+        /// Checks whether the player has any opponents in range (on a neighboring cell).
+        /// </summary>
+        /// <param name="player">Player that is looking for targets</param>
         public void CheckForOpponents(Player player)
         {
             if (IsShootingPlayer(player))
                 return;
-            //lock (Constants.HumanMovementLock)
-                lock (Constants.MovementLock)
+
+            lock (Constants.MovementLock)
+            {
+                // check whether player can shoot at any other player
+                foreach (var opponent in _opponents[player].Where(o => !IsShootingPlayer(o)))
                 {
-                    // check whether player can shoot at any other player
-                    foreach (var opponent in _opponents[player].Where(o => !IsShootingPlayer(o)))
+                    // check next opponent if the current opponent is no neighbor
+                    if (!player.Location.Neighbors.Contains(opponent.Location)) continue;
+
+                    var op = opponent;
+                    // *someone* has spotted *someone*
+                    // did the player move into a camper's crosshair?
+                    if (opponent.Location.GetNeighbor(opponent.Orientation) == player.Location)
                     {
-                        if (player.Location.Neighbors.Contains(opponent.Location))
-                        {
-                            var op = opponent;
-                            // *someone* has spotted *someone*
-                            // did the player move into a camper's crosshair?
-                            if (opponent.Location.GetNeighbor(opponent.Orientation) == player.Location)
-                            {
-                                Console.WriteLine(player + " got camped by " + opponent + "!");
-                                // swap player and opponent
-                                op = player;
-                                player = opponent;
-                            }
+                        Console.WriteLine(player + " got camped by " + opponent + "!");
 
-                            Console.WriteLine(player + " has spotted " + op);
-                            player.EnemySpotted();
-                            op.SpottedByEnemy();
-
-                            if (_shootingPlayers != null)
-                                throw new Exception("Can only have one gunfight at a time!");
-                            _shootingPlayers = new[] {player, op};
-
-                            var hit = Constants.Rnd.NextDouble() < player.ShootingAccuracy;
-                            var headshot = hit && (Constants.Rnd.NextDouble() < player.HeadshotChance);
-                            var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
-
-                            Thread.Sleep(Constants.ShootingTimeout);
-                            op.Damage(player,
-                                (hit ? 1 : 0)*(frontalAttack ? player.FrontDamage : player.BackDamage)*
-                                (headshot ? 2 : 1),
-                                frontalAttack, headshot);
-                            return;
-                        }
+                        // swap player and opponent because campers have first strike
+                        op = player;
+                        player = opponent;
                     }
+
+                    // tell the players who spotted whom
+                    Console.WriteLine(player + " has spotted " + op);
+                    player.EnemySpotted();
+                    op.SpottedByEnemy();
+
+                    // ensure we don't already have a shots exchange
+                    if (_shootingPlayers != null)
+                        throw new Exception("Can only have one gunfight at a time!");
+                    _shootingPlayers = new[] {player, op};
+
+                    // calculate stuff for the first shot
+                    var hit = Constants.Rnd.NextDouble() < player.ShootingAccuracy;
+                    var headshot = hit && (Constants.Rnd.NextDouble() < player.HeadshotChance);
+                    var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
+
+                    Thread.Sleep(Constants.ShootingTimeout);
+                    op.Damage(player,
+                        (hit ? 1 : 0)*(frontalAttack ? player.FrontDamage : player.BackDamage)*
+                        (headshot ? 2 : 1),
+                        frontalAttack, headshot);
+
+                    // done!
+                    return;
                 }
+            }
         }
 
         #endregion
