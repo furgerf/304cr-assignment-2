@@ -45,6 +45,11 @@ namespace Ai2dShooter.View
         /// </summary>
         private readonly Player.OnHealthChanged _updateHealth;
 
+        /// <summary>
+        /// Called when the player's kills changes.
+        /// </summary>
+        private readonly Player.OnKillsChanged _updateKills;
+
         #endregion
 
         #region Constructor
@@ -77,6 +82,13 @@ namespace Ai2dShooter.View
                 else
                     progressHealth.Value = Player.Health;
             };
+            _updateKills = () =>
+            {
+                if (InvokeRequired)
+                    Invoke((MethodInvoker) (() => _updateHealth()));
+                else
+                    txtKills.Text = Player.Kills.ToString(CultureInfo.InvariantCulture);
+            };
         }
 
         #endregion
@@ -89,23 +101,28 @@ namespace Ai2dShooter.View
         private void UpdateControls()
         {
             grpName.ForeColor = Player.Color;
+
             _updateLocation();
             _updateHealth();
             txtHealthyThreshold.Text = Player.HealthyThreshold.ToString(CultureInfo.InvariantCulture);
             txtDamage.Text = Player.FrontDamage + "/" + Player.BackDamage;
-            txtHeadshot.Text = Player.HeadshotChance*100 + "%";
+            txtAccuracy.Text = Player.ShootingAccuracy + "/" + Player.HeadshotChance;
+            txtSlowness.Text = Player.Slowness + "ms/cell";
+            _updateKills();
         }
 
         private void RegisterEvents(Player player)
         {
             player.HealthChanged += _updateHealth;
             player.LocationChanged += _updateLocation;
+            player.KillsChanged += _updateKills;
         }
 
         private void UnregisterEvents(Player player)
         {
             player.HealthChanged -= _updateHealth;
             player.LocationChanged -= _updateLocation;
+            player.KillsChanged -= _updateKills;
         }
 
         #endregion

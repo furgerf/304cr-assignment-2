@@ -26,11 +26,25 @@ namespace Ai2dShooter.Model
 
         public event OnDeath Death;
 
+        public delegate void OnKillsChanged();
+
+        public event OnKillsChanged KillsChanged;
+
         #endregion
 
         #region Public Fields
 
-        public int Kills { get; private set; }
+        public int Kills
+        {
+            get { return _kills; }
+            private set
+            {
+                if (_kills == value) return;
+                _kills = value;
+                if (KillsChanged != null)
+                    KillsChanged();
+            }
+        }
 
         public double ShootingAccuracy { get; private set; }
 
@@ -122,6 +136,7 @@ namespace Ai2dShooter.Model
         private PointF _locationOffset;
 
         private Direction _orientation;
+        private int _kills;
 
         protected bool IsMoving { get; set; }
 
