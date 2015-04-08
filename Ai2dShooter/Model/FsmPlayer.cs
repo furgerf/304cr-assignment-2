@@ -32,6 +32,8 @@ namespace Ai2dShooter.Model
 
         private State _state;
 
+        private bool _resetting;
+
         #endregion
 
         #region Constructor
@@ -60,6 +62,12 @@ namespace Ai2dShooter.Model
             // if required, draw a line to the cell that is currently being targeted by the player
             if (_targetCell != null && IsAlive)
                 graphics.DrawLine(_opponentPen, box.X + box.Width/2, box.Y + box.Height/2, _targetCell.X * scaleFactor + box.Width / 2, _targetCell.Y*scaleFactor + box.Height / 2);
+        }
+
+        protected override void ResetPlayerImplementation()
+        {
+            _state = State.SeekEnemy;
+            _resetting = true;
         }
 
         public override void StartGame()
@@ -105,6 +113,12 @@ namespace Ai2dShooter.Model
         /// </summary>
         private void HealthDecision()
         {
+            if (_resetting)
+            {
+                _resetting = false;
+                return;
+            }
+
             //Console.WriteLine("HEALTH STATE: " + _state);
             switch (_state)
             {
@@ -121,6 +135,12 @@ namespace Ai2dShooter.Model
         /// </summary>
         private void MovementDecision()
         {
+            if (_resetting)
+            {
+                _resetting = false;
+                return;
+            }
+
             if (IsMoving || !IsAlive)
                 return;
 

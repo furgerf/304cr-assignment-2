@@ -175,6 +175,8 @@ namespace Ai2dShooter.Model
 
         protected bool IsMoving { get; set; }
 
+        private readonly Cell _initialLocation;
+
         #endregion
 
         #region Constructor
@@ -183,6 +185,7 @@ namespace Ai2dShooter.Model
         {
             // initialize values from parameters
             _location = initialLocation;
+            _initialLocation = initialLocation;
             Controller = controller;
             Team = team;
 
@@ -236,15 +239,15 @@ namespace Ai2dShooter.Model
 
                 if (!IsMoving)
                 {
-                    //for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i -= 2)
-                    //{
-                    //    LocationOffset.X -= 2*stepOffset.X;
-                    //    LocationOffset.Y -= 2*stepOffset.Y;
-                    //    Thread.Sleep(Slowness/Constants.Framerate);
-                    //}
+                    for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i -= 2)
+                    {
+                        LocationOffset.X -= 2 * stepOffset.X;
+                        LocationOffset.Y -= 2 * stepOffset.Y;
+                        Thread.Sleep(Slowness / Constants.Framerate);
+                    }
 
                     // clear offset
-                    //LocationOffset = Point.Empty;
+                    LocationOffset = Point.Empty;
 
                     //Console.WriteLine(this + " had his movement aborted");
                     continue;
@@ -398,6 +401,15 @@ namespace Ai2dShooter.Model
             opponent.Damage(this, (hit ? 1 : 0)*FrontDamage*(hs ? 2 : 1), true, hs);
         }
 
+        public void Reset()
+        {
+            Kills = 0;
+            Health = 100;
+            _location = _initialLocation; // no lock/event
+
+            ResetPlayerImplementation();
+        }
+
         #endregion
 
         #region Abstract Methods
@@ -409,6 +421,8 @@ namespace Ai2dShooter.Model
         public abstract void SpottedByEnemy();
 
         protected abstract void DrawPlayerImplementation(Graphics graphics, int scaleFactor, Rectangle box);
+
+        protected abstract void ResetPlayerImplementation();
 
         public virtual void KilledEnemy()
         {

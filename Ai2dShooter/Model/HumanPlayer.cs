@@ -22,6 +22,11 @@ namespace Ai2dShooter.Model
             graphics.DrawString("H", new Font(FontFamily.GenericSansSerif, 22), Brushes.White, box);
         }
 
+        protected override void ResetPlayerImplementation()
+        {
+            // do nothing
+        }
+
         public override void StartGame()
         {
             // do nothing

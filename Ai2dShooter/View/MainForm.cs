@@ -170,6 +170,25 @@ namespace Ai2dShooter.View
                 return;
             }
 
+            // enter restarts game
+            if (e.KeyCode == Keys.Enter)
+            {
+                //var lockMe = GameController.Instance.ArePlayersShooting ? Constants.ShootingLock : Constants.MovementLock;
+                //lock (lockMe)
+                //{
+                    if (GameController.Instance.GameRunning)
+                        GameController.Instance.StopGame();
+
+                    foreach (var p in _players)
+                        p.Reset();
+
+                    new GameController(_players).StartGame();
+
+                    return;
+                //}
+
+            }
+
             // human-controlled player related commands
             if (!HasLivingHumanPlayer || !HumanPlayer.IsAlive)
                 return;
