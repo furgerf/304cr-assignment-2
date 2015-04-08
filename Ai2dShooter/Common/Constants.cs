@@ -14,15 +14,17 @@ namespace Ai2dShooter.Common
 
         public static readonly Dictionary<PlayerController, string> PlayerControllerNames = new Dictionary<PlayerController, string> {{PlayerController.Human, "Human"}, {PlayerController.AiFsm, "AI: FSM"}};
 
-        public const int Framerate = 50;
+        public const int Framerate = 20;
 
         public static readonly object MovementLock = new object();
 
+        public static readonly object ShootingLock = new object();
+
         //public static readonly object HumanMovementLock = new object();
 
-        public const int AiMoveTimeout = 100;
+        public const int AiMoveTimeout = 50;
 
-        public const int ShootingTimeout = 500; //(int)(1.5*AiMoveTimeout);
+        public const int ShootingTimeout = 400; //(int)(1.5*AiMoveTimeout);
 
         public static readonly SoundPlayer HeadshotSound;
         public static readonly SoundPlayer PlaySound;

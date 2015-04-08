@@ -76,18 +76,32 @@ namespace Ai2dShooter.View
             };
             _updateHealth = () =>
             {
+                try
+                {
+                    if (InvokeRequired)
+                        Invoke((MethodInvoker) (() => _updateHealth()));
+                    else
+                        progressHealth.Value = Player.Health;
 
-                if (InvokeRequired)
-                    Invoke((MethodInvoker)(() => _updateHealth()));
-                else
-                    progressHealth.Value = Player.Health;
+                }
+                catch (ObjectDisposedException ode)
+                {
+                    Console.WriteLine(ode.Message);
+                }
             };
             _updateKills = () =>
             {
-                if (InvokeRequired)
-                    Invoke((MethodInvoker)(() => _updateKills()));
-                else
-                    txtKills.Text = Player.Kills.ToString(CultureInfo.InvariantCulture);
+                try
+                {
+                    if (InvokeRequired)
+                        Invoke((MethodInvoker) (() => _updateKills()));
+                    else
+                        txtKills.Text = Player.Kills.ToString(CultureInfo.InvariantCulture);
+                }
+                catch (ObjectDisposedException ode)
+                {
+                    Console.WriteLine(ode.Message);
+                }
             };
         }
 

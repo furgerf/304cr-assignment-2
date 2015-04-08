@@ -20,6 +20,8 @@ namespace Ai2dShooter.Controller
 
         public bool GameRunning;
 
+        public bool GamePaused { get; private set; }
+
         public bool ArePlayersShooting
         {
             get { return _shootingPlayers != null; }
@@ -105,6 +107,7 @@ namespace Ai2dShooter.Controller
         {
             Constants.PlaySound.Play();
 
+            GamePaused = false;
             GameRunning = true;
 
             new Thread(() =>
@@ -123,7 +126,28 @@ namespace Ai2dShooter.Controller
         /// </summary>
         public void StopGame()
         {
+            GamePaused = false;
             GameRunning = false;
+        }
+
+        public void PauseResumeGame()
+        {
+            if (GamePaused)
+            {
+                GamePaused = false;
+                return;
+            }
+
+            GamePaused = true;
+            new Thread(() =>
+            {
+                var lockMe = ArePlayersShooting ? Constants.ShootingLock : Constants.MovementLock;
+                lock (lockMe)
+                {
+                    while (GamePaused)
+                        Thread.Sleep(100);
+                }
+            }).Start();
         }
 
         /// <summary>

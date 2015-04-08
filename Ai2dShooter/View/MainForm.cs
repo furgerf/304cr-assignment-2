@@ -131,6 +131,14 @@ namespace Ai2dShooter.View
                 p.DrawPlayer(e.Graphics, Constants.ScaleFactor);
             // draw fog
             DrawFog(e.Graphics);
+            // draw paused
+            if (GameController.Instance.GamePaused)
+                DrawPaused(e.Graphics);
+        }
+
+        private void DrawPaused(Graphics graphics)
+        {
+            graphics.FillRectangle(new SolidBrush(Color.FromArgb(Constants.DeadAlpha, Color.DimGray)), 0, 0, Maze.Instance.Width * Constants.ScaleFactor, Maze.Instance.Height * Constants.ScaleFactor);
         }
 
         private void DrawFog(Graphics graphics)
@@ -155,6 +163,14 @@ namespace Ai2dShooter.View
 
         private void OnKeyUp(object sender, KeyEventArgs e)
         {
+            // space bar pauses/resumes game
+            if (e.KeyCode == Keys.Space)
+            {
+                GameController.Instance.PauseResumeGame();
+                return;
+            }
+
+            // human-controlled player related commands
             if (!HasLivingHumanPlayer || !HumanPlayer.IsAlive)
                 return;
 
@@ -178,9 +194,15 @@ namespace Ai2dShooter.View
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // tell the threads to terminate
-            ApplicationRunning = false;
-            GameController.Instance.StopGame();
+            if (GameController.Instance.GamePaused)
+                GameController.Instance.PauseResumeGame();
+
+            lock (Constants.ShootingLock)
+            {
+                // tell the threads to terminate
+                ApplicationRunning = false;
+                GameController.Instance.StopGame();
+            }
         }
 
         #endregion

@@ -192,7 +192,7 @@ namespace Ai2dShooter.Model
 
             // initialize random values
             ShootingAccuracy = ((double) Constants.Rnd.Next(3) + 17)/20; // 85-95%
-            Slowness = Constants.Rnd.Next(100, 200);
+            Slowness = Constants.Rnd.Next(80, 100);
             HealthyThreshold = Constants.Rnd.Next(10, 50);
             BackDamage = Constants.Rnd.Next(35, 75);
             FrontDamage = Constants.Rnd.Next(35, BackDamage);
@@ -236,15 +236,15 @@ namespace Ai2dShooter.Model
 
                 if (!IsMoving)
                 {
-                    for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i -= 2)
-                    {
-                        LocationOffset.X -= 2*stepOffset.X;
-                        LocationOffset.Y -= 2*stepOffset.Y;
-                        Thread.Sleep(Slowness/Constants.Framerate);
-                    }
+                    //for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i -= 2)
+                    //{
+                    //    LocationOffset.X -= 2*stepOffset.X;
+                    //    LocationOffset.Y -= 2*stepOffset.Y;
+                    //    Thread.Sleep(Slowness/Constants.Framerate);
+                    //}
 
                     // clear offset
-                    LocationOffset = Point.Empty;
+                    //LocationOffset = Point.Empty;
 
                     //Console.WriteLine(this + " had his movement aborted");
                     continue;
@@ -353,6 +353,12 @@ namespace Ai2dShooter.Model
 
         public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot)
         {
+            lock (Constants.ShootingLock)
+            {
+                if (!GameController.Instance.GameRunning)
+                    return;
+            }
+
             // reduce life
             Health -= damage <= Health ? damage : Health;
 
