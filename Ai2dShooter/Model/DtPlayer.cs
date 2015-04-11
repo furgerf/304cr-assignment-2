@@ -49,7 +49,8 @@ namespace Ai2dShooter.Model
         {
             // make the box a bit smaller (so the circle doesn't exceed the box)
             var smallerBox = box;
-            smallerBox.Inflate((int) -_opponentPen.Width, (int) -_opponentPen.Width);
+            const int penWidth = 4;
+            smallerBox.Inflate(-penWidth, -penWidth);
 
             // draw circle in the color belonging to the current state
             if (_lastDecision != Decision.Count)
@@ -65,7 +66,7 @@ namespace Ai2dShooter.Model
                     new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height*2/3),
                     new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height/3),
                 };
-                graphics.DrawPolygon(new Pen(DecisionColors[(int) _lastDecision], 2), edges);
+                graphics.DrawPolygon(new Pen(DecisionColors[(int)_lastDecision], penWidth), edges);
             }
 
             // if required, draw a line to the cell that is currently being targeted by the player

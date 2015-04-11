@@ -50,10 +50,11 @@ namespace Ai2dShooter.Model
         {
             // make the box a bit smaller (so the circle doesn't exceed the box)
             var smallerBox = box;
-            smallerBox.Inflate((int)-_opponentPen.Width, (int)-_opponentPen.Width);
+            const int penWidth = 4;
+            smallerBox.Inflate(-penWidth, -penWidth);
 
             // draw circle in the color belonging to the current state
-            graphics.DrawEllipse(new Pen(StateColors[(int)_state], 3), smallerBox);
+            graphics.DrawEllipse(new Pen(StateColors[(int)_state], penWidth), smallerBox);
 
             // if required, draw a line to the cell that is currently being targeted by the player
             if (_targetCell != null && IsAlive)
