@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -16,14 +15,11 @@ namespace Ai2dShooter.Model
     {
         #region Private Fields
 
-        private enum State { SeekEnemy, Combat, SeekFriend, Dead }
+        private enum State { FindEnemy, AttackEnemy, Combat, FindFriend, Dead }
 
-        private static readonly Dictionary<State, Color> StateColors = new Dictionary<State, Color>
+        private static readonly Color[] StateColors =
         {
-            {State.SeekEnemy, Color.Green},
-            {State.Combat, Color.Red},
-            {State.SeekFriend, Color.Pink},
-            {State.Dead, Color.FromArgb(Constants.DeadAlpha, Color.DeepSkyBlue)}
+            Color.Green, Color.Goldenrod, Color.Red, Color.Pink, Color.DeepSkyBlue
         };
 
         private readonly Pen _opponentPen = new Pen(Color.Orange, 2);
@@ -57,7 +53,7 @@ namespace Ai2dShooter.Model
             smallerBox.Inflate((int)-_opponentPen.Width, (int)-_opponentPen.Width);
 
             // draw circle in the color belonging to the current state
-            graphics.DrawEllipse(new Pen(StateColors[_state], 3), smallerBox);
+            graphics.DrawEllipse(new Pen(StateColors[(int)_state], 3), smallerBox);
 
             // if required, draw a line to the cell that is currently being targeted by the player
             if (_targetCell != null && IsAlive)
@@ -66,14 +62,14 @@ namespace Ai2dShooter.Model
 
         protected override void ResetPlayerImplementation()
         {
-            _state = State.SeekEnemy;
+            _state = State.FindEnemy;
             _resetting = true;
         }
 
         public override void StartGame()
         {
             // initial state: seek enemy
-            _state = State.SeekEnemy;
+            _state = State.FindEnemy;
 
             // start own worker thread
             new Thread(MovementDecision).Start();
@@ -98,7 +94,7 @@ namespace Ai2dShooter.Model
             base.KilledEnemy();
 
             // depending on health, look for friends or enemies
-            _state = Health >= HealthyThreshold ? State.SeekEnemy : State.SeekFriend;
+            _state = Health >= HealthyThreshold ? State.FindEnemy : State.FindFriend;
 
             // start movement
             MovementDecision();
@@ -148,11 +144,13 @@ namespace Ai2dShooter.Model
             Cell[] neighbors;
             switch (_state)
             {
-                case State.SeekEnemy:
+                case State.FindEnemy:
+                case State.AttackEnemy:
                     // stuck?
                     neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
                     if (neighbors.Length == 1)
                     {
+                        _state = State.FindEnemy;
                         // backtrack
                         Move(Location.GetDirection(neighbors[0]));
                     }
@@ -160,6 +158,7 @@ namespace Ai2dShooter.Model
                     {
                         // find closest enemy
                         _targetCell = GameController.Instance.GetClosestOpponentCell(this);
+                        _state = _targetCell == null ? State.FindEnemy : State.AttackEnemy;
 
                         if (_targetCell == null)
                         {
@@ -207,7 +206,7 @@ namespace Ai2dShooter.Model
                         }
                     }
                     break;
-                case State.SeekFriend:
+                case State.FindFriend:
                     // stuck?
                     neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
                     if (neighbors.Length == 1)
@@ -217,7 +216,6 @@ namespace Ai2dShooter.Model
                     }
                     else
                     {
-                        // TODO: Maybe also take enemies into account (flee)
                         // find closest friend
                         _targetCell = GameController.Instance.GetClosestFriendCell(this);
 
