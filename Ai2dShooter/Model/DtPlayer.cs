@@ -23,8 +23,6 @@ namespace Ai2dShooter.Model
 
         private Cell _targetCell;
 
-        private bool _resetting;
-
         private Decision _lastDecision = Decision.Count;
 
         private bool _inCombat;
@@ -75,11 +73,6 @@ namespace Ai2dShooter.Model
                     _targetCell.X*scaleFactor + box.Width/2, _targetCell.Y*scaleFactor + box.Height/2);
         }
 
-        protected override void ResetPlayerImplementation()
-        {
-            _resetting = true;
-        }
-
         public override void StartGame()
         {
             // start own worker thread
@@ -114,18 +107,10 @@ namespace Ai2dShooter.Model
 
         private void MakeDecision()
         {
-            if (_resetting)
-            {
-                _resetting = false;
-                return;
-            }
-
-            if (IsMoving || !IsAlive || _inCombat)
+            if (IsMoving || !IsAlive || _inCombat || !PlayerExists)
                 return;
 
-            Cell[] neighbors;
-
-            neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
+            var neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
 
             _lastDecision = Decision.Count;
 

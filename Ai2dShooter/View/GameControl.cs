@@ -64,8 +64,11 @@ namespace Ai2dShooter.View
                 comPlayerControllerCold.Items.Add((PlayerController)i);
             }
             
-            comPlayerControllerHot.SelectedIndex = 1;
+            comPlayerControllerHot.SelectedIndex = 0;
             comPlayerControllerCold.SelectedIndex = 1;
+
+            numPlayerCountHot.Value = 6;
+            numPlayerCountCold.Value = 6;
         }
 
         #endregion

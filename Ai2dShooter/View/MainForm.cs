@@ -41,6 +41,7 @@ namespace Ai2dShooter.View
         #endregion
 
         #region Constructor
+
         public MainForm()
         {
             InitializeComponent();
@@ -50,7 +51,8 @@ namespace Ai2dShooter.View
             // setup map
             Maze.CreateNew(25, 15); // 30, 15
 
-            _canvas.Size = new Size(Constants.ScaleFactor * Maze.Instance.Width, Constants.ScaleFactor *Maze.Instance.Height);
+            _canvas.Size = new Size(Constants.ScaleFactor*Maze.Instance.Width,
+                Constants.ScaleFactor*Maze.Instance.Height);
 
             // setup players
             //_players = new Player[]
@@ -103,10 +105,8 @@ namespace Ai2dShooter.View
                     _canvas.Invalidate();
                     Thread.Sleep(Constants.Framelength);
                 }
-                
-            }).Start();
 
-            //new GameController(_players).StartGame();
+            }).Start();
         }
 
         #endregion
@@ -166,6 +166,48 @@ namespace Ai2dShooter.View
                                 Constants.ScaleFactor));
         }
 
+        private void StartGame()
+        {
+            var hot = _gameControl.TeamHot;
+            var cold = _gameControl.TeamCold;
+
+            Utils.ResetTeamColors();
+
+            _players = new Player[hot.Length + cold.Length];
+            for (var i = 0; i < hot.Length; i++)
+                switch (hot[i])
+                {
+                    case PlayerController.Human:
+                        _players[i] = new HumanPlayer(Maze.Instance.GetCorner(true, i), Teams.TeamHot);
+                        break;
+                    case PlayerController.AiFsm:
+                        _players[i] = new FsmPlayer(Maze.Instance.GetCorner(true, i), Teams.TeamHot);
+                        break;
+                    case PlayerController.AiDt:
+                        _players[i] = new DtPlayer(Maze.Instance.GetCorner(true, i), Teams.TeamHot);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            for (var i = 0; i < cold.Length; i++)
+                switch (cold[i])
+                {
+                    case PlayerController.Human:
+                        _players[hot.Length + i] = new HumanPlayer(Maze.Instance.GetCorner(false, i), Teams.TeamCold);
+                        break;
+                    case PlayerController.AiFsm:
+                        _players[hot.Length + i] = new FsmPlayer(Maze.Instance.GetCorner(false, i), Teams.TeamCold);
+                        break;
+                    case PlayerController.AiDt:
+                        _players[hot.Length + i] = new DtPlayer(Maze.Instance.GetCorner(false, i), Teams.TeamCold);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+            new GameController(_players).StartGame();
+        }
+
         #endregion
 
         #region Event Handling
@@ -179,23 +221,24 @@ namespace Ai2dShooter.View
                 return;
             }
 
-            // enter restarts game
+            // enter starts/stops game
             if (e.KeyCode == Keys.Enter)
             {
-                //var lockMe = GameController.Instance.ArePlayersShooting ? Constants.ShootingLock : Constants.MovementLock;
-                //lock (lockMe)
-                //{
+                if (GameController.HasGame)
+                {
                     if (GameController.Instance.GameRunning)
                         GameController.Instance.StopGame();
 
                     foreach (var p in _players)
-                        p.Reset();
+                        p.RemovePlayer();
 
-                    new GameController(_players).StartGame();
-
-                    return;
-                //}
-
+                    _players = null;
+                }
+                else
+                {
+                    StartGame();
+                }
+                return;
             }
 
             // human-controlled player related commands

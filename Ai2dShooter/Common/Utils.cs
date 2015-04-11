@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace Ai2dShooter.Common
 {
@@ -29,11 +30,27 @@ namespace Ai2dShooter.Common
             {Teams.TeamCold, new List<Color>{Color.RoyalBlue, Color.Navy, Color.LimeGreen, Color.MediumSeaGreen, Color.DarkGreen, Color.Aqua}}
         };
 
+        private static readonly Dictionary<Teams, List<Color>> UsedTeamColors = new Dictionary<Teams, List<Color>>
+        {
+            {Teams.TeamHot, new List<Color>()},
+            {Teams.TeamCold, new List<Color>()}
+        };
+
         public static Color GetTeamColor(Teams team)
         {
             var color = TeamColors[team][Constants.Rnd.Next(TeamColors[team].Count)];
             TeamColors[team].Remove(color);
+            UsedTeamColors[team].Add(color);
             return color;
+        }
+
+        public static void ResetTeamColors()
+        {
+            foreach (var t in UsedTeamColors.Keys)
+            {
+                TeamColors[t].AddRange(UsedTeamColors[t]);
+                UsedTeamColors[t].Clear();
+            }
         }
     }
 }

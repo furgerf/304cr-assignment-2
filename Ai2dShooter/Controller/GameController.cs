@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using Ai2dShooter.Common;
@@ -17,6 +18,8 @@ namespace Ai2dShooter.Controller
         /// Currently running game. Updated whenever a new game is created.
         /// </summary>
         public static GameController Instance { get; private set; }
+
+        public static bool HasGame { get { return Instance != null; }}
 
         public bool GameRunning;
 
@@ -128,6 +131,8 @@ namespace Ai2dShooter.Controller
         {
             GamePaused = false;
             GameRunning = false;
+
+            Instance = null;
         }
 
         public void PauseResumeGame()

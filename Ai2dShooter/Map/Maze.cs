@@ -161,6 +161,33 @@ namespace Ai2dShooter.Map
 
         #region Methods
 
+        public Cell GetCorner(bool north, int number)
+        {
+            if (north)
+            {
+                switch (number%3)
+                {
+                    case 0:
+                        return NorthWestCorner;
+                    case 1:
+                        return NorthCenterCorner;
+                    case 2:
+                        return NorthEastCorner;
+                }
+            }
+            switch (number%3)
+            {
+                case 0:
+                    return SouthWestCorner;
+                case 1:
+                    return SouthCenterCorner;
+                case 2:
+                    return SouthEastCorner;
+            }
+
+            throw new Exception("This won't ever be executed");
+        }
+
         /// <summary>
         /// Public access to random maze creation
         /// </summary>

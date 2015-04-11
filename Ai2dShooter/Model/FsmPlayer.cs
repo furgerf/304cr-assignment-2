@@ -28,8 +28,6 @@ namespace Ai2dShooter.Model
 
         private State _state;
 
-        private bool _resetting;
-
         #endregion
 
         #region Constructor
@@ -59,12 +57,6 @@ namespace Ai2dShooter.Model
             // if required, draw a line to the cell that is currently being targeted by the player
             if (_targetCell != null && IsAlive)
                 graphics.DrawLine(_opponentPen, box.X + box.Width/2, box.Y + box.Height/2, _targetCell.X * scaleFactor + box.Width / 2, _targetCell.Y*scaleFactor + box.Height / 2);
-        }
-
-        protected override void ResetPlayerImplementation()
-        {
-            _state = State.FindEnemy;
-            _resetting = true;
         }
 
         public override void StartGame()
@@ -103,13 +95,7 @@ namespace Ai2dShooter.Model
 
         private void MakeDecision()
         {
-            if (_resetting)
-            {
-                _resetting = false;
-                return;
-            }
-
-            if (IsMoving || !IsAlive)
+            if (IsMoving || !IsAlive || !PlayerExists)
                 return;
 
             Cell[] neighbors;

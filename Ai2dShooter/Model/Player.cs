@@ -62,7 +62,7 @@ namespace Ai2dShooter.Model
             get { return _health; }
             private set
             {
-                if (_health == value) return;
+                if (_health == value || !PlayerExists) return;
 
                 // update value
                 _health = value;
@@ -94,7 +94,7 @@ namespace Ai2dShooter.Model
             get { return _location; }
             set
             {
-                if (_location == value || !IsAlive) return;
+                if (_location == value || !IsAlive || !PlayerExists) return;
 
                 lock (Constants.MovementLock)
                 {
@@ -173,9 +173,9 @@ namespace Ai2dShooter.Model
 
         private int _kills;
 
-        protected bool IsMoving { get; set; }
+        protected bool PlayerExists = true;
 
-        private readonly Cell _initialLocation;
+        protected bool IsMoving { get; set; }
 
         #endregion
 
@@ -185,7 +185,6 @@ namespace Ai2dShooter.Model
         {
             // initialize values from parameters
             _location = initialLocation;
-            _initialLocation = initialLocation;
             Controller = controller;
             Team = team;
 
@@ -211,10 +210,15 @@ namespace Ai2dShooter.Model
 
         #region Implemented Methods
 
+        public void RemovePlayer()
+        {
+            PlayerExists = false;
+        }
+
         private void MovementWorker()
         {
             // loop while application is running
-            while (MainForm.ApplicationRunning)
+            while (MainForm.ApplicationRunning && PlayerExists)
             {
                 // zzzzzzzzZZZZZZZZZZzzzzzz
                 if (!IsMoving)
@@ -233,7 +237,7 @@ namespace Ai2dShooter.Model
 
                 // do the steps
                 int i;
-                for (i = 0; i < stepCount && IsMoving && MainForm.ApplicationRunning && IsAlive; i++)
+                for (i = 0; i < stepCount && IsMoving && MainForm.ApplicationRunning && IsAlive && PlayerExists; i++)
                 {
                     LocationOffset.X += stepOffset.X;
                     LocationOffset.Y += stepOffset.Y;
@@ -242,7 +246,7 @@ namespace Ai2dShooter.Model
 
                 if (!IsMoving)
                 {
-                    for (; i >= 0 && MainForm.ApplicationRunning && IsAlive; i -= 2)
+                    for (; i >= 0 && MainForm.ApplicationRunning && IsAlive && PlayerExists; i -= 2)
                     {
                         LocationOffset.X -= 2 * stepOffset.X;
                         LocationOffset.Y -= 2 * stepOffset.Y;
@@ -359,6 +363,9 @@ namespace Ai2dShooter.Model
 
         public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot)
         {
+            if (!PlayerExists)
+                return;
+
             lock (Constants.ShootingLock)
             {
                 if (!GameController.Instance.GameRunning)
@@ -404,14 +411,14 @@ namespace Ai2dShooter.Model
             opponent.Damage(this, (hit ? 1 : 0)*FrontDamage*(hs ? 2 : 1), true, hs);
         }
 
-        public void Reset()
-        {
-            Kills = 0;
-            Health = 100;
-            _location = _initialLocation; // no lock/event
+        //public void Reset()
+        //{
+        //    Kills = 0;
+        //    Health = 100;
+        //    _location = _initialLocation; // no lock/event
 
-            ResetPlayerImplementation();
-        }
+        //    ResetPlayerImplementation();
+        //}
 
         #endregion
 
@@ -425,7 +432,7 @@ namespace Ai2dShooter.Model
 
         protected abstract void DrawPlayerImplementation(Graphics graphics, int scaleFactor, Rectangle box);
 
-        protected abstract void ResetPlayerImplementation();
+        //protected abstract void ResetPlayerImplementation();
 
         public virtual void KilledEnemy()
         {
