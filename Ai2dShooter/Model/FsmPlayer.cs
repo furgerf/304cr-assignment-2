@@ -37,8 +37,8 @@ namespace Ai2dShooter.Model
         public FsmPlayer(Cell initialLocation, Teams team)
             : base(initialLocation, PlayerController.AiFsm, team)
         {
-            LocationChanged += MovementDecision;
-            HealthChanged += HealthDecision;
+            LocationChanged += MakeDecision;
+            HealthChanged += MakeDecision;
             Death += () => _state = State.Dead;
         }
 
@@ -72,7 +72,7 @@ namespace Ai2dShooter.Model
             _state = State.FindEnemy;
 
             // start own worker thread
-            new Thread(MovementDecision).Start();
+            new Thread(MakeDecision).Start();
         }
 
         public override void EnemySpotted()
@@ -97,39 +97,10 @@ namespace Ai2dShooter.Model
             _state = Health >= HealthyThreshold ? State.FindEnemy : State.FindFriend;
 
             // start movement
-            MovementDecision();
+            MakeDecision();
         }
 
-        #endregion
-
-        #region Event Handling
-
-        /// <summary>
-        /// Should only lose life while in combat, and then there's no need to do anything.
-        /// </summary>
-        private void HealthDecision()
-        {
-            if (_resetting)
-            {
-                _resetting = false;
-                return;
-            }
-
-            //Console.WriteLine("HEALTH STATE: " + _state);
-            switch (_state)
-            {
-                case State.Combat:
-                    // keep attacking
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        /// <summary>
-        /// Make a decision in which direction to move.
-        /// </summary>
-        private void MovementDecision()
+        private void MakeDecision()
         {
             if (_resetting)
             {
@@ -140,7 +111,6 @@ namespace Ai2dShooter.Model
             if (IsMoving || !IsAlive)
                 return;
 
-            //Console.WriteLine("MOVEMENT STATE: " + _state);
             Cell[] neighbors;
             switch (_state)
             {
@@ -165,8 +135,7 @@ namespace Ai2dShooter.Model
                             // no target found, move in random direction that is not backwards
                             Move(
                                 Location.GetDirection(
-                                    neighbors.Except(new[]
-                                    {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))}).ToArray()[
+                                    neighbors.Except(new[] { Location.GetNeighbor((Direction)(((int)Orientation + 2) % 4)) }).ToArray()[
                                         Constants.Rnd.Next(neighbors.Length - 1)]));
                         }
                         else
@@ -178,7 +147,7 @@ namespace Ai2dShooter.Model
                             for (var i = 0; i < (int)Direction.Count; i++)
                             {
                                 // get neighbor in that direction
-                                var neighbor = Location.GetNeighbor((Direction) i);
+                                var neighbor = Location.GetNeighbor((Direction)i);
                                 // ignore neighbors that can't be moved to
                                 if (neighbor == null || neighbor.IsWall)
                                 {
@@ -191,18 +160,18 @@ namespace Ai2dShooter.Model
                                                     Constants.Rnd.Next(Constants.Visibility);
 
                                 // if we'd have to go backwards, double the score
-                                if (((int) Orientation + 2%(int) Direction.Count) == i)
+                                if (((int)Orientation + 2 % (int)Direction.Count) == i)
                                     directionScore[i] *= 2;
                             }
 
                             // pick all directions with lowest costs
                             var bestDirections =
                                 (from d in directionScore
-                                    where d == directionScore.Min()
-                                    select Array.IndexOf(directionScore, d)).ToArray();
+                                 where d == directionScore.Min()
+                                 select Array.IndexOf(directionScore, d)).ToArray();
 
                             // randomly chose one of the best directions
-                            Move((Direction) bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
+                            Move((Direction)bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
                         }
                     }
                     break;
@@ -224,8 +193,7 @@ namespace Ai2dShooter.Model
                             // all friends are dead 
                             Move(
                                 Location.GetDirection(
-                                    neighbors.Except(new[]
-                                    {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))}).ToArray()[
+                                    neighbors.Except(new[] { Location.GetNeighbor((Direction)(((int)Orientation + 2) % 4)) }).ToArray()[
                                         Constants.Rnd.Next(neighbors.Length - 1)]));
                         }
                         else
@@ -234,10 +202,10 @@ namespace Ai2dShooter.Model
                             var directionScore = new int[4];
 
                             // iterate over directions
-                            for (var i = 0; i < (int) Direction.Count; i++)
+                            for (var i = 0; i < (int)Direction.Count; i++)
                             {
                                 // get neighbor in that direction
-                                var neighbor = Location.GetNeighbor((Direction) i);
+                                var neighbor = Location.GetNeighbor((Direction)i);
                                 // ignore neighbors that can't be moved to
                                 if (neighbor == null || neighbor.IsWall)
                                 {
@@ -246,25 +214,28 @@ namespace Ai2dShooter.Model
                                 }
 
                                 // calculate score: distance + rnd
-                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
+                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell) *
                                                     neighbor.GetManhattenDistance(_targetCell) +
                                                     Constants.Rnd.Next(Constants.Visibility);
 
                                 // if we'd have to go backwards, double the score
-                                if (((int) Orientation + 2%(int) Direction.Count) == i)
+                                if (((int)Orientation + 2 % (int)Direction.Count) == i)
                                     directionScore[i] *= 2;
                             }
 
                             // pick all directions with lowest costs
                             var bestDirections =
                                 (from d in directionScore
-                                    where d == directionScore.Min()
-                                    select Array.IndexOf(directionScore, d)).ToArray();
+                                 where d == directionScore.Min()
+                                 select Array.IndexOf(directionScore, d)).ToArray();
 
                             // randomly chose one of the best directions
-                            Move((Direction) bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
+                            Move((Direction)bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
                         }
                     }
+                    break;
+                case State.Combat:
+                    // keep fighting
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
