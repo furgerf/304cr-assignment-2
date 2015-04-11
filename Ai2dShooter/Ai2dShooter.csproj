@@ -51,6 +51,7 @@
     <Compile Include="Controller\GameController.cs" />
     <Compile Include="Map\Cell.cs" />
     <Compile Include="Map\Maze.cs" />
+    <Compile Include="Model\DtPlayer.cs" />
     <Compile Include="Model\FsmPlayer.cs" />
     <Compile Include="Model\HumanPlayer.cs" />
     <Compile Include="Model\Player.cs" />
