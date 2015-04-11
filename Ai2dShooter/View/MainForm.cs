@@ -16,7 +16,7 @@ namespace Ai2dShooter.View
 
         private static Player[] _players;
 
-        private static Player HumanPlayer { get { return _players.FirstOrDefault(p => p.Controller == PlayerController.Human);}}
+        private static Player HumanPlayer { get { return _players == null ? null : _players.FirstOrDefault(p => p.Controller == PlayerController.Human);}}
 
         public static bool HasLivingHumanPlayer { get { return HumanPlayer != null && HumanPlayer.IsAlive; } }
 
@@ -36,6 +36,8 @@ namespace Ai2dShooter.View
 
         public static bool ApplicationRunning { get; set; }
 
+        private readonly GameControl _gameControl;
+
         #endregion
 
         #region Constructor
@@ -51,38 +53,41 @@ namespace Ai2dShooter.View
             _canvas.Size = new Size(Constants.ScaleFactor * Maze.Instance.Width, Constants.ScaleFactor *Maze.Instance.Height);
 
             // setup players
-            _players = new Player[]
-            {
-                //new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
-                new DtPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
-                new DtPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
-                new DtPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
-                new DtPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
-                new DtPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
-                new DtPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
-                new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
-                new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
-                new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
-                new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
-                new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold),
-                new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold)
-            };
+            //_players = new Player[]
+            //{
+            //    //new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
+            //    new DtPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
+            //    new DtPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
+            //    new DtPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
+            //    new DtPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
+            //    new DtPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
+            //    new DtPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
+            //    new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
+            //    new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
+            //    new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
+            //    new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
+            //    new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold),
+            //    new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold)
+            //};
 
             // setup player controls
-            var playerControlRight = 0;
-            var playerControlBottom = 0;
-            for (var i = 0; i < _players.Length; i++)
-            {
-                var pc = new PlayerControl {Player = _players[i]};
-                pc.Location = new Point(_canvas.Location.X + (pc.Width + 8) * i, _canvas.Location.Y + _canvas.Height + 8);
-                playerControlRight = pc.Right;
-                playerControlBottom = pc.Bottom;
+            //var playerControlRight = 0;
+            //var playerControlBottom = 0;
+            //for (var i = 0; i < _players.Length; i++)
+            //{
+            //    var pc = new PlayerControl {Player = _players[i]};
+            //    pc.Location = new Point(_canvas.Location.X + (pc.Width + 8) * i, _canvas.Location.Y + _canvas.Height + 8);
+            //    playerControlRight = pc.Right;
+            //    playerControlBottom = pc.Bottom;
 
-                Controls.Add(pc);
-                _players[i].LocationChanged += () => _canvas.Invalidate();
-            }
-            Width = playerControlRight + 16;
-            Height = playerControlBottom + 32;
+            //    Controls.Add(pc);
+            //    _players[i].LocationChanged += () => _canvas.Invalidate();
+            //}
+            //Width = playerControlRight + 16;
+            //Height = playerControlBottom + 32;
+
+            _gameControl = new GameControl {Location = new Point(_canvas.Right + _canvas.Padding.Right, _canvas.Top)};
+            Controls.Add(_gameControl);
 
             // setup drawing
             _canvas.Paint += DrawCanvas;
@@ -101,7 +106,7 @@ namespace Ai2dShooter.View
                 
             }).Start();
 
-            new GameController(_players).StartGame();
+            //new GameController(_players).StartGame();
         }
 
         #endregion
@@ -123,6 +128,10 @@ namespace Ai2dShooter.View
         {
             // draw map
             Maze.DrawMaze(e.Graphics, Constants.ScaleFactor);
+
+            if (_players == null)
+                return;
+
             // draw dead players
             foreach (var p in _players.Where(p => !p.IsAlive))
                 p.DrawPlayer(e.Graphics, Constants.ScaleFactor);
@@ -213,14 +222,16 @@ namespace Ai2dShooter.View
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (GameController.Instance.GamePaused)
+            if (GameController.Instance != null && GameController.Instance.GamePaused)
                 GameController.Instance.PauseResumeGame();
 
             lock (Constants.ShootingLock)
             {
                 // tell the threads to terminate
                 ApplicationRunning = false;
-                GameController.Instance.StopGame();
+                
+                if (GameController.Instance != null)
+                    GameController.Instance.StopGame();
             }
         }
 
