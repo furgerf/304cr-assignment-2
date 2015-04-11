@@ -127,6 +127,9 @@ namespace Ai2dShooter.Model
                 // healthy?
                 if (Health < HealthyThreshold)
                 {
+                    if (GameController.Instance == null)
+                        return;
+
                     // find closest friend
                     _targetCell = GameController.Instance.GetClosestFriendCell(this);
 
@@ -182,6 +185,9 @@ namespace Ai2dShooter.Model
                 }
                 else
                 {
+                    if (GameController.Instance == null)
+                        return;
+
                     // find closest enemy
                     _targetCell = GameController.Instance.GetClosestOpponentCell(this);
 

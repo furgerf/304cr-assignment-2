@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -12,13 +13,20 @@ namespace Ai2dShooter.View
 {
     public partial class MainForm : Form
     {
+        // TODO: Make static fields non-static and use static instance!!!
         #region Fields
+
+        public static bool ApplicationRunning { get; set; }
 
         private static Player[] _players;
 
         private static Player HumanPlayer { get { return _players == null ? null : _players.FirstOrDefault(p => p.Controller == PlayerController.Human);}}
 
         public static bool HasLivingHumanPlayer { get { return HumanPlayer != null && HumanPlayer.IsAlive; } }
+
+        private static MainForm _instance;
+
+        public static bool PlaySoundEffects { get { return _gameControl.SoundEffects; } }
 
         /// <summary>
         /// Disables flickering when drawing on canvas.
@@ -34,9 +42,9 @@ namespace Ai2dShooter.View
             }
         }
 
-        public static bool ApplicationRunning { get; set; }
+        private static GameControl _gameControl;
 
-        private readonly GameControl _gameControl;
+        private static readonly List<Control> _playerControls = new List<Control>(); 
 
         #endregion
 
@@ -44,12 +52,16 @@ namespace Ai2dShooter.View
 
         public MainForm()
         {
+            _instance = this;
+
             InitializeComponent();
+
+            WindowState = FormWindowState.Maximized;
 
             ApplicationRunning = true;
 
             // setup map
-            Maze.CreateNew(25, 15); // 30, 15
+            Maze.CreateNew(35, 12); // 30, 15
 
             _canvas.Size = new Size(Constants.ScaleFactor*Maze.Instance.Width,
                 Constants.ScaleFactor*Maze.Instance.Height);
@@ -105,7 +117,6 @@ namespace Ai2dShooter.View
                     _canvas.Invalidate();
                     Thread.Sleep(Constants.Framelength);
                 }
-
             }).Start();
         }
 
@@ -168,44 +179,74 @@ namespace Ai2dShooter.View
 
         private void StartGame()
         {
+            _gameControl.Enabled = false;
+
             var hot = _gameControl.TeamHot;
             var cold = _gameControl.TeamCold;
+            var allList = hot.ToList();
+            allList.AddRange(cold);
+            var all = allList.ToArray();
 
             Utils.ResetTeamColors();
 
-            _players = new Player[hot.Length + cold.Length];
-            for (var i = 0; i < hot.Length; i++)
-                switch (hot[i])
+            _players = new Player[all.Length];
+            for (var i = 0; i < all.Length; i++)
+            {
+                var isHot = i < hot.Length;
+                switch (all[i])
                 {
                     case PlayerController.Human:
-                        _players[i] = new HumanPlayer(Maze.Instance.GetCorner(true, i), Teams.TeamHot);
+                        _players[i] = new HumanPlayer(Maze.Instance.GetCorner(isHot, i),
+                            isHot ? Teams.TeamHot : Teams.TeamCold);
                         break;
                     case PlayerController.AiFsm:
-                        _players[i] = new FsmPlayer(Maze.Instance.GetCorner(true, i), Teams.TeamHot);
+                        _players[i] = new FsmPlayer(Maze.Instance.GetCorner(isHot, i),
+                            isHot ? Teams.TeamHot : Teams.TeamCold);
                         break;
                     case PlayerController.AiDt:
-                        _players[i] = new DtPlayer(Maze.Instance.GetCorner(true, i), Teams.TeamHot);
+                        _players[i] = new DtPlayer(Maze.Instance.GetCorner(isHot, i),
+                            isHot ? Teams.TeamHot : Teams.TeamCold);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-            for (var i = 0; i < cold.Length; i++)
-                switch (cold[i])
-                {
-                    case PlayerController.Human:
-                        _players[hot.Length + i] = new HumanPlayer(Maze.Instance.GetCorner(false, i), Teams.TeamCold);
-                        break;
-                    case PlayerController.AiFsm:
-                        _players[hot.Length + i] = new FsmPlayer(Maze.Instance.GetCorner(false, i), Teams.TeamCold);
-                        break;
-                    case PlayerController.AiDt:
-                        _players[hot.Length + i] = new DtPlayer(Maze.Instance.GetCorner(false, i), Teams.TeamCold);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+            }
+
+            // setup player controls
+            for (var i = 0; i < _players.Length; i++)
+            {
+                var pc = new PlayerControl { Player = _players[i] };
+
+                pc.Location = i < hot.Length ? new Point(_canvas.Location.X + (pc.Width + 8) * i, _canvas.Location.Y + _canvas.Height + 8) : new Point(_canvas.Location.X + (pc.Width + 8) * (i - hot.Length), _canvas.Location.Y + _canvas.Height + 8 + pc.Height + 8);
+
+                _playerControls.Add(pc);
+                _players[i].LocationChanged += () => _canvas.Invalidate();
+            }
+            Controls.AddRange(_playerControls.ToArray());
+
 
             new GameController(_players).StartGame();
+        }
+
+        public static void StopGame()
+        {
+            _instance.Invoke((MethodInvoker) (() => _gameControl.Enabled = true));
+
+            if (GameController.Instance != null && GameController.Instance.GameRunning)
+                GameController.Instance.StopGame();
+
+            foreach (var pc in _playerControls)
+            {
+                var pc1 = pc;
+                _instance.Invoke((MethodInvoker) pc1.Dispose);
+            }
+            _playerControls.Clear();
+
+            if (_players != null)
+                foreach (var p in _players)
+                    p.RemovePlayer();
+
+            _players = null;
         }
 
         #endregion
@@ -217,6 +258,9 @@ namespace Ai2dShooter.View
             // space bar pauses/resumes game
             if (e.KeyCode == Keys.Space)
             {
+                if (GameController.Instance == null)
+                    return;
+
                 GameController.Instance.PauseResumeGame();
                 return;
             }
@@ -225,19 +269,9 @@ namespace Ai2dShooter.View
             if (e.KeyCode == Keys.Enter)
             {
                 if (GameController.HasGame)
-                {
-                    if (GameController.Instance.GameRunning)
-                        GameController.Instance.StopGame();
-
-                    foreach (var p in _players)
-                        p.RemovePlayer();
-
-                    _players = null;
-                }
+                    StopGame();
                 else
-                {
                     StartGame();
-                }
                 return;
             }
 

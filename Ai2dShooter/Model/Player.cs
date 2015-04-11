@@ -74,7 +74,9 @@ namespace Ai2dShooter.Model
                 if (Health <= 0 && Death != null)
                 {
                     Death();
-                    Constants.DeathSound.Play();
+
+                    if (MainForm.PlaySoundEffects)
+                        Constants.DeathSound.Play();
                 }
             }
         }
@@ -161,7 +163,7 @@ namespace Ai2dShooter.Model
 
         #region Private/Protected Fields
 
-        private static readonly string[] PlayerNames = Resources.names.Split('\n');
+        private static readonly string[] PlayerNames = Resources.names.Split('\r');
 
         private int _health;
 
@@ -194,12 +196,12 @@ namespace Ai2dShooter.Model
 
             // initialize random values
             ShootingAccuracy = ((double) Constants.Rnd.Next(3) + 17)/20; // 85-95%
-            Slowness = Constants.Rnd.Next(300, 600);
+            Slowness = Constants.Rnd.Next(200, 400);
             HealthyThreshold = Constants.Rnd.Next(10, 50);
             BackDamage = Constants.Rnd.Next(35, 75);
             FrontDamage = Constants.Rnd.Next(35, BackDamage);
             HeadshotChance = ((double) Constants.Rnd.Next(2, 5))/20; // 10-20%
-            Name = PlayerNames[Constants.Rnd.Next(PlayerNames.Length)];
+            Name = PlayerNames[Constants.Rnd.Next(PlayerNames.Length)].Substring(1);
             Orientation = (Direction) Constants.Rnd.Next((int) Direction.Count);
 
             // start movement thread
@@ -347,6 +349,9 @@ namespace Ai2dShooter.Model
             if (!CanMove(direction))
                 throw new ArgumentException("Illegal move in direction " + direction);
 
+            if (GameController.Instance == null)
+                return;
+
             GameController.Instance.CheckForOpponents(this);
 
             // abort if we're already moving
@@ -368,7 +373,7 @@ namespace Ai2dShooter.Model
 
             lock (Constants.ShootingLock)
             {
-                if (!GameController.Instance.GameRunning)
+                if (GameController.Instance == null || !GameController.Instance.GameRunning)
                     return;
             }
 
@@ -378,17 +383,20 @@ namespace Ai2dShooter.Model
             Console.WriteLine(this + " has taken " + damage + " damage from " + opponent + " from " +
                               (frontalAttack ? "the front" : "the back") + (headshot ? ", it was a HEADSHOT!" : ""));
 
-            // play sounds
-            if (headshot)
-                Constants.HeadshotSound.Play();
-            if (damage == 0)
-                Constants.MissSound.Play();
-            else if (damage > 55)
-                Constants.HardHitSound.Play();
-            else if (damage > 45)
-                Constants.MediumHitSound.Play();
-            else
-                Constants.LowHitSound.Play();
+            if (MainForm.PlaySoundEffects)
+            {
+                // play sounds
+                if (headshot)
+                    Constants.HeadshotSound.Play();
+                if (damage == 0)
+                    Constants.MissSound.Play();
+                else if (damage > 55)
+                    Constants.HardHitSound.Play();
+                else if (damage > 45)
+                    Constants.MediumHitSound.Play();
+                else
+                    Constants.LowHitSound.Play();
+            }
 
             // retaliate!
             if (!IsAlive)
@@ -437,7 +445,7 @@ namespace Ai2dShooter.Model
         public virtual void KilledEnemy()
         {
             Kills++;
-            if (Kills == 3)
+            if (MainForm.PlaySoundEffects && Kills == 3)
                 Constants.TripleKillSound.Play();
         }
 

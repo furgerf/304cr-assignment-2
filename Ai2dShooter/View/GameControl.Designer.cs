@@ -36,6 +36,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.comPlayerControllerCold = new System.Windows.Forms.ComboBox();
             this.numPlayerCountCold = new System.Windows.Forms.NumericUpDown();
+            this.chkSoundEffects = new System.Windows.Forms.CheckBox();
             this.grpTeamHot.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numPlayerCountHot)).BeginInit();
             this.grpTeamCold.SuspendLayout();
@@ -146,14 +147,27 @@
             0,
             0});
             // 
+            // chkSoundEffects
+            // 
+            this.chkSoundEffects.AutoSize = true;
+            this.chkSoundEffects.Checked = true;
+            this.chkSoundEffects.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSoundEffects.Location = new System.Drawing.Point(3, 84);
+            this.chkSoundEffects.Name = "chkSoundEffects";
+            this.chkSoundEffects.Size = new System.Drawing.Size(93, 17);
+            this.chkSoundEffects.TabIndex = 4;
+            this.chkSoundEffects.Text = "Sound Effects";
+            this.chkSoundEffects.UseVisualStyleBackColor = true;
+            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkSoundEffects);
             this.Controls.Add(this.grpTeamCold);
             this.Controls.Add(this.grpTeamHot);
             this.Name = "GameControl";
-            this.Size = new System.Drawing.Size(216, 81);
+            this.Size = new System.Drawing.Size(216, 107);
             this.grpTeamHot.ResumeLayout(false);
             this.grpTeamHot.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numPlayerCountHot)).EndInit();
@@ -161,6 +175,7 @@
             this.grpTeamCold.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numPlayerCountCold)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -174,5 +189,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox comPlayerControllerCold;
         private System.Windows.Forms.NumericUpDown numPlayerCountCold;
+        private System.Windows.Forms.CheckBox chkSoundEffects;
     }
 }

@@ -114,6 +114,9 @@ namespace Ai2dShooter.Model
                     else
                     {
                         // find closest enemy
+                        if (GameController.Instance == null)
+                            return;
+
                         _targetCell = GameController.Instance.GetClosestOpponentCell(this);
                         _state = _targetCell == null ? State.FindEnemy : State.AttackEnemy;
 
@@ -172,6 +175,9 @@ namespace Ai2dShooter.Model
                     }
                     else
                     {
+                        if (GameController.Instance == null)
+                            return;
+
                         // find closest friend
                         _targetCell = GameController.Instance.GetClosestFriendCell(this);
 

@@ -75,7 +75,7 @@ namespace Ai2dShooter.Controller
                     // remove own friend list
                     _friends.Remove(p1);
 
-                    if (_deathCount++ == 0)
+                    if (MainForm.PlaySoundEffects && _deathCount++ == 0)
                         Constants.FirstBloodSound.Play();
 
                     foreach (var o in _opponents.Values)
@@ -83,10 +83,10 @@ namespace Ai2dShooter.Controller
                         {
                             // game over!
                             // did all players of one team survive?
-                            if (_opponents[_opponents.Keys.ToArray()[0]].Length == _opponents.Keys.Count)
+                            if (MainForm.PlaySoundEffects && _opponents[_opponents.Keys.ToArray()[0]].Length == _opponents.Keys.Count)
                                 Constants.PerfectSound.Play();
 
-                            MainForm.ApplicationRunning = false;
+                            //MainForm.ApplicationRunning = false;
                             StopGame();
                         }
                 };
@@ -108,7 +108,8 @@ namespace Ai2dShooter.Controller
         /// </summary>
         public void StartGame()
         {
-            Constants.PlaySound.Play();
+            if (MainForm.PlaySoundEffects)
+                Constants.PlaySound.Play();
 
             GamePaused = false;
             GameRunning = true;
@@ -129,10 +130,12 @@ namespace Ai2dShooter.Controller
         /// </summary>
         public void StopGame()
         {
-            GamePaused = false;
-            GameRunning = false;
-
             Instance = null;
+
+            //GamePaused = false;
+            //GameRunning = false;
+            
+            MainForm.StopGame();
         }
 
         public void PauseResumeGame()

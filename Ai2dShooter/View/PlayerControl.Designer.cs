@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.grpName = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtHeadshot = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.txtKills = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -40,8 +42,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.progressHealth = new System.Windows.Forms.ProgressBar();
             this.label2 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.txtHeadshot = new System.Windows.Forms.TextBox();
             this.grpName.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,9 +62,28 @@
             this.grpName.Controls.Add(this.label2);
             this.grpName.Location = new System.Drawing.Point(6, 3);
             this.grpName.Name = "grpName";
-            this.grpName.Size = new System.Drawing.Size(163, 207);
+            this.grpName.Size = new System.Drawing.Size(183, 207);
             this.grpName.TabIndex = 0;
             this.grpName.TabStop = false;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 129);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(56, 13);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "Headshot:";
+            // 
+            // txtHeadshot
+            // 
+            this.txtHeadshot.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtHeadshot.Enabled = false;
+            this.txtHeadshot.Location = new System.Drawing.Point(120, 126);
+            this.txtHeadshot.Name = "txtHeadshot";
+            this.txtHeadshot.Size = new System.Drawing.Size(57, 20);
+            this.txtHeadshot.TabIndex = 13;
+            this.txtHeadshot.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label5
             // 
@@ -77,11 +96,12 @@
             // 
             // txtKills
             // 
+            this.txtKills.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtKills.Enabled = false;
             this.txtKills.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtKills.Location = new System.Drawing.Point(120, 178);
             this.txtKills.Name = "txtKills";
-            this.txtKills.Size = new System.Drawing.Size(37, 22);
+            this.txtKills.Size = new System.Drawing.Size(57, 22);
             this.txtKills.TabIndex = 11;
             this.txtKills.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -96,19 +116,21 @@
             // 
             // txtSlowness
             // 
+            this.txtSlowness.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtSlowness.Enabled = false;
             this.txtSlowness.Location = new System.Drawing.Point(120, 152);
             this.txtSlowness.Name = "txtSlowness";
-            this.txtSlowness.Size = new System.Drawing.Size(37, 20);
+            this.txtSlowness.Size = new System.Drawing.Size(57, 20);
             this.txtSlowness.TabIndex = 9;
             this.txtSlowness.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // txtHealthyThreshold
             // 
+            this.txtHealthyThreshold.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtHealthyThreshold.Enabled = false;
             this.txtHealthyThreshold.Location = new System.Drawing.Point(120, 48);
             this.txtHealthyThreshold.Name = "txtHealthyThreshold";
-            this.txtHealthyThreshold.Size = new System.Drawing.Size(37, 20);
+            this.txtHealthyThreshold.Size = new System.Drawing.Size(57, 20);
             this.txtHealthyThreshold.TabIndex = 8;
             this.txtHealthyThreshold.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -123,19 +145,21 @@
             // 
             // txtAccuracy
             // 
+            this.txtAccuracy.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtAccuracy.Enabled = false;
             this.txtAccuracy.Location = new System.Drawing.Point(120, 100);
             this.txtAccuracy.Name = "txtAccuracy";
-            this.txtAccuracy.Size = new System.Drawing.Size(37, 20);
+            this.txtAccuracy.Size = new System.Drawing.Size(57, 20);
             this.txtAccuracy.TabIndex = 6;
             this.txtAccuracy.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // txtDamage
             // 
+            this.txtDamage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtDamage.Enabled = false;
             this.txtDamage.Location = new System.Drawing.Point(120, 74);
             this.txtDamage.Name = "txtDamage";
-            this.txtDamage.Size = new System.Drawing.Size(37, 20);
+            this.txtDamage.Size = new System.Drawing.Size(57, 20);
             this.txtDamage.TabIndex = 5;
             this.txtDamage.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -152,7 +176,7 @@
             // 
             this.progressHealth.Location = new System.Drawing.Point(6, 19);
             this.progressHealth.Name = "progressHealth";
-            this.progressHealth.Size = new System.Drawing.Size(151, 23);
+            this.progressHealth.Size = new System.Drawing.Size(171, 23);
             this.progressHealth.TabIndex = 3;
             // 
             // label2
@@ -164,31 +188,13 @@
             this.label2.TabIndex = 1;
             this.label2.Text = "Healthy Threshold:";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 129);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(56, 13);
-            this.label6.TabIndex = 14;
-            this.label6.Text = "Headshot:";
-            // 
-            // txtHeadshot
-            // 
-            this.txtHeadshot.Enabled = false;
-            this.txtHeadshot.Location = new System.Drawing.Point(120, 126);
-            this.txtHeadshot.Name = "txtHeadshot";
-            this.txtHeadshot.Size = new System.Drawing.Size(37, 20);
-            this.txtHeadshot.TabIndex = 13;
-            this.txtHeadshot.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
             // PlayerControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.grpName);
             this.Name = "PlayerControl";
-            this.Size = new System.Drawing.Size(174, 216);
+            this.Size = new System.Drawing.Size(192, 216);
             this.grpName.ResumeLayout(false);
             this.grpName.PerformLayout();
             this.ResumeLayout(false);

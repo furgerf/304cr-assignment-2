@@ -49,6 +49,8 @@ namespace Ai2dShooter.View
             }
         }
 
+        public bool SoundEffects { get { return chkSoundEffects.Checked; } }
+
         #endregion
 
         #region Constructor
