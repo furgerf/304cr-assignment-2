@@ -195,7 +195,7 @@ namespace Ai2dShooter.Model
 
             // initialize random values
             ShootingAccuracy = ((double) Constants.Rnd.Next(3) + 17)/20; // 85-95%
-            Slowness = Constants.Rnd.Next(80, 100);
+            Slowness = Constants.Rnd.Next(300, 600);
             HealthyThreshold = Constants.Rnd.Next(10, 50);
             BackDamage = Constants.Rnd.Next(35, 75);
             FrontDamage = Constants.Rnd.Next(35, BackDamage);
@@ -219,22 +219,25 @@ namespace Ai2dShooter.Model
                 // zzzzzzzzZZZZZZZZZZzzzzzz
                 if (!IsMoving)
                 {
-                    Thread.Sleep(Constants.Framerate);
+                    Thread.Sleep(Constants.Framelength);
                     continue;
                 }
+
+                // calculate step number
+                var stepCount = (float)Slowness / Constants.Framelength;
 
                 // get offset in right direction
                 PointF stepOffset = Utils.GetDirectionPoint(Orientation);
                 // divide offset to get offset for single step
-                stepOffset = new PointF(stepOffset.X/Constants.Framerate, stepOffset.Y/Constants.Framerate);
+                stepOffset = new PointF(stepOffset.X / stepCount, stepOffset.Y / stepCount);
 
-                // do half the steps
+                // do the steps
                 int i;
-                for (i = 0; i < Constants.Framerate && IsMoving && MainForm.ApplicationRunning && IsAlive; i++)
+                for (i = 0; i < stepCount && IsMoving && MainForm.ApplicationRunning && IsAlive; i++)
                 {
                     LocationOffset.X += stepOffset.X;
                     LocationOffset.Y += stepOffset.Y;
-                    Thread.Sleep(Slowness/Constants.Framerate);
+                    Thread.Sleep(Constants.Framelength);
                 }
 
                 if (!IsMoving)
@@ -243,7 +246,7 @@ namespace Ai2dShooter.Model
                     {
                         LocationOffset.X -= 2 * stepOffset.X;
                         LocationOffset.Y -= 2 * stepOffset.Y;
-                        Thread.Sleep(Slowness / Constants.Framerate);
+                        Thread.Sleep(Constants.Framelength);
                     }
 
                     // clear offset

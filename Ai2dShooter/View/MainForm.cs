@@ -96,7 +96,7 @@ namespace Ai2dShooter.View
                 while (ApplicationRunning)
                 {
                     _canvas.Invalidate();
-                    Thread.Sleep(Constants.Framerate);
+                    Thread.Sleep(Constants.Framelength);
                 }
                 
             }).Start();
