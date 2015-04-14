@@ -53,7 +53,6 @@
     <Compile Include="Map\Maze.cs" />
     <Compile Include="Model\Decision.cs" />
     <Compile Include="Model\DecisionData.cs" />
-    <Compile Include="Model\DecisionTree.cs" />
     <Compile Include="Model\DtPlayer.cs" />
     <Compile Include="Model\FsmPlayer.cs" />
     <Compile Include="Model\HumanPlayer.cs" />

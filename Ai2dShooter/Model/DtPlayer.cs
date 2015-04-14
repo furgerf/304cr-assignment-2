@@ -27,7 +27,7 @@ namespace Ai2dShooter.Model
 
         private bool _inCombat;
 
-        private static readonly DecisionTree Tree;
+        private static readonly Model.Decision Tree;
 
         #endregion
 
@@ -47,7 +47,8 @@ namespace Ai2dShooter.Model
                 new DecisionData(false, false, false, Model.Decision.DecisionType.Reload)
             });
 
-            Tree = DecisionTree.CreateTree(data.Item1, data.Item2, data.Item3);
+            Tree = Model.Decision.CreateTree(data.Item1, data.Item2, data.Item3);
+            var foo = Tree.Evaluate(Model.Decision.ParseTreeQueryData(new DecisionData(false, true, false, Model.Decision.DecisionType.Count)));
         }
 
         public DtPlayer(Cell initialLocation, Teams team)
