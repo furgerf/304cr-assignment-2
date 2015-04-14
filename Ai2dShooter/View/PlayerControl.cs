@@ -6,10 +6,16 @@ using Ai2dShooter.Model;
 
 namespace Ai2dShooter.View
 {
+    /// <summary>
+    /// Displays information about a player.
+    /// </summary>
     public partial class PlayerControl : UserControl
     {
         #region Fields
 
+        /// <summary>
+        /// Player who's information is displayed in the control.
+        /// </summary>
         public Player Player
         {
             get { return _player; }

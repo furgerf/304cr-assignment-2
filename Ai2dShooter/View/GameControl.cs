@@ -3,10 +3,16 @@ using Ai2dShooter.Common;
 
 namespace Ai2dShooter.View
 {
+    /// <summary>
+    /// Lets the user control some game settings.
+    /// </summary>
     public partial class GameControl : UserControl
     {
         #region Fields
 
+        /// <summary>
+        /// Retrieves the controller of the members of team hot.
+        /// </summary>
         public PlayerController[] TeamHot
         {
             get
@@ -31,6 +37,9 @@ namespace Ai2dShooter.View
             }
         }
 
+        /// <summary>
+        /// Retrieves the controller of the members of team cold.
+        /// </summary>
         public PlayerController[] TeamCold
         {
             get
@@ -49,6 +58,9 @@ namespace Ai2dShooter.View
             }
         }
 
+        /// <summary>
+        /// True if sound effects are enabled.
+        /// </summary>
         public bool SoundEffects { get { return chkSoundEffects.Checked; } }
 
         #endregion
@@ -59,6 +71,7 @@ namespace Ai2dShooter.View
         {
             InitializeComponent();
 
+            // add combobox entries
             for (var i = (int) PlayerController.Human + 1; i < (int) PlayerController.Count; i++)
             {
                 comPlayerControllerHot.Items.Add((PlayerController)i);
@@ -66,6 +79,7 @@ namespace Ai2dShooter.View
                 comPlayerControllerCold.Items.Add((PlayerController)i);
             }
             
+            // assign default values
             comPlayerControllerHot.SelectedIndex = 0;
             comPlayerControllerCold.SelectedIndex = 1;
 

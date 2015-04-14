@@ -99,7 +99,7 @@ namespace Ai2dShooter.Model
 
                 Death();
 
-                if (MainForm.PlaySoundEffects)
+                if (MainForm.Instance.PlaySoundEffects)
                     Constants.DeathSound.Play();
             }
         }
@@ -254,7 +254,7 @@ namespace Ai2dShooter.Model
         private void MovementWorker()
         {
             // loop while application is running
-            while (MainForm.ApplicationRunning && PlayerExists)
+            while (MainForm.Instance.ApplicationRunning && PlayerExists)
             {
                 // zzzzzzzzZZZZZZZZZZzzzzzz
                 if (!IsMoving)
@@ -273,7 +273,7 @@ namespace Ai2dShooter.Model
 
                 // do the steps
                 int i;
-                for (i = 0; i < stepCount && IsMoving && MainForm.ApplicationRunning && IsAlive && PlayerExists; i++)
+                for (i = 0; i < stepCount && IsMoving && MainForm.Instance.ApplicationRunning && IsAlive && PlayerExists; i++)
                 {
                     LocationOffset.X += stepOffset.X;
                     LocationOffset.Y += stepOffset.Y;
@@ -282,7 +282,7 @@ namespace Ai2dShooter.Model
 
                 if (!IsMoving)
                 {
-                    for (; i >= 0 && MainForm.ApplicationRunning && IsAlive && PlayerExists; i -= 2)
+                    for (; i >= 0 && MainForm.Instance.ApplicationRunning && IsAlive && PlayerExists; i -= 2)
                     {
                         LocationOffset.X -= 2 * stepOffset.X;
                         LocationOffset.Y -= 2 * stepOffset.Y;
@@ -356,7 +356,7 @@ namespace Ai2dShooter.Model
                 orientationEnd);
 
             // draw opponent visibility range
-            if (Controller != PlayerController.Human && IsAlive && !MainForm.HasLivingHumanPlayer)
+            if (Controller != PlayerController.Human && IsAlive && !MainForm.Instance.HasLivingHumanPlayer)
             {
                 foreach (var c in VisibleReachableCells)
                     graphics.FillRectangle(
@@ -367,7 +367,7 @@ namespace Ai2dShooter.Model
 
             }
 
-            if (!MainForm.HasLivingHumanPlayer || Controller == PlayerController.Human)
+            if (!MainForm.Instance.HasLivingHumanPlayer || Controller == PlayerController.Human)
                 DrawPlayerImplementation(graphics, scaleFactor, box);
         }
 
@@ -437,7 +437,7 @@ namespace Ai2dShooter.Model
                               (frontalAttack ? "the front" : "the back") + (headshot ? ", it was a HEADSHOT!" : ""));
 
             // play appropriate sound
-            if (MainForm.PlaySoundEffects)
+            if (MainForm.Instance.PlaySoundEffects)
             {
                 if (knife)
                 {
@@ -523,7 +523,7 @@ namespace Ai2dShooter.Model
         public virtual void KilledEnemy()
         {
             Kills++;
-            if (MainForm.PlaySoundEffects && Kills == 3)
+            if (MainForm.Instance.PlaySoundEffects && Kills == 3)
                 Constants.TripleKillSound.Play();
         }
 

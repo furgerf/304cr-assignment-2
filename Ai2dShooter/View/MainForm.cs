@@ -13,20 +13,23 @@ namespace Ai2dShooter.View
 {
     public partial class MainForm : Form
     {
-        // TODO: Make static fields non-static and use static instance!!!
-        #region Fields
+        #region Public Fields
 
-        public static bool ApplicationRunning { get; set; }
+        public bool ApplicationRunning { get; set; }
 
-        private static Player[] _players;
+        public bool HasLivingHumanPlayer { get { return HumanPlayer != null && HumanPlayer.IsAlive; } }
 
-        private static Player HumanPlayer { get { return _players == null ? null : _players.FirstOrDefault(p => p.Controller == PlayerController.Human);}}
+        public bool PlaySoundEffects { get { return _gameControl.SoundEffects; } }
 
-        public static bool HasLivingHumanPlayer { get { return HumanPlayer != null && HumanPlayer.IsAlive; } }
+        public static MainForm Instance { get; private set; }
 
-        private static MainForm _instance;
+        #endregion
 
-        public static bool PlaySoundEffects { get { return _gameControl.SoundEffects; } }
+        #region Private Fields
+
+        private Player[] _players;
+
+        private Player HumanPlayer { get { return _players == null ? null : _players.FirstOrDefault(p => p.Controller == PlayerController.Human);}}
 
         /// <summary>
         /// Disables flickering when drawing on canvas.
@@ -42,9 +45,9 @@ namespace Ai2dShooter.View
             }
         }
 
-        private static GameControl _gameControl;
+        private readonly GameControl _gameControl;
 
-        private static readonly List<Control> _playerControls = new List<Control>(); 
+        private readonly List<Control> _playerControls = new List<Control>(); 
 
         #endregion
 
@@ -52,7 +55,7 @@ namespace Ai2dShooter.View
 
         public MainForm()
         {
-            _instance = this;
+            Instance = this;
 
             InitializeComponent();
 
@@ -65,40 +68,6 @@ namespace Ai2dShooter.View
 
             _canvas.Size = new Size(Constants.ScaleFactor*Maze.Instance.Width,
                 Constants.ScaleFactor*Maze.Instance.Height);
-
-            // setup players
-            //_players = new Player[]
-            //{
-            //    //new HumanPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot),
-            //    new DtPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
-            //    new DtPlayer(Maze.Instance.NorthWestCorner, Teams.TeamHot), 
-            //    new DtPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
-            //    new DtPlayer(Maze.Instance.NorthCenterCorner, Teams.TeamHot), 
-            //    new DtPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
-            //    new DtPlayer(Maze.Instance.NorthEastCorner, Teams.TeamHot),
-            //    new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
-            //    new FsmPlayer(Maze.Instance.SouthEastCorner, Teams.TeamCold),
-            //    new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
-            //    new FsmPlayer(Maze.Instance.SouthCenterCorner, Teams.TeamCold),
-            //    new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold),
-            //    new FsmPlayer(Maze.Instance.SouthWestCorner, Teams.TeamCold)
-            //};
-
-            // setup player controls
-            //var playerControlRight = 0;
-            //var playerControlBottom = 0;
-            //for (var i = 0; i < _players.Length; i++)
-            //{
-            //    var pc = new PlayerControl {Player = _players[i]};
-            //    pc.Location = new Point(_canvas.Location.X + (pc.Width + 8) * i, _canvas.Location.Y + _canvas.Height + 8);
-            //    playerControlRight = pc.Right;
-            //    playerControlBottom = pc.Bottom;
-
-            //    Controls.Add(pc);
-            //    _players[i].LocationChanged += () => _canvas.Invalidate();
-            //}
-            //Width = playerControlRight + 16;
-            //Height = playerControlBottom + 32;
 
             _gameControl = new GameControl {Location = new Point(_canvas.Right + _canvas.Padding.Right, _canvas.Top)};
             Controls.Add(_gameControl);
@@ -156,7 +125,7 @@ namespace Ai2dShooter.View
                 DrawPaused(e.Graphics);
         }
 
-        private void DrawPaused(Graphics graphics)
+        private static void DrawPaused(Graphics graphics)
         {
             graphics.FillRectangle(new SolidBrush(Color.FromArgb(Constants.DeadAlpha, Color.DimGray)), 0, 0, Maze.Instance.Width * Constants.ScaleFactor, Maze.Instance.Height * Constants.ScaleFactor);
         }
@@ -177,10 +146,14 @@ namespace Ai2dShooter.View
                                 Constants.ScaleFactor));
         }
 
-        private void StartGame()
+        /// <summary>
+        /// Creates a new game.
+        /// </summary>
+        private void CreateGame()
         {
             _gameControl.Enabled = false;
 
+            // get player controllers
             var hot = _gameControl.TeamHot;
             var cold = _gameControl.TeamCold;
             var allList = hot.ToList();
@@ -189,6 +162,7 @@ namespace Ai2dShooter.View
 
             Utils.ResetTeamColors();
 
+            // create players
             _players = new Player[all.Length];
             for (var i = 0; i < all.Length; i++)
             {
@@ -224,13 +198,16 @@ namespace Ai2dShooter.View
             }
             Controls.AddRange(_playerControls.ToArray());
 
-
+            // start new game
             new GameController(_players).StartGame();
         }
 
-        public static void StopGame()
+        /// <summary>
+        /// Stops the current game.
+        /// </summary>
+        public void StopGame()
         {
-            _instance.Invoke((MethodInvoker) (() => _gameControl.Enabled = true));
+            Instance.Invoke((MethodInvoker) (() => _gameControl.Enabled = true));
 
             if (GameController.Instance != null && GameController.Instance.GameRunning)
                 GameController.Instance.StopGame();
@@ -238,7 +215,7 @@ namespace Ai2dShooter.View
             foreach (var pc in _playerControls)
             {
                 var pc1 = pc;
-                _instance.Invoke((MethodInvoker) pc1.Dispose);
+                Instance.Invoke((MethodInvoker) pc1.Dispose);
             }
             _playerControls.Clear();
 
@@ -271,7 +248,7 @@ namespace Ai2dShooter.View
                 if (GameController.HasGame)
                     StopGame();
                 else
-                    StartGame();
+                    CreateGame();
                 return;
             }
 
