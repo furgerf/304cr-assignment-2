@@ -118,6 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="ak47_boltpull" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ak47_boltpull.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ak47_clipin" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ak47_clipin.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ak47_clipout" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ak47_clipout.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="bulletltor07" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\bulletltor07.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>

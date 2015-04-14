@@ -41,6 +41,10 @@ namespace Ai2dShooter.Common
         public static readonly SoundPlayer KnifeHitSound;
         public static readonly SoundPlayer KnifeMissSound;
 
+        public static readonly SoundPlayer Reload1Sound;
+        public static readonly SoundPlayer Reload2Sound;
+        public static readonly SoundPlayer Reload3Sound;
+
         public const int DeadAlpha = 64;
 
         static Constants()
@@ -58,6 +62,10 @@ namespace Ai2dShooter.Common
             HardHitSound = new SoundPlayer(Properties.Resources.deagle_1);
             KnifeHitSound = new SoundPlayer(Properties.Resources.knife_hit3);
             KnifeMissSound = new SoundPlayer(Properties.Resources.knife_slash1);
+
+            Reload1Sound = new SoundPlayer(Properties.Resources.ak47_clipout);
+            Reload2Sound = new SoundPlayer(Properties.Resources.ak47_clipin);
+            Reload3Sound = new SoundPlayer(Properties.Resources.ak47_boltpull);
         }
     }
 }
