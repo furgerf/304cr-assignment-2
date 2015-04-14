@@ -9,7 +9,7 @@ namespace Ai2dShooter.Map
     /// <summary>
     /// Represents the logical structure of the map.
     /// </summary>
-    public class Maze
+    public sealed class Maze
     {
         #region Fields
 

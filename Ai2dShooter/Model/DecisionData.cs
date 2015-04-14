@@ -10,13 +10,13 @@ namespace Ai2dShooter.Model
 
         public bool IsEnemyInRange { get; private set; }
 
-        public Decision.DecisionType Decision { get; private set; }
+        public DtPlayer.DecisionType Decision { get; private set; }
 
         #endregion
 
         #region Constructor
 
-        public DecisionData(bool isHealthy, bool hasAmmo, bool isEnemyInRange, Decision.DecisionType decision) : this()
+        public DecisionData(bool isHealthy, bool hasAmmo, bool isEnemyInRange, DtPlayer.DecisionType decision) : this()
         {
             Decision = decision;
             IsEnemyInRange = isEnemyInRange;

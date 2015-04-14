@@ -3,7 +3,10 @@ using Ai2dShooter.Common;
 
 namespace Ai2dShooter.Map
 {
-    public class Cell
+    /// <summary>
+    /// Smallest part of the map.
+    /// </summary>
+    public sealed class Cell
     {
         #region Fields
 

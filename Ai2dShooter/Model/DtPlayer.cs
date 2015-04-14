@@ -12,7 +12,11 @@ namespace Ai2dShooter.Model
     {
         #region Private Fields
 
-        private enum Decision { MoveToEnemy, MoveToFriend, RandomMove, Backtrack, Count };
+        /// <summary>
+        /// Possible decisions that can be made.
+        /// </summary>
+        public enum DecisionType { MoveToEnemy, MoveToFriend, RandomMove, Reload, Count }
+
 
         private static readonly Color[] DecisionColors =
         {
@@ -23,11 +27,11 @@ namespace Ai2dShooter.Model
 
         private Cell _targetCell;
 
-        private Decision _lastDecision = Decision.Count;
+        private DecisionType _lastDecision = DecisionType.Count;
 
         private bool _inCombat;
 
-        private static readonly Model.Decision Tree;
+        private static readonly Decision Tree;
 
         #endregion
 
@@ -35,19 +39,19 @@ namespace Ai2dShooter.Model
 
         static DtPlayer()
         {
-            var data = Model.Decision.ParseTreeCreationData(new[]
+            var data = ParseTreeCreationData(new[]
             {
-                new DecisionData(true, true, true, Model.Decision.DecisionType.MoveToEnemy),
-                new DecisionData(true, true, false, Model.Decision.DecisionType.RandomMove),
-                new DecisionData(true, false, true, Model.Decision.DecisionType.MoveToEnemy),
-                new DecisionData(false, true, true, Model.Decision.DecisionType.MoveToEnemy),
-                new DecisionData(true, false, false, Model.Decision.DecisionType.Reload),
-                new DecisionData(false, true, false, Model.Decision.DecisionType.MoveToFriend),
-                new DecisionData(false, false, true, Model.Decision.DecisionType.MoveToEnemy),
-                new DecisionData(false, false, false, Model.Decision.DecisionType.Reload)
+                new DecisionData(true, true, true, DecisionType.MoveToEnemy),
+                new DecisionData(true, true, false, DecisionType.RandomMove),
+                new DecisionData(true, false, true, DecisionType.MoveToEnemy),
+                new DecisionData(false, true, true, DecisionType.MoveToEnemy),
+                new DecisionData(true, false, false, DecisionType.Reload),
+                new DecisionData(false, true, false, DecisionType.MoveToFriend),
+                new DecisionData(false, false, true, DecisionType.MoveToEnemy),
+                new DecisionData(false, false, false, DecisionType.Reload)
             });
 
-            Tree = Model.Decision.CreateTree(data.Item1, data.Item2, data.Item3);
+            Tree = Decision.CreateTree(data.Item1, data.Item2, data.Item3);
         }
 
         public DtPlayer(Cell initialLocation, Teams team)
@@ -55,7 +59,7 @@ namespace Ai2dShooter.Model
         {
             LocationChanged += MakeDecision;
             HealthChanged += MakeDecision;
-            Death += () => _lastDecision = Decision.Count;
+            Death += () => _lastDecision = DecisionType.Count;
         }
 
         #endregion
@@ -70,7 +74,7 @@ namespace Ai2dShooter.Model
             smallerBox.Inflate(-penWidth, -penWidth);
 
             // draw circle in the color belonging to the current state
-            if (_lastDecision != Decision.Count)
+            if (_lastDecision != DecisionType.Count)
             {
                 var edges = new[]
                 {
@@ -131,12 +135,12 @@ namespace Ai2dShooter.Model
 
             var neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
 
-            _lastDecision = Decision.Count;
+            _lastDecision = DecisionType.Count;
 
             // stuck?
             if (neighbors.Length == 1)
             {
-                _lastDecision = Decision.Backtrack;
+                //_lastDecision = DecisionType.Backtrack;
 
                 // backtrack
                 Move(Location.GetDirection(neighbors[0]));
@@ -154,7 +158,7 @@ namespace Ai2dShooter.Model
 
                     if (_targetCell == null)
                     {
-                        _lastDecision = Decision.RandomMove;
+                        _lastDecision = DecisionType.RandomMove;
 
                         // all friends are dead 
                         Move(
@@ -165,7 +169,7 @@ namespace Ai2dShooter.Model
                     }
                     else
                     {
-                        _lastDecision = Decision.MoveToFriend;
+                        _lastDecision = DecisionType.MoveToFriend;
 
                         // calculate scores for each direction
                         var directionScore = new int[4];
@@ -178,7 +182,7 @@ namespace Ai2dShooter.Model
                             // ignore neighbors that can't be moved to
                             if (neighbor == null || neighbor.IsWall)
                             {
-                                directionScore[i] = int.MaxValue;
+                                directionScore[i] = Int32.MaxValue;
                                 continue;
                             }
 
@@ -212,7 +216,7 @@ namespace Ai2dShooter.Model
 
                     if (_targetCell == null)
                     {
-                        _lastDecision = Decision.RandomMove;
+                        _lastDecision = DecisionType.RandomMove;
 
                         // no target found, move in random direction that is not backwards
                         Move(
@@ -223,7 +227,7 @@ namespace Ai2dShooter.Model
                     }
                     else
                     {
-                        _lastDecision = Decision.MoveToEnemy;
+                        _lastDecision = DecisionType.MoveToEnemy;
 
                         // calculate scores for each direction
                         var directionScore = new int[4];
@@ -236,7 +240,7 @@ namespace Ai2dShooter.Model
                             // ignore neighbors that can't be moved to
                             if (neighbor == null || neighbor.IsWall)
                             {
-                                directionScore[i] = int.MaxValue;
+                                directionScore[i] = Int32.MaxValue;
                                 continue;
                             }
 
@@ -265,7 +269,31 @@ namespace Ai2dShooter.Model
             Thread.Sleep(Constants.AiMoveTimeout);
         }
 
-        #endregion
+        public static Tuple<Func<bool[], bool>[], bool[][], int[]> ParseTreeCreationData(DecisionData[] data)
+        {
+            var tests = new Func<bool[], bool>[]
+            {
+                d => d[0],
+                d => d[1],
+                d => d[2]
+            };
+            var attributes = new bool[data.Length][];
+            var decisions = new int[data.Length];
 
+            for (var i = 0; i < data.Length; i++)
+            {
+                attributes[i] = new[] { data[i].IsHealthy, data[i].HasAmmo, data[i].IsEnemyInRange };
+                decisions[i] = (int)data[i].Decision;
+            }
+
+            return new Tuple<Func<bool[], bool>[], bool[][], int[]>(tests, attributes, decisions);
+        }
+
+        public static bool[] ParseTreeQueryData(DecisionData data)
+        {
+            return new[] { data.IsHealthy, data.HasAmmo, data.IsEnemyInRange };
+        }
+
+        #endregion
     }
 }
