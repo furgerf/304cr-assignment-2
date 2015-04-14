@@ -112,9 +112,9 @@ namespace Ai2dShooter.View
                 try
                 {
                     if (InvokeRequired)
-                        Invoke((MethodInvoker)(() => _updateAmmo()));
+                        Invoke((MethodInvoker) (() => _updateAmmo()));
                     else
-                        txtAmmo.Text = Player.Ammo.ToString(CultureInfo.InvariantCulture);
+                        txtAmmo.Text = Player.Ammo + "/" + Player.MaxAmmo;
                 }
                 catch (ObjectDisposedException ode)
                 {

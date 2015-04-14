@@ -45,6 +45,8 @@ namespace Ai2dShooter.Common
         public static readonly SoundPlayer Reload2Sound;
         public static readonly SoundPlayer Reload3Sound;
 
+        public static readonly SoundPlayer[] ReloadSounds;
+
         public const int DeadAlpha = 64;
 
         static Constants()
@@ -66,6 +68,7 @@ namespace Ai2dShooter.Common
             Reload1Sound = new SoundPlayer(Properties.Resources.ak47_clipout);
             Reload2Sound = new SoundPlayer(Properties.Resources.ak47_clipin);
             Reload3Sound = new SoundPlayer(Properties.Resources.ak47_boltpull);
+            ReloadSounds = new[] {Reload1Sound, Reload2Sound, Reload3Sound};
         }
     }
 }

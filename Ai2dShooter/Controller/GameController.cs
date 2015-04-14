@@ -238,9 +238,17 @@ namespace Ai2dShooter.Controller
 
             lock (Constants.MovementLock)
             {
+                if (!player.IsAlive || !_opponents.ContainsKey(player))
+                    return;
+
+                var opponents = _opponents[player].Where(o => !IsShootingPlayer(o));
+
                 // check whether player can shoot at any other player
-                foreach (var opponent in _opponents[player].Where(o => !IsShootingPlayer(o)))
+                foreach (var opponent in opponents)
                 {
+                    if (!player.IsAlive || !_opponents.ContainsKey(player))
+                        return;
+
                     // check next opponent if the current opponent is no neighbor
                     if (!player.Location.Neighbors.Contains(opponent.Location)) continue;
 

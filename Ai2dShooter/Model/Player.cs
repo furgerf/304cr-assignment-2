@@ -42,6 +42,9 @@ namespace Ai2dShooter.Model
 
         public bool UsesKnife { get { return Ammo == 0; } }
 
+
+        public const int MaxAmmo = 3;
+
         public int Ammo
         {
             get { return _ammo; }
@@ -215,7 +218,7 @@ namespace Ai2dShooter.Model
             // initialize fixed values
             Health = 100;
             Color = Utils.GetTeamColor(team);
-            Ammo = 3;
+            Ammo = MaxAmmo;
 
             // initialize random values
             ShootingAccuracy = ((double) Constants.Rnd.Next(3) + 17)/20; // 85-95%
