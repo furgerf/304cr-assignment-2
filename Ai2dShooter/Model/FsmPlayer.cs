@@ -11,7 +11,7 @@ namespace Ai2dShooter.Model
     /// <summary>
     /// An AI player controlled by a finite state machine (FSM).
     /// </summary>
-    public class FsmPlayer : Player
+    public sealed class FsmPlayer : Player
     {
         #region Private Fields
 
@@ -24,10 +24,19 @@ namespace Ai2dShooter.Model
 
         private readonly Pen _targetPen = new Pen(Color.FromArgb(127, Color.LawnGreen), 4);
 
+        /// <summary>
+        /// Cell that the player is targetting.
+        /// </summary>
         private Cell _targetCell;
 
+        /// <summary>
+        /// Current state.
+        /// </summary>
         private State _state;
 
+        /// <summary>
+        /// Number of reloading steps remaining.
+        /// </summary>
         private int _reloadSteps;
 
         #endregion
@@ -37,6 +46,7 @@ namespace Ai2dShooter.Model
         public FsmPlayer(Cell initialLocation, Teams team)
             : base(initialLocation, PlayerController.AiFsm, team)
         {
+            // register to events
             LocationChanged += MakeDecision;
             HealthChanged += MakeDecision;
             Death += () => _state = State.Dead;
@@ -111,6 +121,7 @@ namespace Ai2dShooter.Model
             Cell[] neighbors;
             switch (_state)
             {
+                    // TODO: FIX
                 case State.FindEnemy:
                 case State.AttackEnemy:
                     // stuck?

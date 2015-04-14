@@ -8,7 +8,10 @@ using Ai2dShooter.Map;
 
 namespace Ai2dShooter.Model
 {
-    public class DtPlayer : Player
+    /// <summary>
+    /// An AI player controlled by a decision tree (DT).
+    /// </summary>
+    public sealed class DtPlayer : Player
     {
         #region Private Fields
 
@@ -23,7 +26,7 @@ namespace Ai2dShooter.Model
             Color.Goldenrod, Color.Pink, Color.Green, Color.Gray
         };
 
-        private readonly Pen _opponentPen = new Pen(Color.Orange, 2);
+        private readonly Pen _targetPen = new Pen(Color.FromArgb(127, Color.LawnGreen), 4);
 
         private Cell _targetCell;
 
@@ -85,14 +88,14 @@ namespace Ai2dShooter.Model
                     new PointF(smallerBox.Left + (float)smallerBox.Width*2/3, smallerBox.Bottom),
                     new PointF(smallerBox.Left + (float)smallerBox.Width/3, smallerBox.Bottom),
                     new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height*2/3),
-                    new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height/3),
+                    new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height/3)
                 };
                 graphics.DrawPolygon(new Pen(DecisionColors[(int)_lastDecision], penWidth), edges);
             }
 
             // if required, draw a line to the cell that is currently being targeted by the player
             if (_targetCell != null && IsAlive)
-                graphics.DrawLine(_opponentPen, box.X + box.Width/2, box.Y + box.Height/2,
+                graphics.DrawLine(_targetPen, box.X + box.Width/2, box.Y + box.Height/2,
                     _targetCell.X*scaleFactor + box.Width/2, _targetCell.Y*scaleFactor + box.Height/2);
         }
 

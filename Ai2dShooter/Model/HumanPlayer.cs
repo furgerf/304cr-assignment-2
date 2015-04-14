@@ -4,7 +4,10 @@ using Ai2dShooter.Map;
 
 namespace Ai2dShooter.Model
 {
-    public class HumanPlayer : Player
+    /// <summary>
+    /// Player that is controlled by a human.
+    /// </summary>
+    public sealed class HumanPlayer : Player
     {
         #region Constructor
 

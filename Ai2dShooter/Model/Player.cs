@@ -12,6 +12,9 @@ using Ai2dShooter.View;
 
 namespace Ai2dShooter.Model
 {
+    /// <summary>
+    /// Represents an agent on the map.
+    /// </summary>
     public abstract class Player
     {
         #region Events
@@ -41,7 +44,6 @@ namespace Ai2dShooter.Model
         #region Public Fields
 
         public bool UsesKnife { get { return Ammo == 0; } }
-
 
         public const int MaxAmmo = 3;
 
@@ -93,13 +95,12 @@ namespace Ai2dShooter.Model
                 if (HealthChanged != null)
                     HealthChanged();
 
-                if (Health <= 0 && Death != null)
-                {
-                    Death();
+                if (Health > 0 || Death == null) return;
 
-                    if (MainForm.PlaySoundEffects)
-                        Constants.DeathSound.Play();
-                }
+                Death();
+
+                if (MainForm.PlaySoundEffects)
+                    Constants.DeathSound.Play();
             }
         }
 
@@ -126,8 +127,6 @@ namespace Ai2dShooter.Model
                     _location = value;
                 }
 
-                //Console.WriteLine(this + " moved from " + prev);
-
                 // trigger event
                 if (LocationChanged != null)
                     LocationChanged();
@@ -150,6 +149,9 @@ namespace Ai2dShooter.Model
             }
         }
 
+        /// <summary>
+        /// Returns all cells that are within the visibility range.
+        /// </summary>
         public IEnumerable<Cell> VisibleReachableCells
         {
             get
@@ -181,6 +183,9 @@ namespace Ai2dShooter.Model
             }
         }
 
+        /// <summary>
+        /// Another (friendly) player that is followed by the current player.
+        /// </summary>
         public Player FollowedPlayer { get; protected set; }
 
         #endregion
@@ -238,6 +243,9 @@ namespace Ai2dShooter.Model
 
         #region Implemented Methods
 
+        /// <summary>
+        /// After stopping the game, notify the players' worker threads to stop working.
+        /// </summary>
         public void RemovePlayer()
         {
             PlayerExists = false;
@@ -363,6 +371,11 @@ namespace Ai2dShooter.Model
                 DrawPlayerImplementation(graphics, scaleFactor, box);
         }
 
+        /// <summary>
+        /// Determines whether the player can move in a specific direction.
+        /// </summary>
+        /// <param name="direction">Direction to potentially move to</param>
+        /// <returns>True if the neighbor in the direction is part of the maze and is no wall</returns>
         public bool CanMove(Direction direction)
         {
             var c = Location.GetNeighbor(direction);
@@ -370,6 +383,10 @@ namespace Ai2dShooter.Model
             return c != null && c.IsClear;
         }
 
+        /// <summary>
+        /// Move in a specific direction.
+        /// </summary>
+        /// <param name="direction">Direction to move to</param>
         public void Move(Direction direction)
         {
             if (!CanMove(direction))
@@ -392,13 +409,23 @@ namespace Ai2dShooter.Model
             //Console.WriteLine(this + " is moving towards " + Location.GetNeighbor(direction));
         }
 
+        /// <summary>
+        /// Handle damage received by the player.
+        /// </summary>
+        /// <param name="opponent">Opponent that dealt the damage</param>
+        /// <param name="damage">Amount of damage</param>
+        /// <param name="frontalAttack">True if the damage was dealt from the front</param>
+        /// <param name="headshot">True if the damage was to the head</param>
+        /// <param name="knife">True if the damage was dealth with a knife</param>
         public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot, bool knife)
         {
             if (!PlayerExists)
                 return;
 
+            // ensure we're still allowed to shoot (the game isn't paused)
             lock (Constants.ShootingLock)
             {
+                // abort if the game was terminated
                 if (GameController.Instance == null || !GameController.Instance.GameRunning)
                     return;
             }
@@ -409,6 +436,7 @@ namespace Ai2dShooter.Model
             Console.WriteLine(this + " has taken " + damage + " damage from " + opponent + " by " + (knife ? "knife" : "gun") + " from " +
                               (frontalAttack ? "the front" : "the back") + (headshot ? ", it was a HEADSHOT!" : ""));
 
+            // play appropriate sound
             if (MainForm.PlaySoundEffects)
             {
                 if (knife)
@@ -448,8 +476,10 @@ namespace Ai2dShooter.Model
             // turn towards opponent
             Orientation = Location.GetDirection(opponent.Location);
 
+            // zzz
             Thread.Sleep(Constants.ShootingTimeout);
 
+            // prepare own hit
             var hit = Constants.Rnd.NextDouble() < ShootingAccuracy;
             var hs = hit && (Constants.Rnd.NextDouble() < HeadshotChance);
             var knifeHit = UsesKnife;
@@ -464,14 +494,32 @@ namespace Ai2dShooter.Model
 
         #region Abstract Methods
 
+        /// <summary>
+        /// Prepare implementation at the beginning of the game.
+        /// </summary>
         public abstract void StartGame();
 
+        /// <summary>
+        /// Notify the player that he's spotted an enemy.
+        /// </summary>
         public abstract void EnemySpotted();
 
+        /// <summary>
+        /// Notify the player that he's been spotted.
+        /// </summary>
         public abstract void SpottedByEnemy();
 
+        /// <summary>
+        /// Draw implementation-specific information.
+        /// </summary>
+        /// <param name="graphics">Graphics used to draw</param>
+        /// <param name="scaleFactor">How big it should be</param>
+        /// <param name="box">Box around the player</param>
         protected abstract void DrawPlayerImplementation(Graphics graphics, int scaleFactor, Rectangle box);
 
+        /// <summary>
+        /// The player has killed an opponent.
+        /// </summary>
         public virtual void KilledEnemy()
         {
             Kills++;
