@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Threading;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 
@@ -9,6 +10,12 @@ namespace Ai2dShooter.Model
     /// </summary>
     public sealed class HumanPlayer : Player
     {
+        #region Fields
+
+        public bool IsReloading { get; private set; }
+
+        #endregion
+
         #region Constructor
 
         public HumanPlayer(Cell initialLocation, Teams team) : base(initialLocation, PlayerController.Human, team)
@@ -38,6 +45,29 @@ namespace Ai2dShooter.Model
         public override void SpottedByEnemy()
         {
             // do nothing
+        }
+
+        public void Reload()
+        {
+            if (Ammo == MaxAmmo)
+                return;
+
+            IsReloading = true;
+
+            new Thread(() =>
+            {
+                for (var i = 2; i >= 0; i--)
+                {
+                    lock (Constants.MovementLock)
+                    {
+                        Constants.ReloadSounds[i].Play();
+                    }
+                    Thread.Sleep(Constants.ReloadTimeout);
+                }
+
+                Ammo = MaxAmmo;
+                IsReloading = false;
+            }).Start();
         }
 
         #endregion

@@ -29,7 +29,7 @@ namespace Ai2dShooter.View
 
         private Player[] _players;
 
-        private Player HumanPlayer { get { return _players == null ? null : _players.FirstOrDefault(p => p.Controller == PlayerController.Human);}}
+        private HumanPlayer HumanPlayer { get { return _players == null ? null : (HumanPlayer)_players.FirstOrDefault(p => p.Controller == PlayerController.Human);}}
 
         /// <summary>
         /// Disables flickering when drawing on canvas.
@@ -261,6 +261,12 @@ namespace Ai2dShooter.View
                 // don't allow the human player to move while there is shooting going on
                 if (GameController.Instance.ArePlayersShooting)
                     return;
+
+                if (HumanPlayer.IsReloading)
+                    return;
+
+                if (e.KeyCode == Keys.R)
+                    HumanPlayer.Reload();
 
                 // arrow keys/wasd for player movement
                 if ((e.KeyCode == Keys.W || e.KeyCode == Keys.Up) && HumanPlayer.CanMove(Direction.North))
