@@ -201,6 +201,10 @@ namespace Ai2dShooter.Controller
             // iterate over fiends
             foreach (var f in _friends[player])
             {
+                // skip all players that follow the current player
+                if (f.FollowedPlayer == player)
+                    continue;
+
                 // ensure closest isn't null for comparison below
                 closest = closest ?? f.Location;
 

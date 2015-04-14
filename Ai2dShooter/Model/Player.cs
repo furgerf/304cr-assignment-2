@@ -159,6 +159,8 @@ namespace Ai2dShooter.Model
             }
         }
 
+        public Player FollowedPlayer { get; protected set; }
+
         #endregion
 
         #region Private/Protected Fields
