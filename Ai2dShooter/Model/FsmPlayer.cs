@@ -19,7 +19,7 @@ namespace Ai2dShooter.Model
 
         private static readonly Color[] StateColors =
         {
-            Color.Green, Color.Goldenrod, Color.Red, Color.Pink, Color.Purple, Color.DeepSkyBlue
+            Color.Green, Color.Goldenrod, Color.Red, Color.Pink, Color.Purple, Color.FromArgb(Constants.DeadAlpha, Color.DeepSkyBlue)
         };
 
         private readonly Pen _targetPen = new Pen(Color.FromArgb(127, Color.LawnGreen), 4);

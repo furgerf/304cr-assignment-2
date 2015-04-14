@@ -81,14 +81,21 @@ namespace Ai2dShooter.Model
             {
                 var edges = new[]
                 {
-                    new PointF(smallerBox.Left + (float)smallerBox.Width/3, smallerBox.Top),
-                    new PointF(smallerBox.Left + (float)smallerBox.Width*2/3, smallerBox.Top),
-                    new PointF(smallerBox.Right, smallerBox.Top + (float)smallerBox.Height/3),
-                    new PointF(smallerBox.Right, smallerBox.Top + (float)smallerBox.Height*2/3),
-                    new PointF(smallerBox.Left + (float)smallerBox.Width*2/3, smallerBox.Bottom),
-                    new PointF(smallerBox.Left + (float)smallerBox.Width/3, smallerBox.Bottom),
-                    new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height*2/3),
-                    new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height/3)
+                    // eight-side polygon
+                    //new PointF(smallerBox.Left + (float)smallerBox.Width/3, smallerBox.Top),
+                    //new PointF(smallerBox.Left + (float)smallerBox.Width*2/3, smallerBox.Top),
+                    //new PointF(smallerBox.Right, smallerBox.Top + (float)smallerBox.Height/3),
+                    //new PointF(smallerBox.Right, smallerBox.Top + (float)smallerBox.Height*2/3),
+                    //new PointF(smallerBox.Left + (float)smallerBox.Width*2/3, smallerBox.Bottom),
+                    //new PointF(smallerBox.Left + (float)smallerBox.Width/3, smallerBox.Bottom),
+                    //new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height*2/3),
+                    //new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height/3)
+
+                    // diamond polygon
+                    new PointF((float)(smallerBox.Left + smallerBox.Right) / 2, smallerBox.Top), 
+                    new PointF(smallerBox.Right, (float)(smallerBox.Top + smallerBox.Bottom) / 2), 
+                    new PointF((float)(smallerBox.Left + smallerBox.Right) / 2, smallerBox.Bottom), 
+                    new PointF(smallerBox.Left, (float)(smallerBox.Top + smallerBox.Bottom) / 2)
                 };
                 graphics.DrawPolygon(new Pen(DecisionColors[(int)_lastDecision], penWidth), edges);
             }
