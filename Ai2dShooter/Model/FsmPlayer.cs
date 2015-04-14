@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Ai2dShooter.Common;
 using Ai2dShooter.Controller;
@@ -15,18 +16,20 @@ namespace Ai2dShooter.Model
     {
         #region Private Fields
 
-        private enum State { FindEnemy, AttackEnemy, Combat, FindFriend, Dead }
+        private enum State { FindEnemy, AttackEnemy, Combat, FindFriend, Reload, Dead }
 
         private static readonly Color[] StateColors =
         {
-            Color.Green, Color.Goldenrod, Color.Red, Color.Pink, Color.DeepSkyBlue
+            Color.Green, Color.Goldenrod, Color.Red, Color.Pink, Color.Purple, Color.DeepSkyBlue
         };
 
-        private readonly Pen _opponentPen = new Pen(Color.Orange, 2);
+        private readonly Pen _targetPen = new Pen(Color.FromArgb(127, Color.LawnGreen), 4);
 
         private Cell _targetCell;
 
         private State _state;
+
+        private int _reloadSteps;
 
         #endregion
 
@@ -56,7 +59,7 @@ namespace Ai2dShooter.Model
 
             // if required, draw a line to the cell that is currently being targeted by the player
             if (_targetCell != null && IsAlive)
-                graphics.DrawLine(_opponentPen, box.X + box.Width/2, box.Y + box.Height/2, _targetCell.X * scaleFactor + box.Width / 2, _targetCell.Y*scaleFactor + box.Height / 2);
+                graphics.DrawLine(_targetPen, box.X + box.Width/2, box.Y + box.Height/2, _targetCell.X * scaleFactor + box.Width / 2, _targetCell.Y*scaleFactor + box.Height / 2);
         }
 
         public override void StartGame()
@@ -86,8 +89,16 @@ namespace Ai2dShooter.Model
         {
             base.KilledEnemy();
 
-            // depending on health, look for friends or enemies
-            _state = Health >= HealthyThreshold ? State.FindEnemy : State.FindFriend;
+            // depending on health, look for friends or enemies or reload
+            if (UsesKnife)
+            {
+                _state = State.Reload;
+                _reloadSteps = Constants.ReloadSounds.Length - 1;
+            }
+            else
+                _state = Health >= HealthyThreshold ? State.FindEnemy : State.FindFriend;
+
+            //Console.WriteLine(this + " has killed an enemy and is now " + _state);
 
             // start movement
             MakeDecision();
@@ -233,6 +244,23 @@ namespace Ai2dShooter.Model
                 case State.Combat:
                     // keep fighting
                     break;
+                case State.Reload:
+                    lock (Constants.MovementLock)
+                    {
+                        Constants.ReloadSounds[_reloadSteps--].Play();
+
+                        if (_reloadSteps == -1)
+                        {
+                            _state = Health >= HealthyThreshold ? State.FindEnemy : State.FindFriend;
+                            Ammo = MaxAmmo;
+                        }
+                        new Thread(() =>
+                        {
+                            Thread.Sleep(25 * Constants.AiMoveTimeout);
+                            MakeDecision();
+                        }).Start();
+                    }
+                    return;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
