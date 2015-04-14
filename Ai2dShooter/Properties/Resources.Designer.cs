@@ -115,6 +115,24 @@ namespace Ai2dShooter.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream knife_hit3 {
+            get {
+                return ResourceManager.GetStream("knife_hit3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream knife_slash1 {
+            get {
+                return ResourceManager.GetStream("knife_slash1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Theodore
         ///Robt
         ///Herschel
@@ -182,17 +200,7 @@ namespace Ai2dShooter.Properties {
         ///Sirena
         ///Lovie
         ///Lilly
-        ///Julieta
-        ///Becki
-        ///Charla
-        ///Sharee
-        ///Emerald
-        ///Summer
-        ///Carole
-        ///Consuelo
-        ///Linda
-        ///Daisy
-        ///V [rest of string was truncated]&quot;;.
+        ///Julie [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string names {
             get {

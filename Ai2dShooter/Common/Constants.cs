@@ -38,6 +38,8 @@ namespace Ai2dShooter.Common
         public static readonly SoundPlayer LowHitSound;
         public static readonly SoundPlayer MediumHitSound;
         public static readonly SoundPlayer HardHitSound;
+        public static readonly SoundPlayer KnifeHitSound;
+        public static readonly SoundPlayer KnifeMissSound;
 
         public const int DeadAlpha = 64;
 
@@ -54,6 +56,8 @@ namespace Ai2dShooter.Common
             LowHitSound = new SoundPlayer(Properties.Resources.usp1);
             MediumHitSound = new SoundPlayer(Properties.Resources.elite_1);
             HardHitSound = new SoundPlayer(Properties.Resources.deagle_1);
+            KnifeHitSound = new SoundPlayer(Properties.Resources.knife_hit3);
+            KnifeMissSound = new SoundPlayer(Properties.Resources.knife_slash1);
         }
     }
 }

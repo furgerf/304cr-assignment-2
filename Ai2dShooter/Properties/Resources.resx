@@ -136,6 +136,12 @@
   <data name="headshot" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\headshot.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="knife_hit3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\knife_hit3.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="knife_slash1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\knife_slash1.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="names" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\names.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
