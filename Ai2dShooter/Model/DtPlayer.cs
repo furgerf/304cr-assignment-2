@@ -131,7 +131,7 @@ namespace Ai2dShooter.Model
                         return;
 
                     // find closest friend
-                    _targetCell = GameController.Instance.GetClosestFriendCell(this);
+                    _targetCell = GameController.Instance.GetClosestFriend(this).Location;
 
                     if (_targetCell == null)
                     {

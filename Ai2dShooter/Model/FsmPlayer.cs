@@ -179,11 +179,12 @@ namespace Ai2dShooter.Model
                             return;
 
                         // find closest friend
-                        _targetCell = GameController.Instance.GetClosestFriendCell(this);
+                        var friend = GameController.Instance.GetClosestFriend(this);
+                        _targetCell = friend == null ? null : friend.Location;
 
                         if (_targetCell == null)
                         {
-                            // all friends are dead 
+                            // all friends are dead or already follow me
                             Move(
                                 Location.GetDirection(
                                     neighbors.Except(new[] { Location.GetNeighbor((Direction)(((int)Orientation + 2) % 4)) }).ToArray()[
@@ -191,6 +192,8 @@ namespace Ai2dShooter.Model
                         }
                         else
                         {
+                            FollowedPlayer = friend;
+
                             // calculate scores for each direction
                             var directionScore = new int[4];
 

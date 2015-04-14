@@ -32,9 +32,28 @@ namespace Ai2dShooter.Model
 
         public event OnKillsChanged KillsChanged;
 
+        public delegate void OnAmmoChanged();
+
+        public event OnAmmoChanged AmmoChanged;
+
         #endregion
 
         #region Public Fields
+
+        public bool UsesKnife { get { return Ammo == 0; } }
+
+        public int Ammo
+        {
+            get { return _ammo; }
+            set
+            {
+                if (_ammo == value) return;
+                _ammo = value;
+
+                if (AmmoChanged != null)
+                    AmmoChanged();
+            }
+        }
 
         public int Kills
         {
@@ -178,6 +197,7 @@ namespace Ai2dShooter.Model
         private int _kills;
 
         protected bool PlayerExists = true;
+        private int _ammo;
 
         protected bool IsMoving { get; set; }
 
@@ -195,6 +215,7 @@ namespace Ai2dShooter.Model
             // initialize fixed values
             Health = 100;
             Color = Utils.GetTeamColor(team);
+            Ammo = 3;
 
             // initialize random values
             ShootingAccuracy = ((double) Constants.Rnd.Next(3) + 17)/20; // 85-95%
@@ -368,7 +389,7 @@ namespace Ai2dShooter.Model
             //Console.WriteLine(this + " is moving towards " + Location.GetNeighbor(direction));
         }
 
-        public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot)
+        public void Damage(Player opponent, int damage, bool frontalAttack, bool headshot, bool knife)
         {
             if (!PlayerExists)
                 return;
@@ -382,22 +403,32 @@ namespace Ai2dShooter.Model
             // reduce life
             Health -= damage <= Health ? damage : Health;
 
-            Console.WriteLine(this + " has taken " + damage + " damage from " + opponent + " from " +
+            Console.WriteLine(this + " has taken " + damage + " damage from " + opponent + " by " + (knife ? "knife" : "gun") + " from " +
                               (frontalAttack ? "the front" : "the back") + (headshot ? ", it was a HEADSHOT!" : ""));
 
             if (MainForm.PlaySoundEffects)
             {
-                // play sounds
-                if (headshot)
-                    Constants.HeadshotSound.Play();
-                if (damage == 0)
-                    Constants.MissSound.Play();
-                else if (damage > 55)
-                    Constants.HardHitSound.Play();
-                else if (damage > 45)
-                    Constants.MediumHitSound.Play();
+                if (knife)
+                {
+                    if (damage == 0)
+                        Constants.KnifeMissSound.Play();
+                    else
+                        Constants.KnifeHitSound.Play();
+                }
                 else
-                    Constants.LowHitSound.Play();
+                {
+                    // play sounds
+                    if (headshot)
+                        Constants.HeadshotSound.Play();
+                    if (damage == 0)
+                        Constants.MissSound.Play();
+                    else if (damage > 55)
+                        Constants.HardHitSound.Play();
+                    else if (damage > 45)
+                        Constants.MediumHitSound.Play();
+                    else
+                        Constants.LowHitSound.Play();
+                }
             }
 
             // retaliate!
@@ -418,17 +449,13 @@ namespace Ai2dShooter.Model
 
             var hit = Constants.Rnd.NextDouble() < ShootingAccuracy;
             var hs = hit && (Constants.Rnd.NextDouble() < HeadshotChance);
-            opponent.Damage(this, (hit ? 1 : 0)*FrontDamage*(hs ? 2 : 1), true, hs);
+            var knifeHit = UsesKnife;
+
+            if (!UsesKnife)
+                Ammo--;
+
+            opponent.Damage(this, (int)((hit ? 1 : 0) * FrontDamage * (hs ? 2 : 1) * (knifeHit ? 0.5 : 1)), true, hs, knifeHit);
         }
-
-        //public void Reset()
-        //{
-        //    Kills = 0;
-        //    Health = 100;
-        //    _location = _initialLocation; // no lock/event
-
-        //    ResetPlayerImplementation();
-        //}
 
         #endregion
 
@@ -441,8 +468,6 @@ namespace Ai2dShooter.Model
         public abstract void SpottedByEnemy();
 
         protected abstract void DrawPlayerImplementation(Graphics graphics, int scaleFactor, Rectangle box);
-
-        //protected abstract void ResetPlayerImplementation();
 
         public virtual void KilledEnemy()
         {

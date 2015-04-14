@@ -50,6 +50,11 @@ namespace Ai2dShooter.View
         /// </summary>
         private readonly Player.OnKillsChanged _updateKills;
 
+        /// <summary>
+        /// Called when the player's ammo changes.
+        /// </summary>
+        private readonly Player.OnAmmoChanged _updateAmmo;
+
         #endregion
 
         #region Constructor
@@ -93,9 +98,23 @@ namespace Ai2dShooter.View
                 try
                 {
                     if (InvokeRequired)
-                        Invoke((MethodInvoker) (() => _updateKills()));
+                        Invoke((MethodInvoker)(() => _updateKills()));
                     else
                         txtKills.Text = Player.Kills.ToString(CultureInfo.InvariantCulture);
+                }
+                catch (ObjectDisposedException ode)
+                {
+                    Console.WriteLine(ode.Message);
+                }
+            };
+            _updateAmmo = () =>
+            {
+                try
+                {
+                    if (InvokeRequired)
+                        Invoke((MethodInvoker)(() => _updateAmmo()));
+                    else
+                        txtAmmo.Text = Player.Ammo.ToString(CultureInfo.InvariantCulture);
                 }
                 catch (ObjectDisposedException ode)
                 {
@@ -117,10 +136,10 @@ namespace Ai2dShooter.View
 
             _updateLocation();
             _updateHealth();
+            _updateAmmo();
             txtHealthyThreshold.Text = Player.HealthyThreshold.ToString(CultureInfo.InvariantCulture);
             txtDamage.Text = Player.FrontDamage + "/" + Player.BackDamage;
-            txtAccuracy.Text = 100*Player.ShootingAccuracy + "%";
-            txtHeadshot.Text = 100*Player.HeadshotChance + "%";
+            txtAccuracy.Text = 100*Player.ShootingAccuracy + "%/" + 100*Player.HeadshotChance + "%";
             txtSlowness.Text = Player.Slowness + "ms/cell";
             _updateKills();
         }
@@ -130,6 +149,7 @@ namespace Ai2dShooter.View
             player.HealthChanged += _updateHealth;
             player.LocationChanged += _updateLocation;
             player.KillsChanged += _updateKills;
+            player.AmmoChanged += _updateAmmo;
         }
 
         private void UnregisterEvents(Player player)
@@ -137,6 +157,7 @@ namespace Ai2dShooter.View
             player.HealthChanged -= _updateHealth;
             player.LocationChanged -= _updateLocation;
             player.KillsChanged -= _updateKills;
+            player.AmmoChanged -= _updateAmmo;
         }
 
         #endregion

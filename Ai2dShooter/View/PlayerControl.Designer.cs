@@ -30,7 +30,7 @@
         {
             this.grpName = new System.Windows.Forms.GroupBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.txtHeadshot = new System.Windows.Forms.TextBox();
+            this.txtAmmo = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.txtKills = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -48,7 +48,7 @@
             // grpName
             // 
             this.grpName.Controls.Add(this.label6);
-            this.grpName.Controls.Add(this.txtHeadshot);
+            this.grpName.Controls.Add(this.txtAmmo);
             this.grpName.Controls.Add(this.label5);
             this.grpName.Controls.Add(this.txtKills);
             this.grpName.Controls.Add(this.label4);
@@ -71,19 +71,19 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(6, 129);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(56, 13);
+            this.label6.Size = new System.Drawing.Size(39, 13);
             this.label6.TabIndex = 14;
-            this.label6.Text = "Headshot:";
+            this.label6.Text = "Ammo:";
             // 
-            // txtHeadshot
+            // txtAmmo
             // 
-            this.txtHeadshot.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtHeadshot.Enabled = false;
-            this.txtHeadshot.Location = new System.Drawing.Point(120, 126);
-            this.txtHeadshot.Name = "txtHeadshot";
-            this.txtHeadshot.Size = new System.Drawing.Size(57, 20);
-            this.txtHeadshot.TabIndex = 13;
-            this.txtHeadshot.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtAmmo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtAmmo.Enabled = false;
+            this.txtAmmo.Location = new System.Drawing.Point(120, 126);
+            this.txtAmmo.Name = "txtAmmo";
+            this.txtAmmo.Size = new System.Drawing.Size(57, 20);
+            this.txtAmmo.TabIndex = 13;
+            this.txtAmmo.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label5
             // 
@@ -139,9 +139,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(6, 103);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(55, 13);
+            this.label3.Size = new System.Drawing.Size(106, 13);
             this.label3.TabIndex = 7;
-            this.label3.Text = "Accuracy:";
+            this.label3.Text = "Accuracy/Headshot:";
             // 
             // txtAccuracy
             // 
@@ -216,6 +216,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtSlowness;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox txtHeadshot;
+        private System.Windows.Forms.TextBox txtAmmo;
     }
 }

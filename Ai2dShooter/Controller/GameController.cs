@@ -190,13 +190,13 @@ namespace Ai2dShooter.Controller
         }
 
         /// <summary>
-        /// Finds the location of the closest friendly player.
+        /// Finds the closest friendly player.
         /// </summary>
         /// <param name="player">Player looking for friends</param>
-        /// <returns>Cell of the closest friend or null if everyone else is dead</returns>
-        public Cell GetClosestFriendCell(Player player)
+        /// <returns>Closest friend or null if everyone else is dead</returns>
+        public Player GetClosestFriend(Player player)
         {
-            Cell closest = null;
+            Player closest = null;
 
             // iterate over fiends
             foreach (var f in _friends[player])
@@ -206,11 +206,11 @@ namespace Ai2dShooter.Controller
                     continue;
 
                 // ensure closest isn't null for comparison below
-                closest = closest ?? f.Location;
+                closest = closest ?? f;
 
                 // update closest if the current friend is closer
-                if (player.Location.GetManhattenDistance(f.Location) < player.Location.GetManhattenDistance(closest))
-                    closest = f.Location;
+                if (player.Location.GetManhattenDistance(f.Location) < player.Location.GetManhattenDistance(closest.Location))
+                    closest = f;
             }
 
             // return closest friend
@@ -233,7 +233,7 @@ namespace Ai2dShooter.Controller
         /// <param name="player">Player that is looking for targets</param>
         public void CheckForOpponents(Player player)
         {
-            if (IsShootingPlayer(player))
+            if (IsShootingPlayer(player) || !player.IsAlive)
                 return;
 
             lock (Constants.MovementLock)
@@ -270,12 +270,16 @@ namespace Ai2dShooter.Controller
                     var hit = Constants.Rnd.NextDouble() < player.ShootingAccuracy;
                     var headshot = hit && (Constants.Rnd.NextDouble() < player.HeadshotChance);
                     var frontalAttack = op.Location.GetDirection(player.Location) == op.Orientation;
+                    var knife = player.UsesKnife;
+
+                    if (!knife)
+                        player.Ammo--;
 
                     Thread.Sleep(Constants.ShootingTimeout);
                     op.Damage(player,
-                        (hit ? 1 : 0)*(frontalAttack ? player.FrontDamage : player.BackDamage)*
-                        (headshot ? 2 : 1),
-                        frontalAttack, headshot);
+                        (int)((hit ? 1 : 0)*(frontalAttack ? player.FrontDamage : player.BackDamage)*
+                        (headshot ? 2 : 1)*(knife ? 0.5 : 1)),
+                        frontalAttack, headshot, knife);
 
                     // done!
                     return;
