@@ -12,12 +12,12 @@ namespace Ai2dShooter.Model
 
         protected Func<bool[], bool> Test { get; private set; }
 
-        public enum DecisionType { MoveToEnemy, MoveToFriend, RandomMove, Backtrack, Reload, Count }
+        public enum DecisionType { MoveToEnemy, MoveToFriend, RandomMove, Reload, Count }
 
         private static readonly Decision[] Decisions =
         {
             new Decision(DecisionType.MoveToEnemy), new Decision(DecisionType.MoveToFriend),
-            new Decision(DecisionType.RandomMove), new Decision(DecisionType.Backtrack),
+            new Decision(DecisionType.RandomMove), //new Decision(DecisionType.Backtrack),
             new Decision(DecisionType.Reload)
         };
 

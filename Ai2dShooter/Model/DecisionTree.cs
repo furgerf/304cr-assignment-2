@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using Ai2dShooter.Common;
 
 namespace Ai2dShooter.Model
@@ -33,6 +34,8 @@ namespace Ai2dShooter.Model
         /// <returns>New decision tree</returns>
         public static DecisionTree CreateTree(Func<bool[], bool>[] tests, bool[][] data, int[] decisions)
         {
+            var decisionCount = decisions.Max() + 1;
+
             if (
                 tests.Length != data[0].Length ||
                 decisions.Length != data.Length)
@@ -47,14 +50,30 @@ namespace Ai2dShooter.Model
 
             // calculate entropy for each attribute
             var entropy = new double[data[0].Length*2];
-            // TODO
+            var decisionCounts = new int[entropy.Length][];
+            for (var i = 0; i < decisionCounts.Length; i++)
+                decisionCounts[i] = new int[decisionCount];
+
+            for (var i = 0; i < data[0].Length; i++)    // iterate over attributes
+            {
+                for (var j = 0; j < data.Length; j++)
+                {
+                    var offset = data[j][i] ? 0 : 1;
+                    decisionCounts[2*i + offset][decisions[j]]++;
+                }
+            }
+
+            for (var i = 0; i < entropy.Length; i++)
+            {
+                var totalCount = (double)decisionCounts[i].Sum();
+                foreach (var dc in decisionCounts[i])
+                    entropy[i] += dc == 0 ? 0 : -dc/totalCount*Math.Log(dc/totalCount, 2);
+            }
 
             // calculate information gain for each attribute
             var gain = new double[data[0].Length];
             for (var i = 0; i < gain.Length; i++)
-                gain[i] = i;
-                //gain[i] = Constants.Rnd.NextDouble();
-            // TODO
+                gain[i] = entropy[2*i] + entropy[2*i+1];
 
             var bestGainAttribute = Array.IndexOf(gain, gain.Max());
 
