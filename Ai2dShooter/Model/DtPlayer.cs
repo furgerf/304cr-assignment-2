@@ -27,9 +27,28 @@ namespace Ai2dShooter.Model
 
         private bool _inCombat;
 
+        private static readonly DecisionTree Tree;
+
         #endregion
 
         #region Constructor
+
+        static DtPlayer()
+        {
+            var data = Model.Decision.ParseTreeCreationData(new[]
+            {
+                new DecisionData(true, true, true, Model.Decision.DecisionType.MoveToEnemy),
+                new DecisionData(true, true, false, Model.Decision.DecisionType.RandomMove),
+                new DecisionData(true, false, true, Model.Decision.DecisionType.MoveToEnemy),
+                new DecisionData(false, true, true, Model.Decision.DecisionType.MoveToEnemy),
+                new DecisionData(true, false, false, Model.Decision.DecisionType.Reload),
+                new DecisionData(false, true, false, Model.Decision.DecisionType.MoveToFriend),
+                new DecisionData(false, false, true, Model.Decision.DecisionType.MoveToEnemy),
+                new DecisionData(false, false, false, Model.Decision.DecisionType.Reload)
+            });
+
+            Tree = DecisionTree.CreateTree(data.Item1, data.Item2, data.Item3);
+        }
 
         public DtPlayer(Cell initialLocation, Teams team)
             : base(initialLocation, PlayerController.AiFsm, team)
