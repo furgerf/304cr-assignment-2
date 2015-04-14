@@ -255,7 +255,7 @@ namespace Ai2dShooter.Model
                         }
                         new Thread(() =>
                         {
-                            Thread.Sleep(25 * Constants.AiMoveTimeout);
+                            Thread.Sleep(Constants.ReloadTimeout);
                             MakeDecision();
                         }).Start();
                     }

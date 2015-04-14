@@ -19,8 +19,7 @@ namespace Ai2dShooter.Model
         private static readonly Decision[] Decisions =
         {
             new Decision(DecisionType.MoveToEnemy), new Decision(DecisionType.MoveToFriend),
-            new Decision(DecisionType.RandomMove), //new Decision(DecisionType.Backtrack),
-            new Decision(DecisionType.Reload)
+            new Decision(DecisionType.RandomMove), new Decision(DecisionType.Reload)
         };
 
         public DecisionType Type { get; private set; }

@@ -71,7 +71,7 @@ namespace Ai2dShooter.View
                     if (InvokeRequired)
                         Invoke((MethodInvoker) (() => _updateLocation()));
                     else
-                        grpName.Text = Player.Name + " - " + Player.Location + " - " + Constants.PlayerControllerNames[Player.Controller];
+                        grpName.Text = Player.Name + " - " + Player.Location + " - " + Constants.PlayerControllerNames[(int)Player.Controller];
                 }
                 catch (ObjectDisposedException ode)
                 {

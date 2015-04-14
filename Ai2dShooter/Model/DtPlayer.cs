@@ -48,7 +48,6 @@ namespace Ai2dShooter.Model
             });
 
             Tree = Model.Decision.CreateTree(data.Item1, data.Item2, data.Item3);
-            var foo = Tree.Evaluate(Model.Decision.ParseTreeQueryData(new DecisionData(false, true, false, Model.Decision.DecisionType.Count)));
         }
 
         public DtPlayer(Cell initialLocation, Teams team)

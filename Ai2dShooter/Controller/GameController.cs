@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using Ai2dShooter.Common;
@@ -10,7 +9,10 @@ using Ai2dShooter.View;
 
 namespace Ai2dShooter.Controller
 {
-    public class GameController
+    /// <summary>
+    /// Class that keeps track of the current game.
+    /// </summary>
+    public sealed class GameController
     {
         #region Public Fields
 
@@ -21,6 +23,9 @@ namespace Ai2dShooter.Controller
 
         public static bool HasGame { get { return Instance != null; }}
 
+        /// <summary>
+        /// True if there is a game that is running or could be resumed.
+        /// </summary>
         public bool GameRunning;
 
         public bool GamePaused { get; private set; }
@@ -48,13 +53,21 @@ namespace Ai2dShooter.Controller
 
         public GameController(Player[] players)
         {
+            // update game instance
             Instance = this;
 
+            // prepare game for the players
             foreach (var p in players)
             {
                 // register to events
                 var p1 = p;
-                p.LocationChanged += () => PlayerLocationChanged(p1);
+                p.LocationChanged += () =>
+                {
+                    if (IsShootingPlayer(p1) || !p1.IsAlive)
+                        return;
+
+                    CheckForOpponents(p1);
+                };
 
                 p.Death += () =>
                 {
@@ -104,7 +117,7 @@ namespace Ai2dShooter.Controller
         #region Main Methods
 
         /// <summary>
-        /// Starts a new game by telling the players to start.
+        /// Starts a new game and tells the players to start.
         /// </summary>
         public void StartGame()
         {
@@ -114,6 +127,7 @@ namespace Ai2dShooter.Controller
             GamePaused = false;
             GameRunning = true;
 
+            // start players on new thread so as not to block the main thread
             new Thread(() =>
             {
                 foreach (var player in _friends.Keys)
@@ -132,12 +146,12 @@ namespace Ai2dShooter.Controller
         {
             Instance = null;
 
-            //GamePaused = false;
-            //GameRunning = false;
-            
             MainForm.StopGame();
         }
 
+        /// <summary>
+        /// Pauses or resumes the game.
+        /// </summary>
         public void PauseResumeGame()
         {
             if (GamePaused)
@@ -146,9 +160,13 @@ namespace Ai2dShooter.Controller
                 return;
             }
 
+            // set paused flag
             GamePaused = true;
             new Thread(() =>
             {
+                // acquire proper lock to pause NOW (rather than SOON):
+                // if players are shooting, stop them
+                // else, stop players from moving
                 var lockMe = ArePlayersShooting ? Constants.ShootingLock : Constants.MovementLock;
                 lock (lockMe)
                 {
@@ -171,12 +189,8 @@ namespace Ai2dShooter.Controller
             var visibleCells = player.VisibleReachableCells.ToArray();
 
             // iterate over opponents to see whether they're close by
-            foreach (var o in _opponents[player])
+            foreach (var o in _opponents[player].Where(o => visibleCells.Contains(o.Location)))
             {
-                // if the opponent's cell isn't visible, return
-                if (!visibleCells.Contains(o.Location))
-                    continue;
-
                 // ensure closest isn't null
                 closest = closest ?? o.Location;
 
@@ -199,12 +213,8 @@ namespace Ai2dShooter.Controller
             Player closest = null;
 
             // iterate over fiends
-            foreach (var f in _friends[player])
+            foreach (var f in _friends[player].Where(f => f.FollowedPlayer != player))
             {
-                // skip all players that follow the current player
-                if (f.FollowedPlayer == player)
-                    continue;
-
                 // ensure closest isn't null for comparison below
                 closest = closest ?? f;
 
@@ -293,18 +303,6 @@ namespace Ai2dShooter.Controller
                     return;
                 }
             }
-        }
-
-        #endregion
-
-        #region Event Handling
-
-        private void PlayerLocationChanged(Player player)
-        {
-            if (IsShootingPlayer(player) || !player.IsAlive)
-                return;
-
-            CheckForOpponents(player);
         }
 
         #endregion

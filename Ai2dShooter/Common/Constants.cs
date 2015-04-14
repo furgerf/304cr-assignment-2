@@ -1,32 +1,76 @@
 using System;
-using System.Collections.Generic;
 using System.Media;
 
 namespace Ai2dShooter.Common
 {
+    /// <summary>
+    /// Contains commonly used constants
+    /// </summary>
     public static class Constants
     {
+        /// <summary>
+        /// Object that generates random numbers.
+        /// </summary>
         public static readonly Random Rnd = new Random();
 
+        /// <summary>
+        /// Scale factor for everything that is drawn.
+        /// </summary>
         public const int ScaleFactor = 32;
         
+        /// <summary>
+        /// Number of fields of vision in each direction for all players.
+        /// </summary>
         public const int Visibility = 4;
 
-        public static readonly Dictionary<PlayerController, string> PlayerControllerNames = new Dictionary<PlayerController, string> {{PlayerController.Human, "Human"}, {PlayerController.AiFsm, "AI: FSM"}};
+        /// <summary>
+        /// Maps readable strings to the enum members.
+        /// </summary>
+        public static readonly string[] PlayerControllerNames = { "Human", "AI: FSM", "AI: DT"};
 
+        /// <summary>
+        /// Opacity with which to draw dead players.
+        /// </summary>
+        public const int DeadAlpha = 64;
+
+        /// <summary>
+        /// Graphic redraw rate.
+        /// </summary>
         public const int Framerate = 200; // FPS
+
+        /// <summary>
+        /// Time between graphic redraws.
+        /// </summary>
         public const int Framelength = 1000/Framerate; // ms
 
+        /// <summary>
+        /// Lock that has to be aquired for any sort of movement. Can be used for pausing.
+        /// </summary>
         public static readonly object MovementLock = new object();
 
+        /// <summary>
+        /// Lock that has to be aquired when shooting. Can be used for pausing.
+        /// </summary>
         public static readonly object ShootingLock = new object();
 
-        //public static readonly object HumanMovementLock = new object();
-
+        /// <summary>
+        /// Time that each AI player waits after making a decision.
+        /// </summary>
         public const int AiMoveTimeout = 50;
 
-        public const int ShootingTimeout = 400; //(int)(1.5*AiMoveTimeout);
+        /// <summary>
+        /// Time that passes after each fired shot.
+        /// </summary>
+        public const int ShootingTimeout = 400;
 
+        /// <summary>
+        /// Time that passes between each step of the reloading process.
+        /// </summary>
+        public const int ReloadTimeout = 1250; // AiMoveTimeout * 25;
+
+        /// <summary>
+        /// Sounds.
+        /// </summary>
         public static readonly SoundPlayer HeadshotSound;
         public static readonly SoundPlayer PlaySound;
         public static readonly SoundPlayer FirstBloodSound;
@@ -47,10 +91,9 @@ namespace Ai2dShooter.Common
 
         public static readonly SoundPlayer[] ReloadSounds;
 
-        public const int DeadAlpha = 64;
-
         static Constants()
         {
+            // load sounds from properties
             HeadshotSound = new SoundPlayer(Properties.Resources.headshot);
             PlaySound = new SoundPlayer(Properties.Resources.play);
             FirstBloodSound = new SoundPlayer(Properties.Resources.firstblood);
