@@ -228,7 +228,7 @@ namespace Ai2dShooter.Model
 
             // initialize random values
             ShootingAccuracy = ((double) Constants.Rnd.Next(3) + 17)/20; // 85-95%
-            Slowness = Constants.Rnd.Next(200, 400);
+            Slowness = Constants.Rnd.Next(200, 350);
             HealthyThreshold = Constants.Rnd.Next(10, 50);
             BackDamage = Constants.Rnd.Next(35, 75);
             FrontDamage = Constants.Rnd.Next(35, BackDamage);
@@ -528,7 +528,7 @@ namespace Ai2dShooter.Model
         {
             Kills++;
             if (MainForm.Instance.PlaySoundEffects && Kills == 3)
-                Constants.TripleKillSound.Play();
+                MainForm.Instance.Invoke((MethodInvoker) (() => Constants.TripleKillSound.Play()));
         }
 
         #endregion

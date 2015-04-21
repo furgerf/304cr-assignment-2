@@ -109,7 +109,7 @@ namespace Ai2dShooter.View
             // draw map
             Maze.DrawMaze(e.Graphics, Constants.ScaleFactor);
 
-            if (_players == null)
+            if (_players == null || !GameController.HasGame)
                 return;
 
             // draw dead players
@@ -212,13 +212,15 @@ namespace Ai2dShooter.View
         {
             Instance.Invoke((MethodInvoker) (() => _gameControl.Enabled = true));
 
-            if (GameController.Instance != null && GameController.Instance.GameRunning)
-                GameController.Instance.StopGame();
+            //if (GameController.Instance != null && GameController.Instance.GameRunning)
+            //    GameController.Instance.StopGame();
+
+            GameController.Instance = null;
 
             foreach (var pc in _playerControls)
             {
                 var pc1 = pc;
-                Instance.Invoke((MethodInvoker) pc1.Dispose);
+                Instance.Invoke((MethodInvoker)pc1.Dispose);
             }
             _playerControls.Clear();
 

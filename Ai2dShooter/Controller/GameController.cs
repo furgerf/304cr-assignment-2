@@ -20,7 +20,7 @@ namespace Ai2dShooter.Controller
         /// <summary>
         /// Currently running game. Updated whenever a new game is created.
         /// </summary>
-        public static GameController Instance { get; private set; }
+        public static GameController Instance { get; set; }
 
         public static bool HasGame { get { return Instance != null; }}
 
@@ -98,7 +98,7 @@ namespace Ai2dShooter.Controller
                             // game over!
                             // did all players of one team survive?
                             if (MainForm.Instance.PlaySoundEffects && _opponents[_opponents.Keys.ToArray()[0]].Length == _opponents.Keys.Count)
-                                Constants.PerfectSound.Play();
+                                MainForm.Instance.Invoke((MethodInvoker) (() => Constants.PerfectSound.Play()));
 
                             //MainForm.ApplicationRunning = false;
                             StopGame();
@@ -334,7 +334,7 @@ namespace Ai2dShooter.Controller
                     // if the friend has any influence, add it
                     // influence is negative distance because high distance -> low influence
                     var distance = p.Location.GetManhattenDistance(cells[i]);
-                    influence[i] += distance <= 2*Constants.Visibility ? -distance : 0;
+                    influence[i] += distance <= 2*Constants.Visibility ? -distance + Constants.Visibility : 0;
                 }
             }
 

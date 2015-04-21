@@ -21,7 +21,7 @@ namespace Ai2dShooter.Common
         /// <summary>
         /// Number of fields of vision in each direction for all players.
         /// </summary>
-        public const int Visibility = 4;
+        public const int Visibility = 5;
 
         /// <summary>
         /// Maps readable strings to the enum members.

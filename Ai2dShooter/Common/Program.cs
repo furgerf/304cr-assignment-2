@@ -7,11 +7,8 @@ namespace Ai2dShooter.Common
     /********
      * TODO *
      ********
-     * 
-     * let DT player use DT
      * fix graphics bug after game terminates
-     * add influence map
-     * fix movement -^
+     * improve concurrent sound FX
      */ 
 
     public static class Program

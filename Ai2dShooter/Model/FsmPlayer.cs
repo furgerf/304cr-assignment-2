@@ -39,7 +39,7 @@ namespace Ai2dShooter.Model
         /// <summary>
         /// Number of reloading steps remaining.
         /// </summary>
-        private int _reloadSteps;
+        private int _reloadSteps = -1;
 
         #endregion
 
@@ -174,9 +174,9 @@ namespace Ai2dShooter.Model
                                 directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
                                                     neighbor.GetManhattenDistance(_targetCell);
 
-                                // if we'd have to go backwards, double the score
-                                if (((int)Orientation + 2 % (int)Direction.Count) == i)
-                                    directionScore[i] *= 2;
+                                //// if we'd have to go backwards, double the score
+                                //if (((int)Orientation + 2 % (int)Direction.Count) == i)
+                                //    directionScore[i] *= 2;
                             }
 
                             // pick all directions with lowest costs
@@ -260,6 +260,12 @@ namespace Ai2dShooter.Model
                     // keep fighting
                     break;
                 case State.Reload:
+                    if (_reloadSteps < 0)
+                    {
+                        Ammo = MaxAmmo;
+                        MakeDecision();
+                        return;
+                    }
                     lock (Constants.MovementLock)
                     {
                         MainForm.Instance.Invoke((MethodInvoker) (() => Constants.ReloadSounds[_reloadSteps--].Play()));

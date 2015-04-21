@@ -182,6 +182,12 @@ namespace Ai2dShooter.Model
                     if (GameController.Instance == null)
                         return;
 
+                    if (neighbors.Length == 1)
+                    {
+                        Move(Location.GetDirection(neighbors[0]));
+                        break;
+                    }
+
                     _targetCell = GameController.Instance.GetClosestVisibleOpponentCell(this);
 
                     // calculate scores for each direction
@@ -203,9 +209,9 @@ namespace Ai2dShooter.Model
                         directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
                                             neighbor.GetManhattenDistance(_targetCell);
 
-                        // if we'd have to go backwards, double the score
-                        if (((int) Orientation + 2%(int) Direction.Count) == i)
-                            directionScore[i] *= 2;
+                        //// if we'd have to go backwards, double the score
+                        //if (((int) Orientation + 2%(int) Direction.Count) == i)
+                        //    directionScore[i] *= 2;
                     }
 
                     // pick all directions with lowest costs
@@ -220,6 +226,12 @@ namespace Ai2dShooter.Model
                 case DecisionType.MoveToFriend:
                     if (GameController.Instance == null)
                         return;
+                    
+                    if (neighbors.Length == 1)
+                    {
+                        Move(Location.GetDirection(neighbors[0]));
+                        break;
+                    }
 
                     // find closest friend
                     var friend = GameController.Instance.GetClosestFriend(this);
@@ -229,6 +241,7 @@ namespace Ai2dShooter.Model
                     {
                         // all friends are dead or already follow me
                         // move in random direction
+
                         Move(
                             Location.GetDirection(
                                 neighbors.Except(new[] {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))})
