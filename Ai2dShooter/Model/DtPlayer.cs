@@ -48,7 +48,7 @@ namespace Ai2dShooter.Model
         /// <summary>
         /// Number of reloading steps remaining.
         /// </summary>
-        private int _reloadSteps;
+        private int _reloadSteps = -1;
 
         #endregion
 
@@ -163,11 +163,14 @@ namespace Ai2dShooter.Model
             _targetCell = null;
 
             // get new decision
-            _lastDecision =
-                (DecisionType)
-                    Tree.Evaluate(
-                        ParseTreeQueryData(new DecisionData(Health >= HealthyThreshold, !UsesKnife,
-                            GameController.Instance.GetClosestVisibleOpponentCell(this) != null, DecisionType.Count))).Type;
+            if (_reloadSteps >= 0)
+                _lastDecision = DecisionType.Reload;
+            else
+                _lastDecision =
+                    (DecisionType)
+                        Tree.Evaluate(
+                            ParseTreeQueryData(new DecisionData(Health >= HealthyThreshold, !UsesKnife,
+                                GameController.Instance.GetClosestVisibleOpponentCell(this) != null, DecisionType.Count))).Type;
 
             // get neighbors
             var neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
@@ -282,11 +285,17 @@ namespace Ai2dShooter.Model
                                     {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))}).ToArray(), this)));
                     break;
                 case DecisionType.Reload:
+                    if (_reloadSteps < 0)
+                    {
+                        Ammo = MaxAmmo;
+                        MakeDecision();
+                        return;
+                    }
                     lock (Constants.MovementLock)
                     {
                         MainForm.Instance.Invoke((MethodInvoker) (() => Constants.ReloadSounds[_reloadSteps--].Play()));
 
-                        if (_reloadSteps <= -1)
+                        if (_reloadSteps < 0)
                         {
                             Ammo = MaxAmmo;
                         }

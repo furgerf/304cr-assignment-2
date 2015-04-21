@@ -328,11 +328,13 @@ namespace Ai2dShooter.Controller
             // loop over possibilities
             for (var i = 0; i < cells.Length; i++)
             {
-                // influence = sum of (2*visibility-distance) for all friends (visibility RANGE)
+                // loop over friends
                 foreach (var p in _friends[player])
                 {
+                    // if the friend has any influence, add it
+                    // influence is negative distance because high distance -> low influence
                     var distance = p.Location.GetManhattenDistance(cells[i]);
-                    influence[i] += distance <= 2*Constants.Visibility ? 2*Constants.Visibility - distance : 0;
+                    influence[i] += distance <= 2*Constants.Visibility ? -distance : 0;
                 }
             }
 
