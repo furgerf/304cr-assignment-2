@@ -123,7 +123,6 @@ namespace Ai2dShooter.Model
             Cell[] neighbors;
             switch (_state)
             {
-                    // TODO: FIX
                 case State.FindEnemy:
                 case State.AttackEnemy:
                     // stuck?
@@ -140,19 +139,22 @@ namespace Ai2dShooter.Model
                         if (GameController.Instance == null)
                             return;
 
-                        _targetCell = GameController.Instance.GetClosestOpponentCell(this);
+                        _targetCell = GameController.Instance.GetClosestVisibleOpponentCell(this);
                         _state = _targetCell == null ? State.FindEnemy : State.AttackEnemy;
 
                         if (_targetCell == null)
                         {
-                            // no target found, move in random direction that is not backwards
+                            // no target found, move to neighboring cell where influence is lowest. Dont go backwards.
                             Move(
                                 Location.GetDirection(
-                                    neighbors.Except(new[] { Location.GetNeighbor((Direction)(((int)Orientation + 2) % 4)) }).ToArray()[
-                                        Constants.Rnd.Next(neighbors.Length - 1)]));
+                                    GameController.Instance.GetCellWithLowestInfluence(
+                                        neighbors.Except(new[]
+                                        {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))}).ToArray(), this)));
                         }
                         else
                         {
+                            // target found
+
                             // calculate scores for each direction
                             var directionScore = new int[4];
 
@@ -169,8 +171,8 @@ namespace Ai2dShooter.Model
                                 }
 
                                 // calculate score: distance * distance + rnd
-                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell) * neighbor.GetManhattenDistance(_targetCell) +
-                                                    Constants.Rnd.Next(Constants.Visibility);
+                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
+                                                    neighbor.GetManhattenDistance(_targetCell);
 
                                 // if we'd have to go backwards, double the score
                                 if (((int)Orientation + 2 % (int)Direction.Count) == i)
@@ -208,6 +210,7 @@ namespace Ai2dShooter.Model
                         if (_targetCell == null)
                         {
                             // all friends are dead or already follow me
+                            // move in random direction
                             Move(
                                 Location.GetDirection(
                                     neighbors.Except(new[] { Location.GetNeighbor((Direction)(((int)Orientation + 2) % 4)) }).ToArray()[
@@ -215,6 +218,7 @@ namespace Ai2dShooter.Model
                         }
                         else
                         {
+                            // found friend to follow
                             FollowedPlayer = friend;
 
                             // calculate scores for each direction
@@ -232,10 +236,9 @@ namespace Ai2dShooter.Model
                                     continue;
                                 }
 
-                                // calculate score: distance + rnd
-                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell) *
-                                                    neighbor.GetManhattenDistance(_targetCell) +
-                                                    Constants.Rnd.Next(Constants.Visibility);
+                                // calculate score: distance * distance
+                                directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
+                                                    neighbor.GetManhattenDistance(_targetCell);
 
                                 // if we'd have to go backwards, double the score
                                 if (((int)Orientation + 2 % (int)Direction.Count) == i)
@@ -261,7 +264,7 @@ namespace Ai2dShooter.Model
                     {
                         MainForm.Instance.Invoke((MethodInvoker) (() => Constants.ReloadSounds[_reloadSteps--].Play()));
 
-                        if (_reloadSteps == -1)
+                        if (_reloadSteps <= -1)
                         {
                             _state = Health >= HealthyThreshold ? State.FindEnemy : State.FindFriend;
                             Ammo = MaxAmmo;

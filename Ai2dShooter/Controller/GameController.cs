@@ -182,7 +182,7 @@ namespace Ai2dShooter.Controller
         /// </summary>
         /// <param name="player">Player looking for a target</param>
         /// <returns>Cell of the nearest target, or null if no target is visible</returns>
-        public Cell GetClosestOpponentCell(Player player)
+        public Cell GetClosestVisibleOpponentCell(Player player)
         {
             Cell closest = null;
 
@@ -304,6 +304,44 @@ namespace Ai2dShooter.Controller
                     return;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the cell where the friends have the lowest influence (highest distance).
+        /// </summary>
+        /// <param name="cells">Cells where the player could move to</param>
+        /// <param name="player">Player looking for a cell to move to</param>
+        /// <returns>Cell where there is the least influence by the player's team.</returns>
+        public Cell GetCellWithLowestInfluence(Cell[] cells, Player player)
+        {
+            // if no friends are alive, return random cell
+            if (_friends[player].Length == 0)
+                return cells[Constants.Rnd.Next(cells.Length)];
+
+            // if there is only one option, return that
+            if (_friends[player].Length == 1)
+                return cells[0];
+
+            // prepare variables
+            var maxDistance = int.MinValue;
+            var maxIndex = -1;
+
+            // loop over possibilities
+            for (var i = 0; i < cells.Length; i++)
+            {
+                // distance = sum of the square of the distance of all friends to the cell
+                // (squared because influence decreases strongly with distance)
+                var distance = _friends[player].Sum(p => p.Location.GetManhattenDistance(cells[i]) * p.Location.GetManhattenDistance(cells[i]));
+
+                if (distance < maxDistance) continue;
+
+                // update maxdistance == least influence
+                maxIndex = i;
+                maxDistance = distance;
+            }
+
+            // return cell with lowest influence
+            return cells[maxIndex];
         }
 
         #endregion

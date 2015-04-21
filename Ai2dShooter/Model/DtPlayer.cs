@@ -2,9 +2,11 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using Ai2dShooter.Common;
 using Ai2dShooter.Controller;
 using Ai2dShooter.Map;
+using Ai2dShooter.View;
 
 namespace Ai2dShooter.Model
 {
@@ -18,7 +20,14 @@ namespace Ai2dShooter.Model
         /// <summary>
         /// Possible decisions that can be made.
         /// </summary>
-        public enum DecisionType { MoveToEnemy, MoveToFriend, RandomMove, Reload, Count }
+        public enum DecisionType
+        {
+            MoveToEnemy,
+            MoveToFriend,
+            SeekEnemy,
+            Reload,
+            Count
+        }
 
 
         private static readonly Color[] DecisionColors =
@@ -36,6 +45,11 @@ namespace Ai2dShooter.Model
 
         private static readonly Decision Tree;
 
+        /// <summary>
+        /// Number of reloading steps remaining.
+        /// </summary>
+        private int _reloadSteps;
+
         #endregion
 
         #region Constructor
@@ -45,7 +59,7 @@ namespace Ai2dShooter.Model
             var data = ParseTreeCreationData(new[]
             {
                 new DecisionData(true, true, true, DecisionType.MoveToEnemy),
-                new DecisionData(true, true, false, DecisionType.RandomMove),
+                new DecisionData(true, true, false, DecisionType.SeekEnemy),
                 new DecisionData(true, false, true, DecisionType.MoveToEnemy),
                 new DecisionData(false, true, true, DecisionType.MoveToEnemy),
                 new DecisionData(true, false, false, DecisionType.Reload),
@@ -92,12 +106,12 @@ namespace Ai2dShooter.Model
                     //new PointF(smallerBox.Left, smallerBox.Top + (float)smallerBox.Height/3)
 
                     // diamond polygon
-                    new PointF((float)(smallerBox.Left + smallerBox.Right) / 2, smallerBox.Top), 
-                    new PointF(smallerBox.Right, (float)(smallerBox.Top + smallerBox.Bottom) / 2), 
-                    new PointF((float)(smallerBox.Left + smallerBox.Right) / 2, smallerBox.Bottom), 
-                    new PointF(smallerBox.Left, (float)(smallerBox.Top + smallerBox.Bottom) / 2)
+                    new PointF((float) (smallerBox.Left + smallerBox.Right)/2, smallerBox.Top),
+                    new PointF(smallerBox.Right, (float) (smallerBox.Top + smallerBox.Bottom)/2),
+                    new PointF((float) (smallerBox.Left + smallerBox.Right)/2, smallerBox.Bottom),
+                    new PointF(smallerBox.Left, (float) (smallerBox.Top + smallerBox.Bottom)/2)
                 };
-                graphics.DrawPolygon(new Pen(DecisionColors[(int)_lastDecision], penWidth), edges);
+                graphics.DrawPolygon(new Pen(DecisionColors[(int) _lastDecision], penWidth), edges);
             }
 
             // if required, draw a line to the cell that is currently being targeted by the player
@@ -140,95 +154,78 @@ namespace Ai2dShooter.Model
 
         private void MakeDecision()
         {
-            if (IsMoving || !IsAlive || _inCombat || !PlayerExists)
+            if (IsMoving || !IsAlive || _inCombat || !PlayerExists || GameController.Instance == null)
                 return;
 
+            // prepare stuff
+            int[] directionScore;
+            int[] bestDirections;
+            _targetCell = null;
+
+            // get new decision
+            _lastDecision =
+                (DecisionType)
+                    Tree.Evaluate(
+                        ParseTreeQueryData(new DecisionData(Health >= HealthyThreshold, !UsesKnife,
+                            GameController.Instance.GetClosestVisibleOpponentCell(this) != null, DecisionType.Count))).Type;
+
+            // get neighbors
             var neighbors = Location.Neighbors.Where(n => n != null && !n.IsWall).ToArray();
 
-            _lastDecision = DecisionType.Count;
-
-            // stuck?
-            if (neighbors.Length == 1)
+            // act on decision
+            switch (_lastDecision)
             {
-                //_lastDecision = DecisionType.Backtrack;
+                case DecisionType.MoveToEnemy:
+                    if (GameController.Instance == null)
+                        return;
 
-                // backtrack
-                Move(Location.GetDirection(neighbors[0]));
-            }
-            else
-            {
-                // healthy?
-                if (Health < HealthyThreshold)
-                {
+                    _targetCell = GameController.Instance.GetClosestVisibleOpponentCell(this);
+
+                    // calculate scores for each direction
+                    directionScore = new int[4];
+
+                    // iterate over directions
+                    for (var i = 0; i < (int) Direction.Count; i++)
+                    {
+                        // get neighbor in that direction
+                        var neighbor = Location.GetNeighbor((Direction) i);
+                        // ignore neighbors that can't be moved to
+                        if (neighbor == null || neighbor.IsWall)
+                        {
+                            directionScore[i] = int.MaxValue;
+                            continue;
+                        }
+
+                        // calculate score: distance * distance + rnd
+                        directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
+                                            neighbor.GetManhattenDistance(_targetCell);
+
+                        // if we'd have to go backwards, double the score
+                        if (((int) Orientation + 2%(int) Direction.Count) == i)
+                            directionScore[i] *= 2;
+                    }
+
+                    // pick all directions with lowest costs
+                    bestDirections =
+                        (from d in directionScore
+                            where d == directionScore.Min()
+                            select Array.IndexOf(directionScore, d)).ToArray();
+
+                    // randomly chose one of the best directions
+                    Move((Direction) bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
+                    break;
+                case DecisionType.MoveToFriend:
                     if (GameController.Instance == null)
                         return;
 
                     // find closest friend
-                    _targetCell = GameController.Instance.GetClosestFriend(this).Location;
+                    var friend = GameController.Instance.GetClosestFriend(this);
+                    _targetCell = friend == null ? null : friend.Location;
 
                     if (_targetCell == null)
                     {
-                        _lastDecision = DecisionType.RandomMove;
-
-                        // all friends are dead 
-                        Move(
-                            Location.GetDirection(
-                                neighbors.Except(new[]
-                                {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))}).ToArray()[
-                                    Constants.Rnd.Next(neighbors.Length - 1)]));
-                    }
-                    else
-                    {
-                        _lastDecision = DecisionType.MoveToFriend;
-
-                        // calculate scores for each direction
-                        var directionScore = new int[4];
-
-                        // iterate over directions
-                        for (var i = 0; i < (int) Direction.Count; i++)
-                        {
-                            // get neighbor in that direction
-                            var neighbor = Location.GetNeighbor((Direction) i);
-                            // ignore neighbors that can't be moved to
-                            if (neighbor == null || neighbor.IsWall)
-                            {
-                                directionScore[i] = Int32.MaxValue;
-                                continue;
-                            }
-
-                            // calculate score: distance + rnd
-                            directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
-                                                neighbor.GetManhattenDistance(_targetCell) +
-                                                Constants.Rnd.Next(Constants.Visibility);
-
-                            // if we'd have to go backwards, double the score
-                            if (((int) Orientation + 2%(int) Direction.Count) == i)
-                                directionScore[i] *= 2;
-                        }
-
-                        // pick all directions with lowest costs
-                        var bestDirections =
-                            (from d in directionScore
-                                where d == directionScore.Min()
-                                select Array.IndexOf(directionScore, d)).ToArray();
-
-                        // randomly chose one of the best directions
-                        Move((Direction) bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
-                    }
-                }
-                else
-                {
-                    if (GameController.Instance == null)
-                        return;
-
-                    // find closest enemy
-                    _targetCell = GameController.Instance.GetClosestOpponentCell(this);
-
-                    if (_targetCell == null)
-                    {
-                        _lastDecision = DecisionType.RandomMove;
-
-                        // no target found, move in random direction that is not backwards
+                        // all friends are dead or already follow me
+                        // move in random direction
                         Move(
                             Location.GetDirection(
                                 neighbors.Except(new[] {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))})
@@ -237,10 +234,11 @@ namespace Ai2dShooter.Model
                     }
                     else
                     {
-                        _lastDecision = DecisionType.MoveToEnemy;
+                        // found friend to follow
+                        FollowedPlayer = friend;
 
                         // calculate scores for each direction
-                        var directionScore = new int[4];
+                        directionScore = new int[4];
 
                         // iterate over directions
                         for (var i = 0; i < (int) Direction.Count; i++)
@@ -250,14 +248,13 @@ namespace Ai2dShooter.Model
                             // ignore neighbors that can't be moved to
                             if (neighbor == null || neighbor.IsWall)
                             {
-                                directionScore[i] = Int32.MaxValue;
+                                directionScore[i] = int.MaxValue;
                                 continue;
                             }
 
-                            // calculate score: distance * distance + rnd
+                            // calculate score: distance * distance
                             directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
-                                                neighbor.GetManhattenDistance(_targetCell) +
-                                                Constants.Rnd.Next(Constants.Visibility);
+                                                neighbor.GetManhattenDistance(_targetCell);
 
                             // if we'd have to go backwards, double the score
                             if (((int) Orientation + 2%(int) Direction.Count) == i)
@@ -265,7 +262,7 @@ namespace Ai2dShooter.Model
                         }
 
                         // pick all directions with lowest costs
-                        var bestDirections =
+                        bestDirections =
                             (from d in directionScore
                                 where d == directionScore.Min()
                                 select Array.IndexOf(directionScore, d)).ToArray();
@@ -273,7 +270,35 @@ namespace Ai2dShooter.Model
                         // randomly chose one of the best directions
                         Move((Direction) bestDirections[Constants.Rnd.Next(bestDirections.Length)]);
                     }
-                }
+                    break;
+                case DecisionType.SeekEnemy:
+                    if (neighbors.Length == 1)
+                        Move(Location.GetDirection(neighbors[0]));
+                    else
+                        Move(
+                            Location.GetDirection(
+                                GameController.Instance.GetCellWithLowestInfluence(
+                                    neighbors.Except(new[]
+                                    {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))}).ToArray(), this)));
+                    break;
+                case DecisionType.Reload:
+                    lock (Constants.MovementLock)
+                    {
+                        MainForm.Instance.Invoke((MethodInvoker) (() => Constants.ReloadSounds[_reloadSteps--].Play()));
+
+                        if (_reloadSteps <= -1)
+                        {
+                            Ammo = MaxAmmo;
+                        }
+                        new Thread(() =>
+                        {
+                            Thread.Sleep(Constants.ReloadTimeout);
+                            MakeDecision();
+                        }).Start();
+                    }
+                    return;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             Thread.Sleep(Constants.AiMoveTimeout);
@@ -292,8 +317,8 @@ namespace Ai2dShooter.Model
 
             for (var i = 0; i < data.Length; i++)
             {
-                attributes[i] = new[] { data[i].IsHealthy, data[i].HasAmmo, data[i].IsEnemyInRange };
-                decisions[i] = (int)data[i].Decision;
+                attributes[i] = new[] {data[i].IsHealthy, data[i].HasAmmo, data[i].IsEnemyInRange};
+                decisions[i] = (int) data[i].Decision;
             }
 
             return new Tuple<Func<bool[], bool>[], bool[][], int[]>(tests, attributes, decisions);
@@ -301,7 +326,7 @@ namespace Ai2dShooter.Model
 
         public static bool[] ParseTreeQueryData(DecisionData data)
         {
-            return new[] { data.IsHealthy, data.HasAmmo, data.IsEnemyInRange };
+            return new[] {data.IsHealthy, data.HasAmmo, data.IsEnemyInRange};
         }
 
         #endregion
