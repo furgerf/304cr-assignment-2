@@ -323,25 +323,30 @@ namespace Ai2dShooter.Controller
                 return cells[0];
 
             // prepare variables
-            var maxDistance = int.MinValue;
-            var maxIndex = -1;
+            var influence = new int[cells.Length];
 
             // loop over possibilities
             for (var i = 0; i < cells.Length; i++)
             {
-                // distance = sum of the square of the distance of all friends to the cell
-                // (squared because influence decreases strongly with distance)
-                var distance = _friends[player].Sum(p => p.Location.GetManhattenDistance(cells[i]) * p.Location.GetManhattenDistance(cells[i]));
-
-                if (distance < maxDistance) continue;
-
-                // update maxdistance == least influence
-                maxIndex = i;
-                maxDistance = distance;
+                // influence = sum of (2*visibility-distance) for all friends (visibility RANGE)
+                foreach (var p in _friends[player])
+                {
+                    var distance = p.Location.GetManhattenDistance(cells[i]);
+                    influence[i] += distance <= 2*Constants.Visibility ? 2*Constants.Visibility - distance : 0;
+                }
             }
 
-            // return cell with lowest influence
-            return cells[maxIndex];
+            // find all cells where influence is minimal
+            var minInfluence = influence.Min();
+            var minInfluenceIndices = new List<int>();
+            for (var i = 0; i < influence.Length; i++)
+            {
+                if (influence[i] == minInfluence)
+                    minInfluenceIndices.Add(i);
+            }
+
+            // return random cell with lowest influence
+            return cells[minInfluenceIndices[Constants.Rnd.Next(minInfluenceIndices.Count)]];
         }
 
         #endregion
