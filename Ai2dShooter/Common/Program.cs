@@ -12,7 +12,6 @@ namespace Ai2dShooter.Common
      * fix graphics bug after game terminates
      * add influence map
      * fix movement -^
-     * fix sound FX stuff
      */ 
 
     public static class Program
