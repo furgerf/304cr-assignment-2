@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using Ai2dShooter.Common;
 using Ai2dShooter.Controller;
 using Ai2dShooter.Map;
@@ -100,7 +101,7 @@ namespace Ai2dShooter.Model
                 Death();
 
                 if (MainForm.Instance.PlaySoundEffects)
-                    Constants.DeathSound.Play();
+                    MainForm.Instance.Invoke((MethodInvoker) (() => Constants.DeathSound.Play()));
             }
         }
 
@@ -439,27 +440,30 @@ namespace Ai2dShooter.Model
             // play appropriate sound
             if (MainForm.Instance.PlaySoundEffects)
             {
-                if (knife)
+                MainForm.Instance.Invoke((MethodInvoker) (() =>
                 {
-                    if (damage == 0)
-                        Constants.KnifeMissSound.Play();
+                    if (knife)
+                    {
+                        if (damage == 0)
+                            Constants.KnifeMissSound.Play();
+                        else
+                            Constants.KnifeHitSound.Play();
+                    }
                     else
-                        Constants.KnifeHitSound.Play();
-                }
-                else
-                {
-                    // play sounds
-                    if (headshot)
-                        Constants.HeadshotSound.Play();
-                    if (damage == 0)
-                        Constants.MissSound.Play();
-                    else if (damage > 55)
-                        Constants.HardHitSound.Play();
-                    else if (damage > 45)
-                        Constants.MediumHitSound.Play();
-                    else
-                        Constants.LowHitSound.Play();
-                }
+                    {
+                        // play sounds
+                        if (headshot)
+                            Constants.HeadshotSound.Play();
+                        if (damage == 0)
+                            Constants.MissSound.Play();
+                        else if (damage > 55)
+                            Constants.HardHitSound.Play();
+                        else if (damage > 45)
+                            Constants.MediumHitSound.Play();
+                        else
+                            Constants.LowHitSound.Play();
+                    }
+                }));
             }
 
             // retaliate!

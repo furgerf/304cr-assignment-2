@@ -2,9 +2,11 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using Ai2dShooter.Common;
 using Ai2dShooter.Controller;
 using Ai2dShooter.Map;
+using Ai2dShooter.View;
 
 namespace Ai2dShooter.Model
 {
@@ -257,7 +259,7 @@ namespace Ai2dShooter.Model
                 case State.Reload:
                     lock (Constants.MovementLock)
                     {
-                        Constants.ReloadSounds[_reloadSteps--].Play();
+                        MainForm.Instance.Invoke((MethodInvoker) (() => Constants.ReloadSounds[_reloadSteps--].Play()));
 
                         if (_reloadSteps == -1)
                         {

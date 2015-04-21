@@ -1,5 +1,5 @@
 using System;
-using System.Media;
+using System.Windows.Media;
 
 namespace Ai2dShooter.Common
 {
@@ -71,47 +71,139 @@ namespace Ai2dShooter.Common
         /// <summary>
         /// Sounds.
         /// </summary>
-        public static readonly SoundPlayer HeadshotSound;
-        public static readonly SoundPlayer PlaySound;
-        public static readonly SoundPlayer FirstBloodSound;
-        public static readonly SoundPlayer PerfectSound;
-        public static readonly SoundPlayer DeathSound;
-        public static readonly SoundPlayer TripleKillSound;
+        public static readonly MediaPlayer HeadshotSound = new MediaPlayer();
+        public static readonly MediaPlayer PlaySound = new MediaPlayer();
+        public static readonly MediaPlayer FirstBloodSound = new MediaPlayer();
+        public static readonly MediaPlayer PerfectSound = new MediaPlayer();
+        public static readonly MediaPlayer DeathSound = new MediaPlayer();
+        public static readonly MediaPlayer TripleKillSound = new MediaPlayer();
 
-        public static readonly SoundPlayer MissSound;
-        public static readonly SoundPlayer LowHitSound;
-        public static readonly SoundPlayer MediumHitSound;
-        public static readonly SoundPlayer HardHitSound;
-        public static readonly SoundPlayer KnifeHitSound;
-        public static readonly SoundPlayer KnifeMissSound;
+        public static readonly MediaPlayer MissSound = new MediaPlayer();
+        public static readonly MediaPlayer LowHitSound = new MediaPlayer();
+        public static readonly MediaPlayer MediumHitSound = new MediaPlayer();
+        public static readonly MediaPlayer HardHitSound = new MediaPlayer();
+        public static readonly MediaPlayer KnifeHitSound = new MediaPlayer();
+        public static readonly MediaPlayer KnifeMissSound = new MediaPlayer();
 
-        public static readonly SoundPlayer Reload1Sound;
-        public static readonly SoundPlayer Reload2Sound;
-        public static readonly SoundPlayer Reload3Sound;
+        public static readonly MediaPlayer Reload1Sound = new MediaPlayer();
+        public static readonly MediaPlayer Reload2Sound = new MediaPlayer();
+        public static readonly MediaPlayer Reload3Sound = new MediaPlayer();
 
-        public static readonly SoundPlayer[] ReloadSounds;
+        public static readonly MediaPlayer[] ReloadSounds = {Reload1Sound, Reload2Sound, Reload3Sound};
 
         static Constants()
         {
             // load sounds from properties
-            HeadshotSound = new SoundPlayer(Properties.Resources.headshot);
-            PlaySound = new SoundPlayer(Properties.Resources.play);
-            FirstBloodSound = new SoundPlayer(Properties.Resources.firstblood);
-            PerfectSound = new SoundPlayer(Properties.Resources.perfect);
-            DeathSound = new SoundPlayer(Properties.Resources.death6);
-            TripleKillSound = new SoundPlayer(Properties.Resources.triplekill);
+            HeadshotSound.Open(new Uri(@"../../Resources/headshot.wav", UriKind.Relative));
+            HeadshotSound.MediaEnded += (o, e) =>
+            {
+                HeadshotSound.Stop();
+                HeadshotSound.Open(new Uri(@"../../Resources/headshot.wav", UriKind.Relative));
+            };
+            PlaySound.Open(new Uri(@"../../Resources/play.wav", UriKind.Relative));
+            PlaySound.MediaEnded += (o, e) =>
+            {
+                PlaySound.Stop();
+                PlaySound.Open(new Uri(@"../../Resources/play.wav", UriKind.Relative));
+            };
+            FirstBloodSound.Open(new Uri(@"../../Resources/firstblood.wav", UriKind.Relative));
+            FirstBloodSound.MediaEnded += (o, e) =>
+            {
+                FirstBloodSound.Stop();
+                FirstBloodSound.Open(new Uri(@"../../Resources/firstblood.wav", UriKind.Relative));
+            };
+            PerfectSound.Open(new Uri(@"../../Resources/perfect.wav", UriKind.Relative));
+            PerfectSound.MediaEnded += (o, e) =>
+            {
+                PerfectSound.Stop();
+                PerfectSound.Open(new Uri(@"../../Resources/perfect.wav", UriKind.Relative));
+            };
+            DeathSound.Open(new Uri(@"../../Resources/death6.wav", UriKind.Relative));
+            DeathSound.MediaEnded += (o, e) =>
+            {
+                DeathSound.Stop();
+                DeathSound.Open(new Uri(@"../../Resources/death6.wav", UriKind.Relative));
+            };
+            TripleKillSound.Open(new Uri(@"../../Resources/triplekill.wav", UriKind.Relative));
+            TripleKillSound.MediaEnded += (o, e) =>
+            {
+                TripleKillSound.Stop();
+                TripleKillSound.Open(new Uri(@"../../Resources/triplekill.wav", UriKind.Relative));
+            };
 
-            MissSound = new SoundPlayer(Properties.Resources.bulletltor07);
-            LowHitSound = new SoundPlayer(Properties.Resources.usp1);
-            MediumHitSound = new SoundPlayer(Properties.Resources.elite_1);
-            HardHitSound = new SoundPlayer(Properties.Resources.deagle_1);
-            KnifeHitSound = new SoundPlayer(Properties.Resources.knife_hit3);
-            KnifeMissSound = new SoundPlayer(Properties.Resources.knife_slash1);
+            MissSound.Open(new Uri(@"../../Resources/bulletltor07.wav", UriKind.Relative));
+            MissSound.MediaEnded += (o, e) =>
+            {
+                MissSound.Stop();
+                MissSound.Open(new Uri(@"../../Resources/bulletltor07.wav", UriKind.Relative));
+            }; 
+            LowHitSound.Open(new Uri(@"../../Resources/usp1.wav", UriKind.Relative));
+            LowHitSound.MediaEnded += (o, e) =>
+            {
+                LowHitSound.Stop();
+                LowHitSound.Open(new Uri(@"../../Resources/usp1.wav", UriKind.Relative));
+            }; 
+            MediumHitSound.Open(new Uri(@"../../Resources/elite-1.wav", UriKind.Relative));
+            MediumHitSound.MediaEnded += (o, e) =>
+            {
+                MediumHitSound.Stop();
+                MediumHitSound.Open(new Uri(@"../../Resources/elite-1.wav", UriKind.Relative));
+            }; 
+            HardHitSound.Open(new Uri(@"../../Resources/deagle-1.wav", UriKind.Relative));
+            HardHitSound.MediaEnded += (o, e) =>
+            {
+                HardHitSound.Stop();
+                HardHitSound.Open(new Uri(@"../../Resources/deagle-1.wav", UriKind.Relative));
+            }; 
+            KnifeHitSound.Open(new Uri(@"../../Resources/knife_hit3.wav", UriKind.Relative));
+            KnifeHitSound.MediaEnded += (o, e) =>
+            {
+                KnifeHitSound.Stop();
+                KnifeHitSound.Open(new Uri(@"../../Resources/knife_hit3.wav", UriKind.Relative));
+            };
+            KnifeMissSound.Open(new Uri(@"../../Resources/knife_slash1.wav", UriKind.Relative));
+            KnifeMissSound.MediaEnded += (o, e) =>
+            {
+                KnifeMissSound.Stop();
+                KnifeMissSound.Open(new Uri(@"../../Resources/knife_slash1.wav", UriKind.Relative));
+            };
 
-            Reload1Sound = new SoundPlayer(Properties.Resources.ak47_clipout);
-            Reload2Sound = new SoundPlayer(Properties.Resources.ak47_clipin);
-            Reload3Sound = new SoundPlayer(Properties.Resources.ak47_boltpull);
-            ReloadSounds = new[] {Reload1Sound, Reload2Sound, Reload3Sound};
+            Reload1Sound.Open(new Uri(@"../../Resources/ak47_clipout.wav", UriKind.Relative));
+            Reload1Sound.MediaEnded += (o, e) =>
+            {
+                Reload1Sound.Stop();
+                Reload1Sound.Open(new Uri(@"../../Resources/ak47_clipout.wav", UriKind.Relative));
+            };
+            Reload2Sound.Open(new Uri(@"../../Resources/ak47_clipin.wav", UriKind.Relative));
+            Reload2Sound.MediaEnded += (o, e) =>
+            {
+                Reload2Sound.Stop();
+                Reload2Sound.Open(new Uri(@"../../Resources/ak47_clipin.wav", UriKind.Relative));
+            };
+            Reload3Sound.Open(new Uri(@"../../Resources/ak47_boltpull.wav", UriKind.Relative));
+            Reload3Sound.MediaEnded += (o, e) =>
+            {
+                Reload3Sound.Stop();
+                Reload3Sound.Open(new Uri(@"../../Resources/ak47_boltpull.wav", UriKind.Relative));
+            };
+
+            //HeadshotSound = new SoundPlayer(Properties.Resources.headshot);
+            //PlaySound = new SoundPlayer(Properties.Resources.play);
+            //FirstBloodSound = new SoundPlayer(Properties.Resources.firstblood);
+            //PerfectSound = new SoundPlayer(Properties.Resources.perfect);
+            //DeathSound = new SoundPlayer(Properties.Resources.death6);
+            //TripleKillSound = new SoundPlayer(Properties.Resources.triplekill);
+
+            //MissSound = new SoundPlayer(Properties.Resources.bulletltor07);
+            //LowHitSound = new SoundPlayer(Properties.Resources.usp1);
+            //MediumHitSound = new SoundPlayer(Properties.Resources.elite_1);
+            //HardHitSound = new SoundPlayer(Properties.Resources.deagle_1);
+            //KnifeHitSound = new SoundPlayer(Properties.Resources.knife_hit3);
+            //KnifeMissSound = new SoundPlayer(Properties.Resources.knife_slash1);
+
+            //Reload1Sound = new SoundPlayer(Properties.Resources.ak47_clipout);
+            //Reload2Sound = new SoundPlayer(Properties.Resources.ak47_clipin);
+            //Reload3Sound = new SoundPlayer(Properties.Resources.ak47_boltpull);
         }
     }
 }

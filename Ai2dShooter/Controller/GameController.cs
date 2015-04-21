@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 using Ai2dShooter.Model;
@@ -89,7 +90,7 @@ namespace Ai2dShooter.Controller
                     _friends.Remove(p1);
 
                     if (MainForm.Instance.PlaySoundEffects && _deathCount++ == 0)
-                        Constants.FirstBloodSound.Play();
+                        MainForm.Instance.Invoke((MethodInvoker) (() => Constants.FirstBloodSound.Play()));
 
                     foreach (var o in _opponents.Values)
                         if (o.Length == 0)

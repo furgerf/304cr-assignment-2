@@ -87,6 +87,39 @@ namespace Ai2dShooter.View
                     Thread.Sleep(Constants.Framelength);
                 }
             }).Start();
+
+
+            //var sound = Constants.Reload3Sound;
+
+            //sound.Play();
+            //new Thread(() =>
+            //{
+            //    Thread.Sleep(3000);
+            //    Invoke((MethodInvoker)(() =>
+            //    {
+            //        sound.Play();
+            //    }
+            //        ));
+            //}).Start();
+
+            //FormClosing += (a, b) =>
+            //{
+            //    //Constants.DeathSound.
+            //};
+
+
+            //PlaySound.Open(new Uri(@"../../Resources/play.wav", UriKind.Relative));
+            //FirstBloodSound.Open(new Uri(@"../../Resources/firstblood.wav", UriKind.Relative));
+            //PerfectSound.Open(new Uri(@"../../Resources/perfect.wav", UriKind.Relative));
+            //DeathSound.Open(new Uri(@"../../Resources/death6.wav", UriKind.Relative));
+            //TripleKillSound.Open(new Uri(@"../../Resources/triplekill.wav", UriKind.Relative));
+
+            //MissSound.Open(new Uri(@"../../Resources/bulletltor07.wav", UriKind.Relative));
+            //LowHitSound.Open(new Uri(@"../../Resources/usp1.wav", UriKind.Relative));
+            //MediumHitSound.Open(new Uri(@"../../Resources/elite-1.wav", UriKind.Relative));
+            //HardHitSound.Open(new Uri(@"../../Resources/deagle-1.wav", UriKind.Relative));
+            //KnifeHitSound.Open(new Uri(@"../../Resources/knife_hit3.wav", UriKind.Relative));
+            //KnifeMissSound
         }
 
         #endregion
