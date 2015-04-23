@@ -7,8 +7,7 @@ namespace Ai2dShooter.Common
     /********
      * TODO *
      ********
-     * fix graphics bug after game terminates
-     * improve concurrent sound FX
+     w improve concurrent sound FX
      */ 
 
     public static class Program
