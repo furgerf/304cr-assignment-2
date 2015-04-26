@@ -80,7 +80,7 @@ namespace Ai2dShooter.View
             }
             
             // assign default values
-            comPlayerControllerHot.SelectedIndex = 0;
+            comPlayerControllerHot.SelectedIndex = 1;
             comPlayerControllerCold.SelectedIndex = 1;
 
             numPlayerCountHot.Value = 6;

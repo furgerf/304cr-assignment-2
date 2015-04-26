@@ -217,6 +217,8 @@ namespace Ai2dShooter.View
             }
             Controls.AddRange(_playerControls.ToArray());
 
+            _canvas.Focus();
+
             // start new game
             new GameController(_players).StartGame();
         }
