@@ -84,5 +84,7 @@ Due to the limited number of possible actions that can be taken, the two methods
 algorithm. As will be discussed in more detail in the [implementation file](https://github.com/furgerf/304cr-assignment-2/blob/master/IMPLEMENTATION.md), building the DT is a very general and thus re-usable problem. After the tree is built, all that is
 left to implement is how the actions are carried out. Thus, the decision-making and the reaction to the decisions can be separated nicely.
 
+A further advantage of DT is that each entity can have its own DT, giving the players individual behavior. This could be achieved for example by randomly assigning different (but reasonable) decisions for the same player status (e.g. cautious players that do not attack when injured and kamikaze players that disregard their health entirely).
+
 One of the main issues that was anticipated is that I have not programmed any games before or know any game engines. Thus, the game was not designed to be extremely complex, as the complete game would have to be written from scratch.
 
