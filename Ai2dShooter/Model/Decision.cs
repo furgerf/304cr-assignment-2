@@ -64,6 +64,14 @@ namespace Ai2dShooter.Model
         /// <returns>New decision tree</returns>
         public static Decision CreateTree(Func<bool[], bool>[] tests, bool[][] data, int[] decisions)
         {
+            // catch null-nodes
+            if (tests.Length == 0 && data.Length == 0 && decisions.Length == 0)
+                return null;
+
+            // if there's only one decision, then return it
+            if (tests.Length == 0 && data.Length == 1 && decisions.Length == 1)
+                return new Decision(decisions[0]);
+
             var decisionCount = decisions.Max() + 1;
 
             // parameter checks
@@ -141,7 +149,14 @@ namespace Ai2dShooter.Model
         public Decision Evaluate(bool[] data)
         {
             if (Type == -1)
-                return Test(data) ? Positive.Evaluate(data) : Negative.Evaluate(data);
+                if (Positive == null && Negative != null)
+                    return Negative;
+                else if (Positive != null && Negative == null)
+                    return Positive;
+                else if (Positive != null && Negative != null)
+                    return Test(data) ? Positive.Evaluate(data) : Negative.Evaluate(data);
+                else
+                    throw new Exception("Both positive and negative children are null and we have no decision :(");
 
             return new Decision(Type);
         }
