@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Threading;
+using System.Windows.Forms;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 using Ai2dShooter.View;
@@ -62,7 +63,10 @@ namespace Ai2dShooter.Model
                     lock (Constants.MovementLock)
                     {
                         if (MainForm.Instance.PlaySoundEffects)
-                            Constants.ReloadSounds[i].Play();
+                        {
+                            var i1 = i;
+                            MainForm.Instance.Invoke((MethodInvoker) (() => Constants.ReloadSounds[i1].Play()));
+                        }
                     }
                     Thread.Sleep(Constants.ReloadTimeout);
                 }

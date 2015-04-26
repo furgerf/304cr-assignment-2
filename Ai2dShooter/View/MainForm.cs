@@ -125,9 +125,11 @@ namespace Ai2dShooter.View
             foreach (var p in _players.Where(p => p.IsAlive && (!HasLivingHumanPlayer || p.Team == HumanPlayer.Team)))
                 p.DrawPlayer(e.Graphics, Constants.ScaleFactor);
             // draw influence maps - team hot
-            DrawInfluenceMap(e.Graphics, GameController.GetInfluenceMap(_players.Where(p => p.IsAlive && p.Team == Teams.TeamHot).ToArray()), Brushes.Red, new Point(0, 0));
+            if (!HasLivingHumanPlayer || HumanPlayer.Team == Teams.TeamHot)
+                DrawInfluenceMap(e.Graphics, GameController.GetInfluenceMap(_players.Where(p => p.IsAlive && p.Team == Teams.TeamHot).ToArray()), Brushes.Red, new Point(0, 0));
             // draw influence maps - team cold
-            DrawInfluenceMap(e.Graphics, GameController.GetInfluenceMap(_players.Where(p => p.IsAlive && p.Team == Teams.TeamCold).ToArray()), Brushes.Blue, new Point(Constants.ScaleFactor / 2, Constants.ScaleFactor / 2));
+            if (!HasLivingHumanPlayer || HumanPlayer.Team == Teams.TeamCold)
+                DrawInfluenceMap(e.Graphics, GameController.GetInfluenceMap(_players.Where(p => p.IsAlive && p.Team == Teams.TeamCold).ToArray()), Brushes.Blue, new Point(Constants.ScaleFactor / 2, Constants.ScaleFactor / 2));
             // draw paused
             if (GameController.Instance.GamePaused)
                 DrawPaused(e.Graphics);
