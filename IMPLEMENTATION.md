@@ -13,9 +13,9 @@ The source code is split into five sections:
 The game is entirely event-based, no polling is used. All relevant events are triggered by the `Player` class, namely when the health, ammo, location, number of kills changes, or when the player dies.
 
 ## Multithreading
-Various threads are used. Notably, each `Player` has its own movement thread which is responsible for his movement.
+Various threads are used. Notably, each `Player` has its own movement thread which is responsible for visually smooth movement.
 
-For synchronisation, two global locks (defined in the `Constants` class) are used: _MovementLock_ and _ShootingLock_. The purpose of the MovementLock is that no two players are allowed to move at the very same time. Whenever a player moves (his location
+For synchronisation, two global locks (defined in the `Constants` class) are used: _MovementLock_ and _ShootingLock_. The purpose of the MovementLock is that no two players are allowed to start a move at the very same time. Whenever a player moves (his location
 changes), the `GameController` instance checks whether the player can shoot at any other player. Only after this check is completed are the other players allowed to move, to prevent timing issues.
 
 The ShootingLock does not serve an in-game purpose but is used to stop or pause the game quickly when players are shooting. Without that, any active gunfight would continue until one of the players is killed when the game is paused or stopped.
@@ -48,5 +48,5 @@ current state of the FSM player). Unsurprisingly, the `HumanPlayer` implementati
 
 ## Maze
 The `Maze` is generated randomly at the beginning. For that, a stack-based approach is used where each `Cell` initially is a wall. Unvisited cells can be _followed_, turning them into cells where the entities can move to. Randomly, neighbors are marked as
-_visited_ for the map generation algorithm, meaning that they will stay walls. This ensures that always, the complete maze is accessible (and not split into multiple submazes).
+_visited_ for the map generation algorithm, meaning that they will stay walls. This ensures that always, the complete maze is accessible (and not split into multiple submazes). However, it was observed that sometimes, these mazes are quite complicated.
 

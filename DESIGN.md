@@ -13,9 +13,9 @@ The players have a number of properties, most of them assigned randomly to make 
 -  Health (100): Each player starts with 100 health.
 -  Health Threshold (10-50): A threshold is used for players to determine whether they are still healthy or not.
 -  Shooting Accuracy (0.85-0.95): Not all players are equally good at hitting their targets. The accuracy determines whether a bullet hits its target.
--  Headshot Change (0.1-0.2): If a player does hit his opponent, he has a chance of hitting the opponent's head, which would double the damage.
+-  Headshot Change (0.1-0.2): If a player does hit his opponent, he has a chance of hitting the opponent's head, doubling the damage.
 -  Back Damage (35-75): The base damage that is dealt if the player shoots at an opponent from the back or the side.
--  Front Damage (35-Back Damage): It is assumed that it is harder to attack an enemy from the front and he is likely to have stronger armor, damage dealt to the front is less than damage dealt to the back.
+-  Front Damage (35-Back Damage): It is assumed that it is harder to attack an enemy from the front and he is likely to have stronger armor, thus damage dealt to the front is less than damage dealt to the back. This gives an advantage to the player that _finds_ his opponent over the player that has been found.
 -  Ammo (3): Each player has 3 bullets. When a player is out of bullets, he uses his knife and his damage is halved.
 -  Slowness (200-350): This determines how slow the player is. This is a value in milliseconds which is the time it takes the player to move from one tile to the next.
 - Visibility (5): How far the player can see in the maze.
@@ -38,7 +38,7 @@ To make the game a bit more interesting, each player is assigned a random name a
 Three different players are available, with the distinguishing factor being the player's decision-making: Human player, Finite State Machine (FSM) player, and Decision Tree (DT) player.
 
 ### Human Player
-Each game can have max. 1 human player. The controls are listed in the [readme](https://github.com/furgerf/304cr-assignment-2/blob/master/README.md#Game Controls/Usage).
+Each game can have max. 1 human player. The controls are listed in the [readme]( https://github.com/furgerf/304cr-assignment-2/blob/master/README.md#game-controlsusage).
 
 If there is a human player that is alive, the game displays the player's view and hides some of the AI players' information.
 
@@ -56,7 +56,7 @@ The second kind of AI player is controlled by a Decision Tree. This tree is crea
 
 Whenever a decision is to be made, the DT is queried, and the player acts according to the decision.
 
-The decisions that can be taken are MoveToEnemy (shown as a yellow diamond), MoveToFriend (pink diamond), SeekEnemy (green diamond), and Reload (gray diamond).
+The decisions that can be taken are _MoveToEnemy_ (shown as a yellow diamond), _MoveToFriend_ (pink diamond), _SeekEnemy_ (green diamond), and _Reload_ (gray diamond).
 
 ### Influence Map
 A common element in shooter games is that members of a team know each other's position, usually via some sort of radar. The friendly player's position is taken into account both when looking for friends and when looking for enemies.
@@ -75,16 +75,19 @@ Some small adjustments to the planned behavior are made:
 - A player never moves backwards (to the tile he was on before) unless he ends up in a dead end.
 
 ## Method Analysis
-Because the map is unknown to the players, path finding could not be used (path finding is explored in detail in [assignment 1](https://github.com/furgerf/304cr-assignment-1)). This may lead to strange AI movement, which is very dependent on the actual
-map. A way around this problem would be to use path finding on a partial map that expands with the player's map exploration. However, this was deemed to be overly complicated, as path finding is not requested in tis assignment.
+Because the map is unknown to the players, path finding could not be used (path finding is explored in detail in [assignment 1](https://github.com/furgerf/304cr-assignment-1)). This may lead to strange AI movement, which is dependent on the actual
+map. It appears that the randomly-generated maps are quite difficult for the AI entities. A way around this problem would be to use path finding on a partial map that expands with the player's map exploration. However, this was deemed to be overly complicated, as path finding is not requested in tis assignment.
+
+Another extension of the game related to this problem would be to give the AI players a memory of recently-visited tiles, and having them chose tiles they have not visited (often), rather than making decisions based on the influence map. However, this
+approach has drawbacks as well, for instance is it possible for several AI entities of the same team to always move in the same direction.
 
 Using the influence maps helps the players of opposing teams find each other. This quite simple method proved to be very effective at increasing the game experience.
 
 Due to the limited number of possible actions that can be taken, the two methods (FSM and DT) may look fairly similar. However, already here, it was clear that DT is a lot simpler, not in the sense of the underlying algorithm, but in the usage of the
 algorithm. As will be discussed in more detail in the [implementation file](https://github.com/furgerf/304cr-assignment-2/blob/master/IMPLEMENTATION.md), building the DT is a very general and thus re-usable problem. After the tree is built, all that is
-left to implement is how the actions are carried out. Thus, the decision-making and the reaction to the decisions can be separated nicely.
+left to implement is how the actions are carried out. Thus, the tree can be created before the game starts (preserving CPU resources during the game) and the decision-making and the reaction to the decisions can be separated nicely.
 
-A further advantage of DT is that each entity can have its own DT, giving the players individual behavior. This could be achieved for example by randomly assigning different (but reasonable) decisions for the same player status (e.g. cautious players that do not attack when injured and kamikaze players that disregard their health entirely).
+A further advantage of DT is that each entity can have its own DT, giving the players individual behavior. This could be achieved for example by randomly assigning different decisions for the same player status (e.g. cautious players that do not attack when injured and kamikaze players that disregard their health entirely).
 
-One of the main issues that was anticipated is that I have not programmed any games before or know any game engines. Thus, the game was not designed to be extremely complex, as the complete game would have to be written from scratch.
+One of the main issues that was anticipated is that I have not programmed any games before or know any game engines. Thus, the game was not designed to be overly complex, as the complete game had to be written from scratch.
 
