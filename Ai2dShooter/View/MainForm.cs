@@ -230,9 +230,6 @@ namespace Ai2dShooter.View
         {
             Instance.Invoke((MethodInvoker) (() => _gameControl.Enabled = true));
 
-            //if (GameController.Instance != null && GameController.Instance.GameRunning)
-            //    GameController.Instance.StopGame();
-
             GameController.Instance = null;
 
             foreach (var pc in _playerControls)

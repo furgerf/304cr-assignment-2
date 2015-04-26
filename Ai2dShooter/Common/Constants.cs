@@ -186,24 +186,6 @@ namespace Ai2dShooter.Common
                 Reload3Sound.Stop();
                 Reload3Sound.Open(new Uri(@"../../Resources/ak47_boltpull.wav", UriKind.Relative));
             };
-
-            //HeadshotSound = new SoundPlayer(Properties.Resources.headshot);
-            //PlaySound = new SoundPlayer(Properties.Resources.play);
-            //FirstBloodSound = new SoundPlayer(Properties.Resources.firstblood);
-            //PerfectSound = new SoundPlayer(Properties.Resources.perfect);
-            //DeathSound = new SoundPlayer(Properties.Resources.death6);
-            //TripleKillSound = new SoundPlayer(Properties.Resources.triplekill);
-
-            //MissSound = new SoundPlayer(Properties.Resources.bulletltor07);
-            //LowHitSound = new SoundPlayer(Properties.Resources.usp1);
-            //MediumHitSound = new SoundPlayer(Properties.Resources.elite_1);
-            //HardHitSound = new SoundPlayer(Properties.Resources.deagle_1);
-            //KnifeHitSound = new SoundPlayer(Properties.Resources.knife_hit3);
-            //KnifeMissSound = new SoundPlayer(Properties.Resources.knife_slash1);
-
-            //Reload1Sound = new SoundPlayer(Properties.Resources.ak47_clipout);
-            //Reload2Sound = new SoundPlayer(Properties.Resources.ak47_clipin);
-            //Reload3Sound = new SoundPlayer(Properties.Resources.ak47_boltpull);
         }
     }
 }

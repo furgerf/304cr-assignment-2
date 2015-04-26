@@ -4,12 +4,6 @@ using Ai2dShooter.View;
 
 namespace Ai2dShooter.Common
 {
-    /********
-     * TODO *
-     ********
-     w improve concurrent sound FX
-     */ 
-
     public static class Program
     {
         /// <summary>

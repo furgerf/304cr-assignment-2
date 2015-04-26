@@ -208,10 +208,6 @@ namespace Ai2dShooter.Model
                         // calculate score: distance * distance + rnd
                         directionScore[i] = neighbor.GetManhattenDistance(_targetCell)*
                                             neighbor.GetManhattenDistance(_targetCell);
-
-                        //// if we'd have to go backwards, double the score
-                        //if (((int) Orientation + 2%(int) Direction.Count) == i)
-                        //    directionScore[i] *= 2;
                     }
 
                     // pick all directions with lowest costs
@@ -241,7 +237,6 @@ namespace Ai2dShooter.Model
                     {
                         // all friends are dead or already follow me
                         // move in random direction
-
                         Move(
                             Location.GetDirection(
                                 neighbors.Except(new[] {Location.GetNeighbor((Direction) (((int) Orientation + 2)%4))})
