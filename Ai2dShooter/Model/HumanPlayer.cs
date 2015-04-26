@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Threading;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
+using Ai2dShooter.View;
 
 namespace Ai2dShooter.Model
 {
@@ -60,7 +61,8 @@ namespace Ai2dShooter.Model
                 {
                     lock (Constants.MovementLock)
                     {
-                        Constants.ReloadSounds[i].Play();
+                        if (MainForm.Instance.PlaySoundEffects)
+                            Constants.ReloadSounds[i].Play();
                     }
                     Thread.Sleep(Constants.ReloadTimeout);
                 }

@@ -24,4 +24,4 @@ See the [license file](https://github.com/furgerf/304cr-assignment-2/blob/master
 - because not the entire map is known to the AI players, they may move in circles
 - because no path finding is used (as the map is not known), players may struggle to move towards friendly players, depending on the map
 - the sound effects sometimes work badly
-
+- since moving to concurrent sound effects (with `MediaPlayer` instead of `SoundPlayer`), the application crashes when terminated while a sound is playing
