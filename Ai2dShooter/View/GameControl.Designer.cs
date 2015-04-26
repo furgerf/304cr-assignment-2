@@ -37,6 +37,7 @@
             this.comPlayerControllerCold = new System.Windows.Forms.ComboBox();
             this.numPlayerCountCold = new System.Windows.Forms.NumericUpDown();
             this.chkSoundEffects = new System.Windows.Forms.CheckBox();
+            this.chkInfluenceMap = new System.Windows.Forms.CheckBox();
             this.grpTeamHot.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numPlayerCountHot)).BeginInit();
             this.grpTeamCold.SuspendLayout();
@@ -159,15 +160,28 @@
             this.chkSoundEffects.Text = "Sound Effects";
             this.chkSoundEffects.UseVisualStyleBackColor = true;
             // 
+            // chkInfluenceMap
+            // 
+            this.chkInfluenceMap.AutoSize = true;
+            this.chkInfluenceMap.Checked = true;
+            this.chkInfluenceMap.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkInfluenceMap.Location = new System.Drawing.Point(3, 107);
+            this.chkInfluenceMap.Name = "chkInfluenceMap";
+            this.chkInfluenceMap.Size = new System.Drawing.Size(94, 17);
+            this.chkInfluenceMap.TabIndex = 5;
+            this.chkInfluenceMap.Text = "Influence Map";
+            this.chkInfluenceMap.UseVisualStyleBackColor = true;
+            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkInfluenceMap);
             this.Controls.Add(this.chkSoundEffects);
             this.Controls.Add(this.grpTeamCold);
             this.Controls.Add(this.grpTeamHot);
             this.Name = "GameControl";
-            this.Size = new System.Drawing.Size(216, 107);
+            this.Size = new System.Drawing.Size(216, 128);
             this.grpTeamHot.ResumeLayout(false);
             this.grpTeamHot.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numPlayerCountHot)).EndInit();
@@ -190,5 +204,6 @@
         private System.Windows.Forms.ComboBox comPlayerControllerCold;
         private System.Windows.Forms.NumericUpDown numPlayerCountCold;
         private System.Windows.Forms.CheckBox chkSoundEffects;
+        private System.Windows.Forms.CheckBox chkInfluenceMap;
     }
 }

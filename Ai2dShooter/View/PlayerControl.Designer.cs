@@ -78,7 +78,6 @@
             // txtAmmo
             // 
             this.txtAmmo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtAmmo.Enabled = false;
             this.txtAmmo.Location = new System.Drawing.Point(120, 126);
             this.txtAmmo.Name = "txtAmmo";
             this.txtAmmo.Size = new System.Drawing.Size(57, 20);
@@ -97,7 +96,6 @@
             // txtKills
             // 
             this.txtKills.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtKills.Enabled = false;
             this.txtKills.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtKills.Location = new System.Drawing.Point(120, 178);
             this.txtKills.Name = "txtKills";
@@ -117,7 +115,6 @@
             // txtSlowness
             // 
             this.txtSlowness.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtSlowness.Enabled = false;
             this.txtSlowness.Location = new System.Drawing.Point(120, 152);
             this.txtSlowness.Name = "txtSlowness";
             this.txtSlowness.Size = new System.Drawing.Size(57, 20);
@@ -127,7 +124,6 @@
             // txtHealthyThreshold
             // 
             this.txtHealthyThreshold.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtHealthyThreshold.Enabled = false;
             this.txtHealthyThreshold.Location = new System.Drawing.Point(120, 48);
             this.txtHealthyThreshold.Name = "txtHealthyThreshold";
             this.txtHealthyThreshold.Size = new System.Drawing.Size(57, 20);
@@ -146,7 +142,6 @@
             // txtAccuracy
             // 
             this.txtAccuracy.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtAccuracy.Enabled = false;
             this.txtAccuracy.Location = new System.Drawing.Point(120, 100);
             this.txtAccuracy.Name = "txtAccuracy";
             this.txtAccuracy.Size = new System.Drawing.Size(57, 20);
@@ -156,7 +151,6 @@
             // txtDamage
             // 
             this.txtDamage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtDamage.Enabled = false;
             this.txtDamage.Location = new System.Drawing.Point(120, 74);
             this.txtDamage.Name = "txtDamage";
             this.txtDamage.Size = new System.Drawing.Size(57, 20);

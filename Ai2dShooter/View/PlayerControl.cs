@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
 using Ai2dShooter.Common;
@@ -120,7 +121,10 @@ namespace Ai2dShooter.View
                     if (InvokeRequired)
                         Invoke((MethodInvoker) (() => _updateAmmo()));
                     else
+                    {
                         txtAmmo.Text = Player.Ammo + "/" + Player.MaxAmmo;
+                        txtAmmo.ForeColor = Player.Ammo == 0 ? Color.Red : DefaultForeColor;
+                    }
                 }
                 catch (ObjectDisposedException ode)
                 {

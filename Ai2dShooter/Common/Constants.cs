@@ -36,7 +36,7 @@ namespace Ai2dShooter.Common
         /// <summary>
         /// Graphic redraw rate.
         /// </summary>
-        public const int Framerate = 200; // FPS
+        public const int Framerate = 100; // FPS
 
         /// <summary>
         /// Time between graphic redraws.

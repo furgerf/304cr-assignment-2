@@ -63,6 +63,11 @@ namespace Ai2dShooter.View
         /// </summary>
         public bool SoundEffects { get { return chkSoundEffects.Checked; } }
 
+        /// <summary>
+        /// True if influence maps should be drawn.
+        /// </summary>
+        public bool InfluenceMaps { get { return chkInfluenceMap.Checked; } }
+
         #endregion
 
         #region Constructor

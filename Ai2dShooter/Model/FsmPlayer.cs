@@ -268,10 +268,13 @@ namespace Ai2dShooter.Model
                     }
                     lock (Constants.MovementLock)
                     {
+                        if (_reloadSteps < 0)
+                            return;
+
                         if (MainForm.Instance.PlaySoundEffects)
                             MainForm.Instance.Invoke((MethodInvoker) (() => Constants.ReloadSounds[_reloadSteps--].Play()));
 
-                        if (_reloadSteps <= -1)
+                        if (_reloadSteps < 0)
                         {
                             _state = Health >= HealthyThreshold ? State.FindEnemy : State.FindFriend;
                             Ammo = MaxAmmo;
