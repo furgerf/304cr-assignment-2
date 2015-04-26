@@ -25,5 +25,5 @@ See the [license file](https://github.com/furgerf/304cr-assignment-2/blob/master
 - because no path finding is used (as the map is not known), players may struggle to move towards other (friendly/enemy) players, depending on the map
 - the sound effects sometimes don't work well
 - since moving to concurrent sound effects (with `MediaPlayer` instead of `SoundPlayer`), the application crashes when terminated while a sound is playing
-- when running the application in another environment, the timing may be off which makes the entire game very fast or slow
+- when running the application in another environment, the timing may be off which makes the entire game very fast or slow. Different related values such as player speed or frame rate can be adjusted in the `Player` and `Constants` class
 
