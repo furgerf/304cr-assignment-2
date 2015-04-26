@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml.XPath;
 using Ai2dShooter.Common;
 using Ai2dShooter.Map;
 using Ai2dShooter.Model;
@@ -331,10 +334,8 @@ namespace Ai2dShooter.Controller
                 // loop over friends
                 foreach (var p in _friends[player])
                 {
-                    // if the friend has any influence, add it
-                    // influence is negative distance because high distance -> low influence
-                    var distance = p.Location.GetManhattenDistance(cells[i]);
-                    influence[i] += distance <= 2*Constants.Visibility ? -distance + Constants.Visibility : 0;
+                    // add influence
+                    influence[i] += GetInfluenceOnCell(p, cells[i]);
                 }
             }
 
@@ -349,6 +350,38 @@ namespace Ai2dShooter.Controller
 
             // return random cell with lowest influence
             return cells[minInfluenceIndices[Constants.Rnd.Next(minInfluenceIndices.Count)]];
+        }
+
+        /// <summary>
+        /// Gets the influence of a player on the cell.
+        /// </summary>
+        /// <param name="player">Player</param>
+        /// <param name="cell">Cell</param>
+        /// <returns>Influence of the player on the cell</returns>
+        private static int GetInfluenceOnCell(Player player, Cell cell)
+        {
+            if (player.FollowedPlayer != null)
+                return 0;
+
+            var distance = player.Location.GetManhattenDistance(cell);
+            return distance <= 2 * Constants.Visibility ? 2 * Constants.Visibility - distance : 0;
+        }
+
+        /// <summary>
+        /// Gets a complete influence map of an array of players on the maze.
+        /// </summary>
+        /// <param name="players">Players</param>
+        /// <returns>Influence map of the players</returns>
+        public static int[,] GetInfluenceMap(Player[] players)
+        {
+            var result = new int[Maze.Instance.Width, Maze.Instance.Height];
+
+            for (var x = 0; x < Maze.Instance.Width; x++)
+                for (var y = 0; y < Maze.Instance.Height; y++)
+                    foreach (var p in players)
+                        result[x, y] += GetInfluenceOnCell(p, Maze.Instance.Cells[x, y]);
+
+            return result;
         }
 
         #endregion

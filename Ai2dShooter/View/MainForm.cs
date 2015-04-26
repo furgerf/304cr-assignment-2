@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
@@ -123,9 +124,22 @@ namespace Ai2dShooter.View
             // draw alive players that are friends if human is playing
             foreach (var p in _players.Where(p => p.IsAlive && (!HasLivingHumanPlayer || p.Team == HumanPlayer.Team)))
                 p.DrawPlayer(e.Graphics, Constants.ScaleFactor);
+            // draw influence maps - team hot
+            DrawInfluenceMap(e.Graphics, GameController.GetInfluenceMap(_players.Where(p => p.IsAlive && p.Team == Teams.TeamHot).ToArray()), Brushes.Red, new Point(0, 0));
+            // draw influence maps - team cold
+            DrawInfluenceMap(e.Graphics, GameController.GetInfluenceMap(_players.Where(p => p.IsAlive && p.Team == Teams.TeamCold).ToArray()), Brushes.Blue, new Point(Constants.ScaleFactor / 2, Constants.ScaleFactor / 2));
             // draw paused
             if (GameController.Instance.GamePaused)
                 DrawPaused(e.Graphics);
+        }
+
+        private static void DrawInfluenceMap(Graphics graphics, int[,] map, Brush brush, Point offset)
+        {
+            for (var x = 0; x < map.GetLength(0); x += 1)
+                for (var y = 0; y < map.GetLength(1); y += 1)
+                    if (map[x, y] != 0)
+                        graphics.DrawString(map[x, y].ToString(CultureInfo.InvariantCulture), new Font(FontFamily.GenericSansSerif, map[x, y]), brush, x*Constants.ScaleFactor + offset.X,
+                            y*Constants.ScaleFactor + offset.Y);
         }
 
         private static void DrawPaused(Graphics graphics)
